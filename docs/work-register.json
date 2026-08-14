@@ -11,6 +11,7 @@
 		"idea",
 		"investigating",
 		"in-progress",
+		"complete",
 		"pr-open",
 		"merged",
 		"closed-unmerged",
@@ -216,14 +217,14 @@
 			"scope": "fork-local",
 			"upstreamDisposition": "no-pr-planned",
 			"title": "Fork-native VS Code and Copilot contributor workspace",
-			"status": "in-progress",
+			"status": "complete",
 			"issues": [],
 			"pullRequests": [],
 			"branches": ["docs/copilot-workspace-governance"],
 			"commits": ["1dc21a2026a80241961a5cc408e322088f48ba98"],
 			"context": "Adds the repository agent contract, Copilot instructions, portable VS Code workspace, minimal OAuth-first MCP configuration, secret template, contributor workflow, and durable work register.",
-			"validation": "Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret-pattern scans pass locally.",
-			"nextAction": "Commit locally, record the implementation commit, then decide whether this remains fork-only or is split into an upstream-safe contributor guidance proposal."
+			"validation": "Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret-pattern scans pass locally. The governance branch is pushed to the fork and a gitignored overlay is active in the primary checkout.",
+			"nextAction": "Maintain the fork-local register and workspace files; propose only generic, upstream-safe guidance separately if desired."
 		}
 	]
 }

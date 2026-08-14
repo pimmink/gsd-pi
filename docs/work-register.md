@@ -20,7 +20,7 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-14**.
 | GSD-W009 | Canonical SQL predicates before LIMIT | Upstream | PR required | #1728 | #1732 | `fix/canonical-sql-predicates` | PR open | Resolve checks and review independently |
 | GSD-W010 | Native/MCP canonical read error parity | Upstream | PR required | #1729 | #1734 | `fix/canonical-read-error-parity` | PR open | Resolve checks while preserving shared error semantics |
 | GSD-W011 | MAI Code 1.1 Flash Copilot routing | Upstream | PR required | — | — | `feat/mai-code-1-1-flash-copilot` | In progress | Finish provider/catalog tests, then prepare issue and PR |
-| GSD-W013 | Fork-native VS Code and Copilot workspace | Fork-local | No PR planned | — | — | `docs/copilot-workspace-governance` | In progress | Commit locally, record commit, then decide fork-only versus upstream-safe split |
+| GSD-W013 | Fork-native VS Code and Copilot workspace | Fork-local | No PR planned | — | — | `docs/copilot-workspace-governance` | Complete | Maintain locally; propose only generic upstream-safe guidance separately if desired |
 
 ## Completed or historical work
 

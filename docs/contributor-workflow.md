@@ -139,6 +139,7 @@ Keep statuses to:
 - `idea`
 - `investigating`
 - `in-progress`
+- `complete`
 - `pr-open`
 - `merged`
 - `closed-unmerged`
