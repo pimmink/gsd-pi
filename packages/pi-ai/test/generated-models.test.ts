@@ -149,6 +149,10 @@ describe("models.generated.ts", () => {
 			reasoning: true,
 			cost: { input: 0.2, output: 1.2 },
 		});
+		expect(model.headers).toMatchObject({
+			"Copilot-Integration-Id": "vscode-chat",
+		});
+		expect(model.thinkingLevelMap).toMatchObject({ off: null, minimal: "low", medium: "medium", xhigh: "high" });
 	});
 
 	test("includes GPT-5.6 variants for OpenAI and OpenAI Codex providers", () => {

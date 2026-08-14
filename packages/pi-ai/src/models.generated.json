@@ -6209,6 +6209,7 @@
       },
       "reasoning": true,
       "thinkingLevelMap": {
+        "off": null,
         "minimal": "low",
         "medium": "medium",
         "xhigh": "high"
