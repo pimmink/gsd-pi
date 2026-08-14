@@ -21,11 +21,6 @@
 		}
 	},
 	"extensions": {
-		"recommendations": [
-			"github.copilot",
-			"github.copilot-chat",
-			"biomejs.biome",
-			"editorconfig.editorconfig"
-		]
+		"recommendations": ["biomejs.biome", "editorconfig.editorconfig"]
 	}
 }

@@ -5,17 +5,30 @@
 ## Repository mission
 
 This fork is the working repository for contributions to `open-gsd/gsd-pi`.
-Changes must remain suitable for upstream publication: focused, tested, documented,
-and free of customer-specific code, assets, credentials, or private project context.
+Changes intended for upstream must remain focused, tested, documented, and free of
+customer-specific code, assets, credentials, or private project context.
 
 ## Authority and remotes
 
-- `upstream` (`open-gsd/gsd-pi`) is the source of truth.
-- `origin` (`pimmink/gsd-pi`) is the contributor fork and PR branch host.
-- Base new work on a freshly fetched `upstream/main`, never stale `origin/main`.
+- `upstream` must resolve to `open-gsd/gsd-pi` and is the source of truth.
+- `origin` must resolve to `pimmink/gsd-pi` and is the contributor fork and PR host.
+- Base new work on freshly fetched `upstream/main`, never stale `origin/main`.
 - Do not commit directly to `main`.
-- Use one issue, branch, worktree, and PR per concern unless a maintainer requests otherwise.
+- Keep one concern per branch, worktree, and PR unless a maintainer requests otherwise.
+- An issue is not automatically required for every concern. Search existing issues and PRs
+  first and follow current upstream `CONTRIBUTING.md` and maintainer direction.
+- Current upstream policy requires an issue first for new features, while obvious bug fixes
+  may skip one. Use or claim an existing relevant issue when required; never create a new
+  issue without explicit authorization.
+- Core or architectural changes must follow current RFC, ADR, and maintainer-approval rules.
 - Preserve dirty work. Never reset, clean, stash, delete, or overwrite unknown changes.
+
+## Public and private boundary
+
+The public fork must never contain customer or private-project context. Do not copy or
+reference customer names, private assets, AWS identifiers, production data, credentials,
+private chat logs, private repository instructions, or private requirements unless the
+information is independently public and necessary for the upstream contribution.
 
 ## Identity
 
@@ -27,76 +40,112 @@ Pim Immink <pimmink@users.noreply.github.com>
 
 Verify repository-local identity before committing. Do not modify global Git identity.
 
-## Required workflow
+## Governance control-plane
 
-1. Read this file, `CONTRIBUTING.md`, and `docs/contributor-workflow.md`.
-2. Read `docs/work-register.md` and its canonical machine-readable source,
-   `docs/work-register.json`.
-3. Fetch both remotes and verify whether the issue or fix already landed upstream.
-4. Create a clean worktree from `upstream/main`.
-5. Reproduce the problem before changing code when practical.
-6. Add a regression test that fails before the fix and passes afterward.
-7. Format touched files and run the narrowest sufficient checks during development.
-8. Run broader checks when the change crosses packages, runtime boundaries, packaging,
-   persistence, authentication, orchestration, or release behavior.
-9. Update both work-register files when issue, branch, PR, commit, status, or next action changes.
-10. Run `node scripts/validate-work-register.mjs` after register changes.
+Fork-local contribution governance is tracked only on
+`origin/docs/copilot-workspace-governance` and checked out at:
+
+```text
+/Users/pimmink/Klanten/gsd-pi-workspace-governance
+```
+
+That checkout is the governance anchor. It owns this file,
+`docs/contributor-workflow.md`, `docs/work-register.json`, its Markdown projection,
+profile/bootstrap documentation, and validation tooling.
+
+Clean feature worktrees start from `upstream/main` and intentionally do not contain these
+governance files. Do not copy them into a contribution branch. Before planning or editing
+in a feature worktree, consult the governance anchor through the dedicated
+`GSD Pi Contributor` VS Code Profile.
+
+`docs/work-register.json` in the governance anchor is canonical. Update it there whenever
+an issue, branch, PR, commit, status, validation result, or next action changes. Then update
+`docs/work-register.md`, run `node scripts/validate-work-register.mjs` from the anchor,
+and publish only to the governance branch. Register maintenance must never contaminate an
+upstream feature PR.
+
+## Required contribution workflow
+
+1. Read current upstream `CONTRIBUTING.md`, `VISION.md`, and relevant repository guidance.
+2. Read this file, `docs/contributor-workflow.md`, and canonical
+   `docs/work-register.json` from the governance anchor.
+3. Fetch both remotes and search upstream issues, PRs, and code for overlap.
+4. Confirm whether current upstream policy requires an issue, RFC, ADR, or maintainer
+   approval. Report the requirement; do not create or claim anything without authorization.
+5. Create a clean worktree from `upstream/main` with one branch per concern.
+6. Reproduce the problem before changing code when practical.
+7. Add regression coverage that fails before the fix and passes afterward.
+8. Format touched files and run the narrowest sufficient checks during development.
+9. Escalate through the two-speed verification workflow as confidence and risk require.
+10. Update the work register from the governance anchor.
 11. Request explicit authorization before any GitHub write.
 
-## Validation baseline
+## Toolchain truth
 
-- Node: respect `package.json#engines` (currently Node 22.18 or newer).
-- Package manager: use the exact `packageManager` version through Corepack.
-- Formatting and lint: `pnpm exec biome check --write <touched-files>`.
-- Targeted tests first; use package-scoped commands where possible.
-- Use `pnpm run verify:merge` for cross-cutting or release-risk changes.
-- Never claim success from planning text or a green subset that does not exercise the changed behavior.
-- Record command, exit code, and relevant result in the PR description or work register.
+Read `package.json#engines` and `packageManager` in the active upstream checkout. Those
+fields are authoritative. Use Corepack for the declared package manager and do not hardcode
+Node or pnpm versions in governance documentation.
+
+## Two-speed verification
+
+Development loop:
+
+1. Format touched files and run targeted tests, builds, and typechecks.
+2. Run `pnpm run verify:fast` for local CI fast-gate policy coverage.
+3. Run `pnpm run verify:pr` when broader build, extension typecheck, unit-test, and lifecycle
+   confidence is needed.
+
+Merge/review loop:
+
+1. Reach a stable implementation and reviewable diff.
+2. Run relevant broader or package-specific checks.
+3. Run `pnpm run verify:merge` before PR review when current upstream policy requires full
+   CI-blocking parity.
+4. Push only after authorization, then use GitHub CI as the remote authority.
+
+`verify:merge` is not an after-every-edit command. Repeat a prior successful
+`verify:merge` when subsequent changes can invalidate its evidence, including relevant
+source, tests, dependencies, lockfiles, generated output, build or packaging logic, native
+code, CI/gate scripts, or merge-conflict resolutions. Documentation-only or metadata-only
+changes need a repeat only when current upstream policy or the changed validation surface
+requires it.
+
+Never claim success from planning text or a green subset that does not exercise the changed
+behavior. Record commands, exit codes, and relevant results in the PR or work register.
 
 ## Runtime and packaging safety
 
-- Source, generated resources, the globally installed package, and the managed runtime copy are separate layers.
-- A source edit is not active until the relevant build/install or explicit local-patch step is completed and verified in a fresh process.
-- Generated model catalogs must come from their generator; do not hand-edit generated JSON or TypeScript.
-- Interrupted bootstrap/build flows must restore source shims and leave no stale backup directory.
-- Do not mix generated output from a different branch into a commit.
+- Source, generated resources, the globally installed package, and managed runtime copies
+  are separate activation layers.
+- A source edit is not active until its relevant build, install, or explicit local-patch step
+  is completed and verified in a fresh process.
+- Generated catalogs must come from their generator; never hand-edit generated output.
+- Include provider, transport, parsing, fallback, and error-path tests when routing behavior
+  changes.
 
-## GitHub operations
+## GitHub writes
 
-- Use GitHub MCP first for repository, issue, PR, review, and check operations.
-- If a correctly formed MCP write fails because the MCP service or credential lacks access,
-  `gh`-managed Git authentication is the approved fallback for that explicitly authorized operation.
-- Record the MCP failure and fallback result.
+- GitHub MCP is the primary GitHub integration.
+- All outward-facing GitHub writes require explicit authorization.
+- If GitHub MCP demonstrably cannot perform an authorized write, record the failure and use
+  `gh`-managed Git authentication only for that specifically authorized fallback.
 - Read-only inspection may use GitHub MCP or bounded `gh` commands.
-- Never force-push, merge, close, delete a branch, or rewrite history without separate explicit authorization.
+- Never force-push, merge, close, delete a branch, or rewrite history without separate
+  explicit authorization.
 
 ## Secrets and MCP
 
-- Never commit PATs, tokens, cookies, credentials, or populated `.env` files.
-- Prefer OAuth-enabled remote MCP servers. The tracked `.vscode/mcp.json` uses the official GitHub Copilot MCP endpoint and requires no committed PAT.
-- If a local GitHub MCP process genuinely requires a PAT, use the secret name
-  `GITHUB_PERSONAL_ACCESS_TOKEN` through VS Code secure input, the OS keychain, or a gitignored `.env`.
-- `.env.example` documents names only; values must remain empty.
-- Treat every MCP server as code with workstation privileges. Keep the server set minimal and review commands before accepting trust prompts.
+- Never commit PATs, tokens, cookies, credentials, populated `.env` files, or secure-input
+  values.
+- Prefer OAuth-enabled remote MCP servers.
+- The dedicated VS Code Profile owns runtime MCP configuration for clean feature worktrees.
+- The tracked `.vscode/mcp.json` on the governance branch is a minimal reference and anchor
+  configuration only; it must not be copied into feature branches.
+- `.env.example` documents optional secret names only and must remain empty.
 
-## Public-repository boundary
+## Work-register records
 
-Do not include customer names, customer assets, private AWS identifiers, internal production details,
-private chat transcripts, or material copied from another private repository. Summarize only the generic technical context needed for upstream work.
-
-## Work register
-
-`docs/work-register.json` is canonical. `docs/work-register.md` is the human-readable projection.
-Every entry needs:
-
-- stable work ID;
-- type and concise problem statement;
-- scope (`upstream` or `fork-local`) and upstream disposition;
-- issue, PR, branch, and commit references;
-- current status and evidence date;
-- validation or known gap;
-- next action.
-
-Fork-local work uses `upstreamDisposition: no-pr-planned` and must not leak into an
-upstream feature PR. Closed, superseded, and abandoned work stays recorded. Never reuse
-work IDs.
+Every entry needs a stable ID, type, concise problem statement, scope, upstream disposition,
+issue/PR/branch/commit references, current status, evidence date, validation or known gap,
+and next action. Fork-local work uses `upstreamDisposition: no-pr-planned`. Closed,
+superseded, and abandoned work stays recorded. Never reuse work IDs.

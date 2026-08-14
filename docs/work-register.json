@@ -239,9 +239,9 @@
 				"c701c6db",
 				"7a9c574d69e7cc212664c4264c72933b2a94782d"
 			],
-			"context": "Adds the repository agent contract, Copilot instructions, portable VS Code workspace, minimal OAuth-first MCP configuration, secret template, contributor workflow, and durable work register.",
-			"validation": "Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret-pattern scans pass locally. The governance branch is pushed to the fork and a gitignored overlay is active in the primary checkout.",
-			"nextAction": "Maintain the fork-local register and workspace files; propose only generic, upstream-safe guidance separately if desired."
+			"context": "Provides the governance anchor with repository agent contract, contributor workflow, durable work register, profile/bootstrap rationale, anchor workspace, and minimal MCP reference. A dedicated local VS Code Profile named GSD Pi Contributor supplies isolated settings, Biome, EditorConfig, GitHub MCP, Context7, bootstrap instructions, and a read-only init prompt to every clean feature worktree.",
+			"validation": "Official VS Code documentation confirms per-profile settings, extensions, MCP configuration, user instructions, prompts, and the `--profile` CLI selector. The local empty profile was created and contains only the intended non-built-in extensions and MCP servers. Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret scans pass locally.",
+			"nextAction": "Maintain profile templates and the canonical register from the governance anchor; keep clean feature worktrees governance-file-free and open them with the GSD Pi Contributor profile."
 		}
 	]
 }
