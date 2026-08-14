@@ -36,6 +36,8 @@
 				"required": [
 					"id",
 					"type",
+					"scope",
+					"upstreamDisposition",
 					"title",
 					"status",
 					"issues",
@@ -49,6 +51,10 @@
 				"properties": {
 					"id": { "type": "string", "pattern": "^GSD-W[0-9]{3}$" },
 					"type": { "type": "string", "minLength": 1 },
+					"scope": { "enum": ["upstream", "fork-local"] },
+					"upstreamDisposition": {
+						"enum": ["pr-required", "no-pr-planned", "historical"]
+					},
 					"title": { "type": "string", "minLength": 1 },
 					"status": { "type": "string", "minLength": 1 },
 					"issues": {

@@ -21,6 +21,8 @@
 		{
 			"id": "GSD-W001",
 			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
 			"title": "Extension registry lockSync ESYNC failure",
 			"status": "merged",
 			"issues": [1598],
@@ -34,6 +36,8 @@
 		{
 			"id": "GSD-W002",
 			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
 			"title": "Markdown renderer output must satisfy markdownlint",
 			"status": "pr-open",
 			"issues": [1600],
@@ -47,6 +51,8 @@
 		{
 			"id": "GSD-W003",
 			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
 			"title": "Milestone status exposes persisted dependencies",
 			"status": "merged",
 			"issues": [1601],
@@ -60,6 +66,8 @@
 		{
 			"id": "GSD-W004",
 			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
 			"title": "Legacy migration consistency for completed slices and structured decisions",
 			"status": "merged",
 			"issues": [1606, 1607],
@@ -73,6 +81,8 @@
 		{
 			"id": "GSD-W005",
 			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
 			"title": "Canonical requirement and decision read tools",
 			"status": "closed-unmerged",
 			"issues": [1608],
@@ -86,6 +96,8 @@
 		{
 			"id": "GSD-W006",
 			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
 			"title": "Claude Sonnet 5 routing catalog and Copilot startup fallback",
 			"status": "merged",
 			"issues": [1612],
@@ -106,6 +118,8 @@
 		{
 			"id": "GSD-W007",
 			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
 			"title": "Package-manager-aware verification commands and bootstrap recovery",
 			"status": "pr-open",
 			"issues": [],
@@ -124,6 +138,8 @@
 		{
 			"id": "GSD-W008",
 			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
 			"title": "Isolate canonical reads from the global workflow database handle",
 			"status": "pr-open",
 			"issues": [1727],
@@ -137,6 +153,8 @@
 		{
 			"id": "GSD-W009",
 			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
 			"title": "Apply canonical list predicates before SQL limit",
 			"status": "pr-open",
 			"issues": [1728],
@@ -150,6 +168,8 @@
 		{
 			"id": "GSD-W010",
 			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
 			"title": "Canonical read error parity between native and MCP surfaces",
 			"status": "pr-open",
 			"issues": [1729],
@@ -163,6 +183,8 @@
 		{
 			"id": "GSD-W011",
 			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
 			"title": "MAI Code 1.1 Flash support for GitHub Copilot routing",
 			"status": "in-progress",
 			"issues": [],
@@ -176,6 +198,8 @@
 		{
 			"id": "GSD-W012",
 			"type": "recovery",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
 			"title": "Pre-fork model routing recovery snapshot",
 			"status": "superseded",
 			"issues": [],
@@ -189,6 +213,8 @@
 		{
 			"id": "GSD-W013",
 			"type": "documentation",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
 			"title": "Fork-native VS Code and Copilot contributor workspace",
 			"status": "in-progress",
 			"issues": [],

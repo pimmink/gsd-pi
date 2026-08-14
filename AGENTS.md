@@ -91,9 +91,12 @@ Every entry needs:
 
 - stable work ID;
 - type and concise problem statement;
+- scope (`upstream` or `fork-local`) and upstream disposition;
 - issue, PR, branch, and commit references;
 - current status and evidence date;
 - validation or known gap;
 - next action.
 
-Closed, superseded, and abandoned work stays recorded. Never reuse work IDs.
+Fork-local work uses `upstreamDisposition: no-pr-planned` and must not leak into an
+upstream feature PR. Closed, superseded, and abandoned work stays recorded. Never reuse
+work IDs.

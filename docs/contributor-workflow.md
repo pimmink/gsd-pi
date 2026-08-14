@@ -129,7 +129,12 @@ not require this PAT fallback.
 
 ## Maintaining the work register
 
-Edit `docs/work-register.json` first. Keep statuses to:
+Edit `docs/work-register.json` first. Set `scope` to `upstream` for intended
+open-gsd contributions and `fork-local` for private fork workflow, recovery, or tooling.
+Fork-local entries must use `upstreamDisposition: no-pr-planned` and stay out of upstream
+feature PRs.
+
+Keep statuses to:
 
 - `idea`
 - `investigating`

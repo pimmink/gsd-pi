@@ -9,6 +9,12 @@ const projectionPath = resolve(process.cwd(), "docs/work-register.md");
 const register = JSON.parse(await readFile(registerPath, "utf8"));
 const projection = await readFile(projectionPath, "utf8");
 const allowedStatuses = new Set(register.statusVocabulary);
+const allowedScopes = new Set(["upstream", "fork-local"]);
+const allowedDispositions = new Set([
+	"pr-required",
+	"no-pr-planned",
+	"historical",
+]);
 const ids = new Set();
 
 assert.equal(
@@ -38,6 +44,21 @@ for (const item of register.items) {
 		allowedStatuses.has(item.status),
 		`${item.id}: unsupported status ${item.status}`,
 	);
+	assert.ok(
+		allowedScopes.has(item.scope),
+		`${item.id}: unsupported scope ${item.scope}`,
+	);
+	assert.ok(
+		allowedDispositions.has(item.upstreamDisposition),
+		`${item.id}: unsupported upstream disposition ${item.upstreamDisposition}`,
+	);
+	if (item.scope === "fork-local") {
+		assert.equal(
+			item.upstreamDisposition,
+			"no-pr-planned",
+			`${item.id}: fork-local work must not require an upstream PR`,
+		);
+	}
 
 	for (const field of ["issues", "pullRequests", "branches", "commits"]) {
 		assert.ok(

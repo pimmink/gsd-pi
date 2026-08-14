@@ -5,28 +5,33 @@
 Human-readable projection of [`work-register.json`](./work-register.json), which is the
 canonical source. GitHub and local Git evidence was refreshed on **2026-08-14**.
 
+- **Upstream / PR required**: intended for contribution to `open-gsd/gsd-pi`.
+- **Fork-local / No PR planned**: tooling, recovery, or workflow used only by this fork;
+  it must not be added to an upstream feature PR.
+- **Historical**: completed or closed upstream work retained for traceability.
+
 ## Active work
 
-| ID | Work | Issue | PR | Branch | Status | Next action |
-| --- | --- | --- | --- | --- | --- | --- |
-| GSD-W002 | Markdown renderer markdownlint compliance | #1600 | #1610 | `fix/markdownlint-table-separators` | PR open | Refresh checks and determine whether current renderer changes supersede it |
-| GSD-W007 | Package-manager-aware verification and bootstrap recovery | — | #1706 | `fix/verification-gate-package-manager` | PR open | Resolve CI and maintainer feedback; split bootstrap fix if requested |
-| GSD-W008 | Canonical read DB isolation | #1727 | #1731 | `fix/canonical-read-db-isolation` | PR open | Resolve checks and review independently |
-| GSD-W009 | Canonical SQL predicates before LIMIT | #1728 | #1732 | `fix/canonical-sql-predicates` | PR open | Resolve checks and review independently |
-| GSD-W010 | Native/MCP canonical read error parity | #1729 | #1734 | `fix/canonical-read-error-parity` | PR open | Resolve checks while preserving shared error semantics |
-| GSD-W011 | MAI Code 1.1 Flash Copilot routing | — | — | `feat/mai-code-1-1-flash-copilot` | In progress | Finish provider/catalog tests, then prepare issue and PR |
-| GSD-W013 | Fork-native VS Code and Copilot workspace | — | — | `docs/copilot-workspace-governance` | In progress | Commit locally, record commit, then decide fork-only versus upstream-safe split |
+| ID | Work | Scope | Upstream | Issue | PR | Branch | Status | Next action |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| GSD-W002 | Markdown renderer markdownlint compliance | Upstream | PR required | #1600 | #1610 | `fix/markdownlint-table-separators` | PR open | Refresh checks and determine whether current renderer changes supersede it |
+| GSD-W007 | Package-manager-aware verification and bootstrap recovery | Upstream | PR required | — | #1706 | `fix/verification-gate-package-manager` | PR open | Resolve CI and maintainer feedback; split bootstrap fix if requested |
+| GSD-W008 | Canonical read DB isolation | Upstream | PR required | #1727 | #1731 | `fix/canonical-read-db-isolation` | PR open | Resolve checks and review independently |
+| GSD-W009 | Canonical SQL predicates before LIMIT | Upstream | PR required | #1728 | #1732 | `fix/canonical-sql-predicates` | PR open | Resolve checks and review independently |
+| GSD-W010 | Native/MCP canonical read error parity | Upstream | PR required | #1729 | #1734 | `fix/canonical-read-error-parity` | PR open | Resolve checks while preserving shared error semantics |
+| GSD-W011 | MAI Code 1.1 Flash Copilot routing | Upstream | PR required | — | — | `feat/mai-code-1-1-flash-copilot` | In progress | Finish provider/catalog tests, then prepare issue and PR |
+| GSD-W013 | Fork-native VS Code and Copilot workspace | Fork-local | No PR planned | — | — | `docs/copilot-workspace-governance` | In progress | Commit locally, record commit, then decide fork-only versus upstream-safe split |
 
 ## Completed or historical work
 
-| ID | Work | Issues | PRs | Outcome |
-| --- | --- | --- | --- | --- |
-| GSD-W001 | Extension registry lockSync ESYNC | #1598 | — | Issue closed; regression no longer active |
-| GSD-W003 | Milestone status dependency visibility | #1601 | — | Issue closed; `dependsOn` is exposed by the status tool |
-| GSD-W004 | Legacy migration slice/decision consistency | #1606, #1607 | #1611 | Merged in `8d1d2067b1ec5b0b06e8772033b6f6f848b7613d` |
-| GSD-W005 | Canonical requirement/decision read tools | #1608 | #1613, #1682 | Closed unmerged; active correctness follow-ups are GSD-W008 through GSD-W010 |
-| GSD-W006 | Sonnet 5 routing and Copilot fallback | #1612 | #1609, #1703, #1705 | All three PRs merged upstream |
-| GSD-W012 | Pre-fork model routing snapshot | — | — | Superseded recovery branch; extract only proven missing MAI tests |
+| ID | Work | Scope | Upstream | Issues | PRs | Outcome |
+| --- | --- | --- | --- | --- | --- | --- |
+| GSD-W001 | Extension registry lockSync ESYNC | Upstream | Historical | #1598 | — | Issue closed; regression no longer active |
+| GSD-W003 | Milestone status dependency visibility | Upstream | Historical | #1601 | — | Issue closed; `dependsOn` is exposed by the status tool |
+| GSD-W004 | Legacy migration slice/decision consistency | Upstream | Historical | #1606, #1607 | #1611 | Merged in `8d1d2067b1ec5b0b06e8772033b6f6f848b7613d` |
+| GSD-W005 | Canonical requirement/decision read tools | Upstream | Historical | #1608 | #1613, #1682 | Closed unmerged; active correctness follow-ups are GSD-W008 through GSD-W010 |
+| GSD-W006 | Sonnet 5 routing and Copilot fallback | Upstream | Historical | #1612 | #1609, #1703, #1705 | All three PRs merged upstream |
+| GSD-W012 | Pre-fork model routing snapshot | Fork-local | No PR planned | — | — | Superseded recovery branch; extract only proven missing MAI tests |
 
 ## Important commit references
 
