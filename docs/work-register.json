@@ -237,7 +237,8 @@
 				"6a6356f7",
 				"b6f96643",
 				"c701c6db",
-				"7a9c574d69e7cc212664c4264c72933b2a94782d"
+				"7a9c574d69e7cc212664c4264c72933b2a94782d",
+				"6ea9ffe9d8ffb95074acf711365b7066a043763a"
 			],
 			"context": "Provides the governance anchor with repository agent contract, contributor workflow, durable work register, profile/bootstrap rationale, anchor workspace, and minimal MCP reference. A dedicated local VS Code Profile named GSD Pi Contributor supplies isolated settings, Biome, EditorConfig, GitHub MCP, Context7, bootstrap instructions, and a read-only init prompt to every clean feature worktree.",
 			"validation": "Official VS Code documentation confirms per-profile settings, extensions, MCP configuration, user instructions, prompts, and the `--profile` CLI selector. The local empty profile was created and contains only the intended non-built-in extensions and MCP servers. Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret scans pass locally.",
