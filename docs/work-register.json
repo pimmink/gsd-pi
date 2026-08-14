@@ -204,8 +204,8 @@
 				"babffb04251d04a70f03ab1cafbe2cb6cb3f8c75"
 			],
 			"context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Fork PR pimmink/gsd-pi#1 was squash-merged into fork main; upstream PR #1758 is open from fork main. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
-			"validation": "Upstream PR #1758 is open at babffb04. Fast gates, GitGuardian, and Socket checks passed; the build was still in progress at refresh time. The PR changes eight catalog/router/cost files and does not include the recovery snapshot's Copilot response-path tests.",
-			"nextAction": "Monitor the remaining PR checks and review; decide whether the focused provider response-path tests from recovery commit 788ef306 should be added before merge."
+			"validation": "Upstream PR #1758 is open at babffb04 with merge state UNSTABLE. Fast gates, GitGuardian, and Socket checks pass; build and ci-gate fail because the headless-auto provider-error pause E2E test received reconciliation drift instead of the expected pause notification. The PR changes eight catalog/router/cost files and does not include the recovery snapshot's Copilot response-path tests.",
+			"nextAction": "Determine whether the headless-auto E2E failure is unrelated/flaky or exposed by the branch, restore build and ci-gate, and decide whether to add the focused provider response-path tests from recovery commit 788ef306 before merge."
 		},
 		{
 			"id": "GSD-W012",

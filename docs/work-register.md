@@ -19,7 +19,7 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-14**.
 | GSD-W008 | Canonical read DB isolation | Upstream | PR required | #1727 | #1731 | `fix/canonical-read-db-isolation` | PR open, clean/green | Await maintainer review |
 | GSD-W009 | Canonical SQL predicates before LIMIT | Upstream | PR required | #1728 | #1732 | `fix/canonical-sql-predicates` | PR open, build failing | Fix build and ci-gate, then await review |
 | GSD-W010 | Native/MCP canonical read error parity | Upstream | PR required | #1729 | #1734 | `fix/canonical-read-error-parity` | PR open, clean/green | Await maintainer review |
-| GSD-W011 | MAI Code 1.1 Flash Copilot routing | Upstream | PR required | — | #1758 | `main` plus MAI feature/fix branches | PR open | Monitor build/review; decide whether to add recovered provider response-path tests |
+| GSD-W011 | MAI Code 1.1 Flash Copilot routing | Upstream | PR required | — | #1758 | `main` plus MAI feature/fix branches | PR open, E2E/build failing | Triage provider-pause E2E drift; restore CI; decide on recovered provider tests |
 | GSD-W013 | Fork-native VS Code and Copilot workspace | Fork-local | No PR planned | — | — | `docs/copilot-workspace-governance` | Complete | Maintain locally; propose only generic upstream-safe guidance separately if desired |
 
 ## Completed or historical work
