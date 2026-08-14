@@ -1,0 +1,203 @@
+{
+	"$schema": "./work-register.schema.json",
+	"schemaVersion": 1,
+	"repository": {
+		"upstream": "open-gsd/gsd-pi",
+		"fork": "pimmink/gsd-pi",
+		"defaultBase": "upstream/main"
+	},
+	"evidenceAsOf": "2026-08-14",
+	"statusVocabulary": [
+		"idea",
+		"investigating",
+		"in-progress",
+		"pr-open",
+		"merged",
+		"closed-unmerged",
+		"superseded",
+		"blocked"
+	],
+	"items": [
+		{
+			"id": "GSD-W001",
+			"type": "bugfix",
+			"title": "Extension registry lockSync ESYNC failure",
+			"status": "merged",
+			"issues": [1598],
+			"pullRequests": [],
+			"branches": [],
+			"commits": [],
+			"context": "gsd extensions used the synchronous proper-lockfile API with an unsupported retries option in v1.12.0.",
+			"validation": "Upstream issue is closed; no contributor PR is recorded in this fork register.",
+			"nextAction": "None unless the regression reappears."
+		},
+		{
+			"id": "GSD-W002",
+			"type": "bugfix",
+			"title": "Markdown renderer output must satisfy markdownlint",
+			"status": "pr-open",
+			"issues": [1600],
+			"pullRequests": [1610],
+			"branches": ["fix/markdownlint-table-separators"],
+			"commits": [],
+			"context": "Generated markdown contained invalid heading, spacing, and table separator forms including MD055, MD056, and MD060 failures.",
+			"validation": "PR #1610 remains open as of the evidence date.",
+			"nextAction": "Refresh from upstream, inspect current checks and maintainer feedback, then rebase or supersede if the renderer changed."
+		},
+		{
+			"id": "GSD-W003",
+			"type": "bugfix",
+			"title": "Milestone status exposes persisted dependencies",
+			"status": "merged",
+			"issues": [1601],
+			"pullRequests": [],
+			"branches": [],
+			"commits": [],
+			"context": "gsd_milestone_status omitted persisted dependsOn data, preventing authoritative dependency verification through the database tool.",
+			"validation": "Upstream issue is closed and current gsd_milestone_status returns dependsOn.",
+			"nextAction": "Keep contract coverage when milestone status evolves."
+		},
+		{
+			"id": "GSD-W004",
+			"type": "bugfix",
+			"title": "Legacy migration consistency for completed slices and structured decisions",
+			"status": "merged",
+			"issues": [1606, 1607],
+			"pullRequests": [1611],
+			"branches": ["fix/migrate-slice-decision-consistency"],
+			"commits": ["8d1d2067b1ec5b0b06e8772033b6f6f848b7613d"],
+			"context": "Legacy migration could produce completed slices with pending tasks and lose structured decision semantics through title-only extraction.",
+			"validation": "PR #1611 merged upstream.",
+			"nextAction": "Retain migration corpus regression coverage."
+		},
+		{
+			"id": "GSD-W005",
+			"type": "feature",
+			"title": "Canonical requirement and decision read tools",
+			"status": "closed-unmerged",
+			"issues": [1608],
+			"pullRequests": [1613, 1682],
+			"branches": ["feat/canonical-read-tools", "pr-1613"],
+			"commits": ["af34c4e4", "8eeed156"],
+			"context": "Added canonical requirement and decision list/get tools and addressed adversarial review findings. The original and follow-up PRs were closed without merge; related behavior later appeared in the v1.15 line and generated three follow-up correctness issues.",
+			"validation": "PR #1613 and PR #1682 are closed without merge. Follow-up issues #1727-#1729 remain tracked separately.",
+			"nextAction": "Use the active canonical-read follow-up PRs as the current authority."
+		},
+		{
+			"id": "GSD-W006",
+			"type": "bugfix",
+			"title": "Claude Sonnet 5 routing catalog and Copilot startup fallback",
+			"status": "merged",
+			"issues": [1612],
+			"pullRequests": [1609, 1703, 1705],
+			"branches": [
+				"fix/model-router-sonnet5-catalog",
+				"fix/copilot-sonnet5-startup-fallback"
+			],
+			"commits": [
+				"409ea8543bc6807b17b49317c117e8c846b1d1bf",
+				"42cb8ec346e06cd41b51c69acccb9e91d3a9290f",
+				"795b4b3df76ca15f91834e6d11c749c179d8ce18"
+			],
+			"context": "Registered claude-sonnet-5 in routing capability, cost, and profile tables and added graceful Copilot fallback when the preferred model is temporarily unavailable.",
+			"validation": "PRs #1609, #1703, and #1705 merged upstream.",
+			"nextAction": "Guard against duplicate registry rows and invalid provider aliases."
+		},
+		{
+			"id": "GSD-W007",
+			"type": "bugfix",
+			"title": "Package-manager-aware verification commands and bootstrap recovery",
+			"status": "pr-open",
+			"issues": [],
+			"pullRequests": [1706],
+			"branches": ["fix/verification-gate-package-manager"],
+			"commits": [
+				"a4c63862",
+				"65b77ec8",
+				"d9ddb5a0",
+				"8b986a9b2953ee56467194bb9b2fa62d2246542e"
+			],
+			"context": "Centralizes npm, pnpm, yarn, and bun command construction. Follow-up commit 8b986a9b restores stale shim backups after interrupted bootstrap runs and writes new backups atomically.",
+			"validation": "PR #1706 remains open. Bootstrap recovery regression tests and the real pi-coding-agent bootstrap build passed locally.",
+			"nextAction": "Review current CI and maintainer feedback; split bootstrap recovery if maintainers require narrower scope."
+		},
+		{
+			"id": "GSD-W008",
+			"type": "bugfix",
+			"title": "Isolate canonical reads from the global workflow database handle",
+			"status": "pr-open",
+			"issues": [1727],
+			"pullRequests": [1731],
+			"branches": ["fix/canonical-read-db-isolation"],
+			"commits": ["31af02a7", "e329a411"],
+			"context": "Routes canonical native and MCP reads through isolated per-project adapters to prevent implicit database creation and global handle mutation.",
+			"validation": "PR #1731 remains open with native and MCP regression coverage described in the PR.",
+			"nextAction": "Resolve checks and maintainer review without combining the SQL predicate or error parity concerns."
+		},
+		{
+			"id": "GSD-W009",
+			"type": "bugfix",
+			"title": "Apply canonical list predicates before SQL limit",
+			"status": "pr-open",
+			"issues": [1728],
+			"pullRequests": [1732],
+			"branches": ["fix/canonical-sql-predicates"],
+			"commits": ["27167552"],
+			"context": "Moves requirement class filtering and decision tombstone exclusion into SQL before LIMIT to prevent under-returning and deleted decision leakage.",
+			"validation": "PR #1732 remains open.",
+			"nextAction": "Resolve checks and maintainer review independently of database isolation."
+		},
+		{
+			"id": "GSD-W010",
+			"type": "bugfix",
+			"title": "Canonical read error parity between native and MCP surfaces",
+			"status": "pr-open",
+			"issues": [1729],
+			"pullRequests": [1734],
+			"branches": ["fix/canonical-read-error-parity"],
+			"commits": ["c4e6aa75", "c547bc73"],
+			"context": "Centralizes db_unavailable, not_found, and query_error semantics and replaces simulated tests with behavioral native-versus-MCP fixtures.",
+			"validation": "PR #1734 remains open.",
+			"nextAction": "Resolve checks and maintainer review while preserving the shared error contract."
+		},
+		{
+			"id": "GSD-W011",
+			"type": "feature",
+			"title": "MAI Code 1.1 Flash support for GitHub Copilot routing",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"branches": ["feat/mai-code-1-1-flash-copilot"],
+			"commits": ["ef6ec9cd", "5a96d62d"],
+			"context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
+			"validation": "No upstream PR exists as of the evidence date. The active branch contains catalog review fixes; provider response-path regression tests from the recovery commit still require an explicit keep-or-drop decision.",
+			"nextAction": "Finish targeted provider and generated-catalog validation, update the register, then request authorization to open an upstream issue and PR."
+		},
+		{
+			"id": "GSD-W012",
+			"type": "recovery",
+			"title": "Pre-fork model routing recovery snapshot",
+			"status": "superseded",
+			"issues": [],
+			"pullRequests": [],
+			"branches": ["recovery/pre-fork-model-routing-20260813"],
+			"commits": ["788ef30621f06e951a9d866dc049c9eb2545b6d6"],
+			"context": "Preserves the unique auto-commit from the retired backup clone. Most Opus 5 and Sonnet 5 content is upstream; MAI catalog work moved to GSD-W011. The recovery snapshot retains additional MAI Copilot provider tests for comparison.",
+			"validation": "Commit object was fetched into the active fork before the 1.5 GB backup clone was deleted.",
+			"nextAction": "Do not merge wholesale. Extract only tests or code proven missing from GSD-W011, then delete the recovery branch after explicit confirmation."
+		},
+		{
+			"id": "GSD-W013",
+			"type": "documentation",
+			"title": "Fork-native VS Code and Copilot contributor workspace",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"branches": ["docs/copilot-workspace-governance"],
+			"commits": [],
+			"context": "Adds the repository agent contract, Copilot instructions, portable VS Code workspace, minimal OAuth-first MCP configuration, secret template, contributor workflow, and durable work register.",
+			"validation": "Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret-pattern scans pass locally.",
+			"nextAction": "Commit locally, record the implementation commit, then decide whether this remains fork-only or is split into an upstream-safe contributor guidance proposal."
+		}
+	]
+}

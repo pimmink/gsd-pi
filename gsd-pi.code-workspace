@@ -1,0 +1,31 @@
+{
+	"folders": [
+		{
+			"name": "gsd-pi",
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "biomejs.biome",
+		"files.exclude": {
+			"**/.cache": true,
+			"**/dist": true,
+			"**/dist-test": true
+		},
+		"search.exclude": {
+			"**/.cache": true,
+			"**/dist": true,
+			"**/dist-test": true,
+			"**/node_modules": true
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"github.copilot",
+			"github.copilot-chat",
+			"biomejs.biome",
+			"editorconfig.editorconfig"
+		]
+	}
+}

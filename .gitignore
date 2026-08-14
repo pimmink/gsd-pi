@@ -70,8 +70,11 @@ docs/coherence-audit/
 .agents/
 .opencode/
 .idea/
-.vscode/
+.vscode/*
+!.vscode/mcp.json
+!.vscode/extensions.json
 *.code-workspace
+!gsd-pi.code-workspace
 
 # Environment and secrets
 .env
@@ -106,6 +109,7 @@ preflight-script.ts
 RELEASE-GUIDE.md
 TODOS.md
 AGENTS.md
+!/AGENTS.md
 
 # opencode local config
 .opencode/

@@ -1,0 +1,83 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/pimmink/gsd-pi/blob/main/docs/work-register.schema.json",
+	"title": "GSD Pi contributor work register",
+	"type": "object",
+	"required": [
+		"schemaVersion",
+		"repository",
+		"evidenceAsOf",
+		"statusVocabulary",
+		"items"
+	],
+	"properties": {
+		"$schema": { "type": "string", "minLength": 1 },
+		"schemaVersion": { "const": 1 },
+		"repository": {
+			"type": "object",
+			"required": ["upstream", "fork", "defaultBase"],
+			"properties": {
+				"upstream": { "type": "string", "minLength": 1 },
+				"fork": { "type": "string", "minLength": 1 },
+				"defaultBase": { "type": "string", "minLength": 1 }
+			},
+			"additionalProperties": false
+		},
+		"evidenceAsOf": { "type": "string", "format": "date" },
+		"statusVocabulary": {
+			"type": "array",
+			"uniqueItems": true,
+			"items": { "type": "string", "minLength": 1 }
+		},
+		"items": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"required": [
+					"id",
+					"type",
+					"title",
+					"status",
+					"issues",
+					"pullRequests",
+					"branches",
+					"commits",
+					"context",
+					"validation",
+					"nextAction"
+				],
+				"properties": {
+					"id": { "type": "string", "pattern": "^GSD-W[0-9]{3}$" },
+					"type": { "type": "string", "minLength": 1 },
+					"title": { "type": "string", "minLength": 1 },
+					"status": { "type": "string", "minLength": 1 },
+					"issues": {
+						"type": "array",
+						"uniqueItems": true,
+						"items": { "type": "integer", "minimum": 1 }
+					},
+					"pullRequests": {
+						"type": "array",
+						"uniqueItems": true,
+						"items": { "type": "integer", "minimum": 1 }
+					},
+					"branches": {
+						"type": "array",
+						"uniqueItems": true,
+						"items": { "type": "string", "minLength": 1 }
+					},
+					"commits": {
+						"type": "array",
+						"uniqueItems": true,
+						"items": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" }
+					},
+					"context": { "type": "string", "minLength": 1 },
+					"validation": { "type": "string", "minLength": 1 },
+					"nextAction": { "type": "string", "minLength": 1 }
+				},
+				"additionalProperties": false
+			}
+		}
+	},
+	"additionalProperties": false
+}
