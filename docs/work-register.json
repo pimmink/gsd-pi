@@ -236,7 +236,8 @@
 				"1dc21a2026a80241961a5cc408e322088f48ba98",
 				"6a6356f7",
 				"b6f96643",
-				"c701c6db"
+				"c701c6db",
+				"7a9c574d69e7cc212664c4264c72933b2a94782d"
 			],
 			"context": "Adds the repository agent contract, Copilot instructions, portable VS Code workspace, minimal OAuth-first MCP configuration, secret template, contributor workflow, and durable work register.",
 			"validation": "Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret-pattern scans pass locally. The governance branch is pushed to the fork and a gitignored overlay is active in the primary checkout.",

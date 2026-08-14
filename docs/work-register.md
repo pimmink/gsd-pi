@@ -41,7 +41,7 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-14**.
 - `8b986a9b2953ee56467194bb9b2fa62d2246542e` — bootstrap recovery follow-up on PR #1706.
 - `788ef30621f06e951a9d866dc049c9eb2545b6d6` — preserved pre-fork recovery snapshot.
 - `47461c6065b116e1320bf7aeef912af8bc77a017` and `babffb04251d04a70f03ab1cafbe2cb6cb3f8c75` — MAI Code 1.1 Flash upstream PR commits.
-- `1dc21a2026a80241961a5cc408e322088f48ba98` through `c701c6db` — fork-native VS Code/Copilot workspace governance.
+- `1dc21a2026a80241961a5cc408e322088f48ba98` through `7a9c574d69e7cc212664c4264c72933b2a94782d` — fork-native VS Code/Copilot workspace governance and init prompt.
 
 ## Register maintenance
 
