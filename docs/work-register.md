@@ -14,12 +14,12 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-14**.
 
 | ID | Work | Scope | Upstream | Issue | PR | Branch | Status | Next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| GSD-W002 | Markdown renderer markdownlint compliance | Upstream | PR required | #1600 | #1610 | `fix/markdownlint-table-separators` | PR open | Refresh checks and determine whether current renderer changes supersede it |
-| GSD-W007 | Package-manager-aware verification and bootstrap recovery | Upstream | PR required | — | #1706 | `fix/verification-gate-package-manager` | PR open | Resolve CI and maintainer feedback; split bootstrap fix if requested |
-| GSD-W008 | Canonical read DB isolation | Upstream | PR required | #1727 | #1731 | `fix/canonical-read-db-isolation` | PR open | Resolve checks and review independently |
-| GSD-W009 | Canonical SQL predicates before LIMIT | Upstream | PR required | #1728 | #1732 | `fix/canonical-sql-predicates` | PR open | Resolve checks and review independently |
-| GSD-W010 | Native/MCP canonical read error parity | Upstream | PR required | #1729 | #1734 | `fix/canonical-read-error-parity` | PR open | Resolve checks while preserving shared error semantics |
-| GSD-W011 | MAI Code 1.1 Flash Copilot routing | Upstream | PR required | — | — | `feat/mai-code-1-1-flash-copilot` | In progress | Finish provider/catalog tests, then prepare issue and PR |
+| GSD-W002 | Markdown renderer markdownlint compliance | Upstream | PR required | #1600 | #1610 | `fix/markdownlint-table-separators` | PR open, dirty/failing | Re-evaluate, then rebase/fix or close as superseded |
+| GSD-W007 | Package-manager-aware verification and bootstrap recovery | Upstream | PR required | — | #1706 | `fix/verification-gate-package-manager` | PR open, dirty | Rebase, restore required CI, split bootstrap fix if requested |
+| GSD-W008 | Canonical read DB isolation | Upstream | PR required | #1727 | #1731 | `fix/canonical-read-db-isolation` | PR open, clean/green | Await maintainer review |
+| GSD-W009 | Canonical SQL predicates before LIMIT | Upstream | PR required | #1728 | #1732 | `fix/canonical-sql-predicates` | PR open, build failing | Fix build and ci-gate, then await review |
+| GSD-W010 | Native/MCP canonical read error parity | Upstream | PR required | #1729 | #1734 | `fix/canonical-read-error-parity` | PR open, clean/green | Await maintainer review |
+| GSD-W011 | MAI Code 1.1 Flash Copilot routing | Upstream | PR required | — | #1758 | `main` plus MAI feature/fix branches | PR open | Monitor build/review; decide whether to add recovered provider response-path tests |
 | GSD-W013 | Fork-native VS Code and Copilot workspace | Fork-local | No PR planned | — | — | `docs/copilot-workspace-governance` | Complete | Maintain locally; propose only generic upstream-safe guidance separately if desired |
 
 ## Completed or historical work
@@ -40,8 +40,8 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-14**.
 - `795b4b3df76ca15f91834e6d11c749c179d8ce18` — merged Copilot Sonnet fallback.
 - `8b986a9b2953ee56467194bb9b2fa62d2246542e` — bootstrap recovery follow-up on PR #1706.
 - `788ef30621f06e951a9d866dc049c9eb2545b6d6` — preserved pre-fork recovery snapshot.
-- `ef6ec9cd` and `5a96d62d` — MAI Code 1.1 Flash feature and review-fix commits.
-- `1dc21a2026a80241961a5cc408e322088f48ba98` — fork-native VS Code/Copilot workspace governance.
+- `47461c6065b116e1320bf7aeef912af8bc77a017` and `babffb04251d04a70f03ab1cafbe2cb6cb3f8c75` — MAI Code 1.1 Flash upstream PR commits.
+- `1dc21a2026a80241961a5cc408e322088f48ba98` through `c701c6db` — fork-native VS Code/Copilot workspace governance.
 
 ## Register maintenance
 

@@ -10,6 +10,9 @@ Also read:
 - [`docs/work-register.md`](../docs/work-register.md)
 - [`docs/work-register.json`](../docs/work-register.json)
 
+Use `.github/prompts/workspace-init.prompt.md` to initialize a new VS Code/Copilot
+session before selecting implementation work.
+
 Key constraints:
 
 - This is a public upstream-contribution fork. Do not introduce customer-specific context,

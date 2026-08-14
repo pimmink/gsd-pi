@@ -9,6 +9,8 @@ This workflow is for development in the `pimmink/gsd-pi` fork with upstream PRs 
 
 Open `gsd-pi.code-workspace` rather than a parent customer workspace. This prevents
 private project instructions and MCP servers from leaking into public upstream work.
+Run the reusable `/workspace-init` prompt from
+`.github/prompts/workspace-init.prompt.md` before selecting implementation work.
 
 Before coding:
 

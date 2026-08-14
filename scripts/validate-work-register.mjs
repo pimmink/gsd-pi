@@ -72,6 +72,18 @@ for (const item of register.items) {
 		);
 	}
 
+	if (item.relatedRefs !== undefined) {
+		assert.ok(
+			Array.isArray(item.relatedRefs),
+			`${item.id}: relatedRefs must be an array`,
+		);
+		assert.equal(
+			new Set(item.relatedRefs).size,
+			item.relatedRefs.length,
+			`${item.id}: duplicate relatedRefs reference`,
+		);
+	}
+
 	for (const field of ["title", "context", "validation", "nextAction"]) {
 		assert.ok(
 			typeof item[field] === "string" && item[field].trim(),

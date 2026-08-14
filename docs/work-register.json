@@ -46,8 +46,8 @@
 			"branches": ["fix/markdownlint-table-separators"],
 			"commits": [],
 			"context": "Generated markdown contained invalid heading, spacing, and table separator forms including MD055, MD056, and MD060 failures.",
-			"validation": "PR #1610 remains open as of the evidence date.",
-			"nextAction": "Refresh from upstream, inspect current checks and maintainer feedback, then rebase or supersede if the renderer changed."
+			"validation": "PR #1610 remains open at 61b608de. GitHub reports merge state DIRTY; fast-gates and ci-gate fail while downstream build jobs are skipped.",
+			"nextAction": "Re-evaluate against current upstream renderer, then rebase and fix checks or close as superseded."
 		},
 		{
 			"id": "GSD-W003",
@@ -133,8 +133,8 @@
 				"8b986a9b2953ee56467194bb9b2fa62d2246542e"
 			],
 			"context": "Centralizes npm, pnpm, yarn, and bun command construction. Follow-up commit 8b986a9b restores stale shim backups after interrupted bootstrap runs and writes new backups atomically.",
-			"validation": "PR #1706 remains open. Bootstrap recovery regression tests and the real pi-coding-agent bootstrap build passed locally.",
-			"nextAction": "Review current CI and maintainer feedback; split bootstrap recovery if maintainers require narrower scope."
+			"validation": "PR #1706 remains open at 8b986a9b. Bootstrap recovery regression tests and the real pi-coding-agent bootstrap build passed locally. GitHub reports merge state DIRTY; only security checks are currently present for the latest head.",
+			"nextAction": "Rebase onto current upstream, restore required CI coverage, and split bootstrap recovery if maintainers require narrower scope."
 		},
 		{
 			"id": "GSD-W008",
@@ -148,8 +148,8 @@
 			"branches": ["fix/canonical-read-db-isolation"],
 			"commits": ["31af02a7", "e329a411"],
 			"context": "Routes canonical native and MCP reads through isolated per-project adapters to prevent implicit database creation and global handle mutation.",
-			"validation": "PR #1731 remains open with native and MCP regression coverage described in the PR.",
-			"nextAction": "Resolve checks and maintainer review without combining the SQL predicate or error parity concerns."
+			"validation": "PR #1731 remains open at e329a411 with merge state CLEAN. Fast gates, contract tests, build, node22 smoke, and ci-gate pass; Windows and code review automation are skipped.",
+			"nextAction": "Await maintainer review without combining the SQL predicate or error parity concerns."
 		},
 		{
 			"id": "GSD-W009",
@@ -163,8 +163,8 @@
 			"branches": ["fix/canonical-sql-predicates"],
 			"commits": ["27167552"],
 			"context": "Moves requirement class filtering and decision tombstone exclusion into SQL before LIMIT to prevent under-returning and deleted decision leakage.",
-			"validation": "PR #1732 remains open.",
-			"nextAction": "Resolve checks and maintainer review independently of database isolation."
+			"validation": "PR #1732 remains open at 27167552 with merge state UNSTABLE. Build and ci-gate fail; seven other checks pass and Windows/node22 jobs are skipped.",
+			"nextAction": "Diagnose the build failure, restore ci-gate, and resolve review independently of database isolation."
 		},
 		{
 			"id": "GSD-W010",
@@ -178,8 +178,8 @@
 			"branches": ["fix/canonical-read-error-parity"],
 			"commits": ["c4e6aa75", "c547bc73"],
 			"context": "Centralizes db_unavailable, not_found, and query_error semantics and replaces simulated tests with behavioral native-versus-MCP fixtures.",
-			"validation": "PR #1734 remains open.",
-			"nextAction": "Resolve checks and maintainer review while preserving the shared error contract."
+			"validation": "PR #1734 remains open at c547bc73 with merge state CLEAN. Fast gates, contract tests, build, node22 smoke, and ci-gate pass; Windows and code review automation are skipped.",
+			"nextAction": "Await maintainer review while preserving the shared error contract."
 		},
 		{
 			"id": "GSD-W011",
@@ -187,14 +187,25 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "MAI Code 1.1 Flash support for GitHub Copilot routing",
-			"status": "in-progress",
+			"status": "pr-open",
 			"issues": [],
-			"pullRequests": [],
-			"branches": ["feat/mai-code-1-1-flash-copilot"],
-			"commits": ["ef6ec9cd", "5a96d62d"],
-			"context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
-			"validation": "No upstream PR exists as of the evidence date. The active branch contains catalog review fixes; provider response-path regression tests from the recovery commit still require an explicit keep-or-drop decision.",
-			"nextAction": "Finish targeted provider and generated-catalog validation, update the register, then request authorization to open an upstream issue and PR."
+			"pullRequests": [1758],
+			"relatedRefs": ["pimmink/gsd-pi#1", "open-gsd/gsd-pi#1758"],
+			"branches": [
+				"main",
+				"feat/mai-code-1-1-flash-copilot",
+				"fix/mai-cost-table-provider-section"
+			],
+			"commits": [
+				"ef6ec9cd",
+				"5a96d62d",
+				"47461c6065b116e1320bf7aeef912af8bc77a017",
+				"8362b8c9",
+				"babffb04251d04a70f03ab1cafbe2cb6cb3f8c75"
+			],
+			"context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Fork PR pimmink/gsd-pi#1 was squash-merged into fork main; upstream PR #1758 is open from fork main. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
+			"validation": "Upstream PR #1758 is open at babffb04. Fast gates, GitGuardian, and Socket checks passed; the build was still in progress at refresh time. The PR changes eight catalog/router/cost files and does not include the recovery snapshot's Copilot response-path tests.",
+			"nextAction": "Monitor the remaining PR checks and review; decide whether the focused provider response-path tests from recovery commit 788ef306 should be added before merge."
 		},
 		{
 			"id": "GSD-W012",
@@ -221,7 +232,12 @@
 			"issues": [],
 			"pullRequests": [],
 			"branches": ["docs/copilot-workspace-governance"],
-			"commits": ["1dc21a2026a80241961a5cc408e322088f48ba98"],
+			"commits": [
+				"1dc21a2026a80241961a5cc408e322088f48ba98",
+				"6a6356f7",
+				"b6f96643",
+				"c701c6db"
+			],
 			"context": "Adds the repository agent contract, Copilot instructions, portable VS Code workspace, minimal OAuth-first MCP configuration, secret template, contributor workflow, and durable work register.",
 			"validation": "Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret-pattern scans pass locally. The governance branch is pushed to the fork and a gitignored overlay is active in the primary checkout.",
 			"nextAction": "Maintain the fork-local register and workspace files; propose only generic, upstream-safe guidance separately if desired."
