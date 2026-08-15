@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-08-14",
+	"evidenceAsOf": "2026-08-15",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -185,9 +185,9 @@
 			"id": "GSD-W011",
 			"type": "feature",
 			"scope": "upstream",
-			"upstreamDisposition": "pr-required",
+			"upstreamDisposition": "historical",
 			"title": "MAI Code 1.1 Flash support for GitHub Copilot routing",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [],
 			"pullRequests": [1758],
 			"relatedRefs": ["pimmink/gsd-pi#1", "open-gsd/gsd-pi#1758"],
@@ -201,11 +201,12 @@
 				"5a96d62d",
 				"47461c6065b116e1320bf7aeef912af8bc77a017",
 				"8362b8c9",
-				"babffb04251d04a70f03ab1cafbe2cb6cb3f8c75"
+				"babffb04251d04a70f03ab1cafbe2cb6cb3f8c75",
+				"c4f785534924f55eb644c451e8668969a875ab1c"
 			],
-			"context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Fork PR pimmink/gsd-pi#1 was squash-merged into fork main; upstream PR #1758 is open from fork main. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
-			"validation": "Upstream PR #1758 is open at babffb04 with merge state UNSTABLE. Fast gates, GitGuardian, and Socket checks pass; build and ci-gate fail because the headless-auto provider-error pause E2E test received reconciliation drift instead of the expected pause notification. The PR changes eight catalog/router/cost files and does not include the recovery snapshot's Copilot response-path tests.",
-			"nextAction": "Determine whether the headless-auto E2E failure is unrelated/flaky or exposed by the branch, restore build and ci-gate, and decide whether to add the focused provider response-path tests from recovery commit 788ef306 before merge."
+			"context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Fork PR pimmink/gsd-pi#1 was squash-merged into fork main; upstream PR #1758 was opened from fork main. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
+			"validation": "Upstream PR #1758 is state MERGED as of 2026-08-15 at head c4f78553 (fork main). All CI checks (fast-gates, build, node22-smoke, ci-gate, GitGuardian, Socket) report SUCCESS; windows-portability SKIPPED. The earlier build/ci-gate failure from the headless-auto provider-error pause E2E test was resolved before merge.",
+			"nextAction": "None; contribution merged upstream. Note: branch fix/mai-cost-table-provider-section has since had unrelated new commits (GSD-W014) added on top of it in the fork worktree after this PR's content was already squash-merged into fork main \u2014 that branch name should not be reused as the PR source for a new, unrelated concern."
 		},
 		{
 			"id": "GSD-W012",
@@ -221,6 +222,26 @@
 			"context": "Preserves the unique auto-commit from the retired backup clone. Most Opus 5 and Sonnet 5 content is upstream; MAI catalog work moved to GSD-W011. The recovery snapshot retains additional MAI Copilot provider tests for comparison.",
 			"validation": "Commit object was fetched into the active fork before the 1.5 GB backup clone was deleted.",
 			"nextAction": "Do not merge wholesale. Extract only tests or code proven missing from GSD-W011, then delete the recovery branch after explicit confirmation."
+		},
+		{
+			"id": "GSD-W014",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Live GitHub Copilot model-catalog check (/gsd copilot-models)",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": [
+				"fix/mai-cost-table-provider-section"
+			],
+			"commits": [
+				"28a2c92c3835e61f5fd19beffc6b8b4c6476bfc6"
+			],
+			"context": "Adds a GSD-extension-side /gsd copilot-models command that fetches GET /models from the authenticated GitHub Copilot account, sanitizes and diffs against a last-known-good snapshot, and dedupes shell notifications, without mutating provider registration, routing, policy, or credentials. Reuses existing registry/OAuth seams (packages/pi-ai github-copilot OAuth, model-registry). Scoped as GSD-extension-only per CONTRIBUTING.md's scope-area table; not auto-mode, so no RFC required. Currently committed on top of fix/mai-cost-table-provider-section, the same branch already used to source the separate, now-merged GSD-W011 (MAI Code 1.1 Flash) contribution \u2014 this mixes two unrelated concerns on one branch and needs a clean upstream/main-based branch before any PR.",
+			"validation": "15/15 targeted unit tests pass (copilot-model-catalog.test.ts, copilot-models-handler.test.ts, ADR-012 provider-equality-allowlist). typecheck:extensions clean. Local pnpm run verify:pr showed 100 unrelated failures (14079 passed/100 failed/28 skipped) that were reproduced as environmental/resource-contention (timeouts, ETIMEDOUT, spawnSync failures in unrelated RTK/workflow-authority/milestone subsystems), not a regression from this feature. Independently confirmed via a from-scratch GitHub Actions run on a dedicated public CI harness (pimmink/gsd-pi-ci, run 31857969918) against this exact commit: 14176 passed / 0 failed / 31 skipped, 0 failures, matching the non-flaky local pass count.",
+			"nextAction": "Create a new branch from fresh upstream/main carrying only this feature's commits (single concern per branch/PR), since fix/mai-cost-table-provider-section's original concern is already merged via GSD-W011/PR #1758. Confirm whether CONTRIBUTING.md rule 3 (issue first for new features) applies \u2014 the first-time-contributor exemption no longer applies since PR #1758 is merged, but this is a new feature, not an obvious bug fix, so an issue is likely still required before a PR. Do not create an issue or open a PR without explicit authorization."
 		},
 		{
 			"id": "GSD-W013",
