@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-08-15",
+	"evidenceAsOf": "2026-08-17",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -206,7 +206,7 @@
 			],
 			"context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Fork PR pimmink/gsd-pi#1 was squash-merged into fork main; upstream PR #1758 was opened from fork main. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
 			"validation": "Upstream PR #1758 is state MERGED as of 2026-08-15 at head c4f78553 (fork main). All CI checks (fast-gates, build, node22-smoke, ci-gate, GitGuardian, Socket) report SUCCESS; windows-portability SKIPPED. The earlier build/ci-gate failure from the headless-auto provider-error pause E2E test was resolved before merge.",
-			"nextAction": "None; contribution merged upstream. Note: branch fix/mai-cost-table-provider-section has since had unrelated new commits (GSD-W014) added on top of it in the fork worktree after this PR's content was already squash-merged into fork main \u2014 that branch name should not be reused as the PR source for a new, unrelated concern."
+			"nextAction": "None; contribution merged upstream. Note: branch fix/mai-cost-table-provider-section had unrelated new commits (GSD-W014) added on top of it in the fork worktree after this PR's content was already squash-merged into fork main. That has since been fixed: GSD-W014 was moved to its own clean feat/github-copilot-model-catalog-sync branch based on fresh upstream/main, and fix/mai-cost-table-provider-section is left untouched as historical reference only \u2014 do not reset, rebase, force-push, or delete it."
 		},
 		{
 			"id": "GSD-W012",
@@ -234,14 +234,15 @@
 			"pullRequests": [],
 			"relatedRefs": [],
 			"branches": [
-				"fix/mai-cost-table-provider-section"
+				"feat/github-copilot-model-catalog-sync"
 			],
 			"commits": [
-				"28a2c92c3835e61f5fd19beffc6b8b4c6476bfc6"
+				"28dd2521",
+				"935c5b2b"
 			],
-			"context": "Adds a GSD-extension-side /gsd copilot-models command that fetches GET /models from the authenticated GitHub Copilot account, sanitizes and diffs against a last-known-good snapshot, and dedupes shell notifications, without mutating provider registration, routing, policy, or credentials. Reuses existing registry/OAuth seams (packages/pi-ai github-copilot OAuth, model-registry). Scoped as GSD-extension-only per CONTRIBUTING.md's scope-area table; not auto-mode, so no RFC required. Currently committed on top of fix/mai-cost-table-provider-section, the same branch already used to source the separate, now-merged GSD-W011 (MAI Code 1.1 Flash) contribution \u2014 this mixes two unrelated concerns on one branch and needs a clean upstream/main-based branch before any PR.",
-			"validation": "15/15 targeted unit tests pass (copilot-model-catalog.test.ts, copilot-models-handler.test.ts, ADR-012 provider-equality-allowlist). typecheck:extensions clean. Local pnpm run verify:pr showed 100 unrelated failures (14079 passed/100 failed/28 skipped) that were reproduced as environmental/resource-contention (timeouts, ETIMEDOUT, spawnSync failures in unrelated RTK/workflow-authority/milestone subsystems), not a regression from this feature. Independently confirmed via a from-scratch GitHub Actions run on a dedicated public CI harness (pimmink/gsd-pi-ci, run 31857969918) against this exact commit: 14176 passed / 0 failed / 31 skipped, 0 failures, matching the non-flaky local pass count.",
-			"nextAction": "Create a new branch from fresh upstream/main carrying only this feature's commits (single concern per branch/PR), since fix/mai-cost-table-provider-section's original concern is already merged via GSD-W011/PR #1758. Confirm whether CONTRIBUTING.md rule 3 (issue first for new features) applies \u2014 the first-time-contributor exemption no longer applies since PR #1758 is merged, but this is a new feature, not an obvious bug fix, so an issue is likely still required before a PR. Do not create an issue or open a PR without explicit authorization."
+			"context": "Adds a GSD-extension-side /gsd copilot-models command that fetches GET /models from the authenticated GitHub Copilot account, sanitizes and diffs against a last-known-good snapshot, and dedupes shell notifications, without mutating provider registration, routing, policy, or credentials. Reuses existing registry/OAuth seams (packages/pi-ai github-copilot OAuth, model-registry). Scoped as GSD-extension-only per CONTRIBUTING.md's scope-area table; not auto-mode, so no RFC required. Branch hygiene fixed: re-based off a fresh upstream/main worktree/branch (feat/github-copilot-model-catalog-sync) instead of the retired fix/mai-cost-table-provider-section, which is left untouched as historical GSD-W011 reference only. IMPORTANT SCOPE NOTE: this is a manual, session-scoped, read-only drift-check only \u2014 a first slice of the fuller catalog-sync vision (provider-owned live catalog refresh, router integration, automatic cost-table updates, interactive drift signaling) described in this feature's own local execution plan, not the complete feature. Do not present this entry as covering that fuller scope.",
+			"validation": "Ported cleanly (git am, no conflicts) onto fresh upstream/main (09ae3c22c3286d3e988ccb94cee27279e026b329). 15/15 targeted unit tests pass (copilot-model-catalog.test.ts, copilot-models-handler.test.ts, ADR-012 provider-equality-allowlist) and typecheck:extensions is clean against the current architecture. Earlier local pnpm run verify:pr and remote CI totals (14176 passed/0 failed/31 skipped) were measured against the prior commit on the retired branch and remain informative but are not re-verified against this new branch's exact HEAD.",
+			"nextAction": "Do not open an issue or PR without explicit authorization. Before any PR: (1) decide and document whether the drift-check slice ships as the whole feature or whether router/cost-table/interactive-signaling work continues first; (2) confirm whether CONTRIBUTING.md rule 3 (issue-first for new features) applies (likely yes \u2014 the first-time-contributor exemption no longer applies since PR #1758/GSD-W011 is merged, but this is a new feature, not an obvious bug fix). Branch is pushed to pimmink/gsd-pi as a WIP backup only, not for review."
 		},
 		{
 			"id": "GSD-W013",
@@ -264,6 +265,22 @@
 			"context": "Provides the governance anchor with repository agent contract, contributor workflow, durable work register, profile/bootstrap rationale, anchor workspace, and minimal MCP reference. A dedicated local VS Code Profile named GSD Pi Contributor supplies isolated settings, Biome, EditorConfig, GitHub MCP, Context7, bootstrap instructions, and a read-only init prompt to every clean feature worktree.",
 			"validation": "Official VS Code documentation confirms per-profile settings, extensions, MCP configuration, user instructions, prompts, and the `--profile` CLI selector. The local empty profile was created and contains only the intended non-built-in extensions and MCP servers. Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret scans pass locally.",
 			"nextAction": "Maintain profile templates and the canonical register from the governance anchor; keep clean feature worktrees governance-file-free and open them with the GSD Pi Contributor profile."
+		},
+		{
+			"id": "GSD-W015",
+			"type": "infrastructure",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Sharded remote pr-verification harness (test-efficiency workstream)",
+			"status": "complete",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": ["perf/unit-test-sharding"],
+			"commits": ["a381d55", "3667f8d", "87648c0"],
+			"context": "Lives entirely in the separate, fully user-owned pimmink/gsd-pi-ci harness repository, not in pimmink/gsd-pi \u2014 no upstream/fork PR is applicable. Adds .github/workflows/remote-pr-verification-sharded.yml, an experimental workflow_dispatch-only workflow that splits pimmink/gsd-pi's test:unit:compiled across 4 parallel shards using Node's native --test-shard=<index>/<total>, after independently validating locally (synthetic multi-glob fixture, exact production flag combination) that the flag must be placed before the glob patterns and is deterministic/complete/non-overlapping. Left the stable remote-pr-verification.yml completely untouched.",
+			"validation": "Two real dispatches against pimmink/gsd-pi commit 28a2c92c3835e61f5fd19beffc6b8b4c6476bfc6 (fix/mai-cost-table-provider-section, historical GSD-W011/W014 spike commit, used only as a fixed measurement target). First dispatch (run 32015752880) failed fast and safely at an intentional file-count safety check (1274 actual vs an incorrectly hand-counted 1272 expected) before any shard ran. Corrective dispatch (run 32016308055) succeeded: all 4 shards + lifecycle-gate + aggregate green; aggregate totals across shards exactly matched the known unsharded baseline (14176 passed/0 failed/31 skipped), proving no test file was skipped or duplicated; total wall clock ~12m04s vs the 19m11s unsharded baseline (~37% reduction, run 31857969918). Merged to gsd-pi-ci:main (fast-forward, no PR needed for this private single-owner repo).",
+			"nextAction": "None required to consider this workstream done. Optional future follow-up: consider promoting the sharded workflow from experimental to the primary remote-pr-verification path once used a few more times, and revisit shard_count if the real suite's size/composition changes materially."
 		}
 	]
 }

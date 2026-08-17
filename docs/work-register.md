@@ -3,7 +3,7 @@
 # Contributor Work Register
 
 Human-readable projection of [`work-register.json`](./work-register.json), which is the
-canonical source. GitHub and local Git evidence was refreshed on **2026-08-15**.
+canonical source. GitHub and local Git evidence was refreshed on **2026-08-17**.
 
 - **Upstream / PR required**: intended for contribution to `open-gsd/gsd-pi`.
 - **Fork-local / No PR planned**: tooling, recovery, or workflow used only by this fork;
@@ -20,7 +20,8 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-15**.
 | GSD-W009 | Canonical SQL predicates before LIMIT | Upstream | PR required | #1728 | #1732 | `fix/canonical-sql-predicates` | PR open, build failing | Fix build and ci-gate, then await review |
 | GSD-W010 | Native/MCP canonical read error parity | Upstream | PR required | #1729 | #1734 | `fix/canonical-read-error-parity` | PR open, clean/green | Await maintainer review |
 | GSD-W013 | Fork-native VS Code and Copilot workspace | Fork-local | No PR planned | — | — | `docs/copilot-workspace-governance` | Complete | Maintain profile/templates/register from governance anchor; keep feature worktrees clean |
-| GSD-W014 | Live GitHub Copilot model-catalog check (`/gsd copilot-models`) | Upstream | PR required | — | — | `fix/mai-cost-table-provider-section` | In progress, remote-CI verified clean | Move to a clean `upstream/main`-based branch (one concern per PR); confirm whether an issue is required before opening a PR |
+| GSD-W014 | Live GitHub Copilot model-catalog check (`/gsd copilot-models`) | Upstream | PR required | — | — | `feat/github-copilot-model-catalog-sync` | In progress, NOT PR-ready — read-only drift-check slice only, not the full catalog-sync feature | Do not open an issue/PR without explicit authorization; decide whether the drift-check slice ships as the whole feature or fuller work continues first |
+| GSD-W015 | Sharded remote pr-verification harness (test-efficiency) | Fork-local (lives in `pimmink/gsd-pi-ci`, not this repo) | No PR planned | — | — | `perf/unit-test-sharding` (gsd-pi-ci) | Complete | None required; optional future promotion from experimental to primary |
 
 ## Completed or historical work
 
@@ -42,7 +43,8 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-15**.
 - `8b986a9b2953ee56467194bb9b2fa62d2246542e` — bootstrap recovery follow-up on PR #1706.
 - `788ef30621f06e951a9d866dc049c9eb2545b6d6` — preserved pre-fork recovery snapshot.
 - `47461c6065b116e1320bf7aeef912af8bc77a017`, `babffb04251d04a70f03ab1cafbe2cb6cb3f8c75`, and `c4f785534924f55eb644c451e8668969a875ab1c` — MAI Code 1.1 Flash upstream PR #1758 commits (merged).
-- `28a2c92c3835e61f5fd19beffc6b8b4c6476bfc6` — GSD-W014 Copilot model-catalog check, committed on the same branch as GSD-W011 and still needing a clean single-concern branch before any PR.
+- `28dd2521`, `935c5b2b` — GSD-W014 Copilot model-catalog check, re-based cleanly onto a fresh `upstream/main` worktree/branch (`feat/github-copilot-model-catalog-sync`); a read-only drift-check slice, not the full catalog-sync feature.
+- `a381d55`, `3667f8d`, `87648c0` (in `pimmink/gsd-pi-ci`, not this repo) — GSD-W015 sharded remote pr-verification harness; two real dispatches, exact pass/fail/skip match to the unsharded baseline, ~37% wall-clock reduction.
 - `1dc21a2026a80241961a5cc408e322088f48ba98` through `6ea9ffe9d8ffb95074acf711365b7066a043763a` — fork-native VS Code/Copilot profile governance and init prompt.
 
 ## Register maintenance
