@@ -15,7 +15,7 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-18**.
 | ID | Work | Scope | Upstream | Issue | PR | Branch | Status | Next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | GSD-W013 | Fork-native VS Code and Copilot workspace | Fork-local | No PR planned | — | — | `docs/copilot-workspace-governance` | Complete | Maintain profile/templates/register from governance anchor; keep feature worktrees clean |
-| GSD-W014 | GitHub Copilot model-catalog sync (`/gsd copilot-models`) | Upstream | PR required | — | — | `feat/github-copilot-model-catalog-sync` | Complete — Phase I economics verified and remote sharded verification green on SHA `4a9b98ac8012db29c335f05e0c2bf24e202ec5d7`. | Phase J is the next phase. Keep the safe-containment baseline, do not broaden into production router changes, and continue the routing-safety follow-up only in an explicitly scoped next step. |
+| GSD-W014 | GitHub Copilot model-catalog sync (`/gsd copilot-models`) | Upstream | PR required | — | — | `feat/github-copilot-model-catalog-sync` | Complete — exact-sha remote sharded verification passed on SHA `78ba3154c202a9a9fa0a08e241a4affd132f1ba0` with build + lifecycle gate + all shards green. | Phase K is next; continue with `/models why` in the correct architecture boundary and keep the fail-closed routing-safety baseline without broadening into a production router redesign. |
 | GSD-W015 | Sharded remote pr-verification harness (test-efficiency) | Fork-local (lives in `pimmink/gsd-pi-ci`, not this repo) | No PR planned | — | — | `perf/unit-test-sharding` (gsd-pi-ci) | Complete | None required; optional future promotion from experimental to primary |
 
 ## Completed or historical work

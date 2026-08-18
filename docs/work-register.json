@@ -234,20 +234,20 @@
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [
-				"remote:run:32158384362",
-				"sha:4a9b98ac8012db29c335f05e0c2bf24e202ec5d7",
-				"phase-i:complete",
-				"phase-j:next"
+				"remote:run:32169179561",
+				"sha:78ba3154c202a9a9fa0a08e241a4affd132f1ba0",
+				"phase-j:complete",
+				"phase-k:next"
 			],
 			"branches": [
 				"feat/github-copilot-model-catalog-sync"
 			],
 			"commits": [
-				"4a9b98ac8012db29c335f05e0c2bf24e202ec5d7"
+				"78ba3154c202a9a9fa0a08e241a4affd132f1ba0"
 			],
-			"context": "Phase I economics are complete in the current feature worktree: provider-aware runtime model economics were restored against the current architecture with provider-qualified identity preserved, unknown costs remaining unknown instead of zero, and the catalog/diff path kept read-only and safe. The feature branch is feat/github-copilot-model-catalog-sync at SHA 4a9b98ac8012db29c335f05e0c2bf24e202ec5d7. Local proof: 53/53 targeted tests passed, pnpm run typecheck:extensions is green, and pnpm run verify:fast is green. Remote proof: pimmink/gsd-pi-ci run 32158384362 succeeded with build + lifecycle shadow gate + all 4 shards green, aggregate totals 14,318 passed / 0 failed / 31 skipped, and manifest coverage 1,291 canonical test files with zero omissions and zero duplicates. Phase J is the next phase; no production router code changes were introduced as part of this closeout.",
-			"validation": "2026-08-18 remote evidence: run 32158384362 concluded success with build success, lifecycle shadow gate success, shards 1/4-4/4 all success, and aggregate success. The exact feature SHA under test was 4a9b98ac8012db29c335f05e0c2bf24e202ec5d7; expected_sha was validated before checkout and the run name itself pinned the branch + SHA. Local verification also passed: 53/53 targeted tests, typecheck:extensions, and verify:fast. All proofs are recorded here as the governing evidence for Phase I complete and Phase J next.",
-			"nextAction": "Phase J: continue the routing-safety follow-up only as a read-only contract/architecture pass or a separately scoped branch. Do not broaden into production router implementation; keep the safe-containment baseline and record the next-phase evidence before any further code change."
+			"context": "Phase J routing-safety work is complete on the feature branch feat/github-copilot-model-catalog-sync at SHA 78ba3154c202a9a9fa0a08e241a4affd132f1ba0. The run used the fail-closed exact-sha verification flow: source_ref=feat/github-copilot-model-catalog-sync, expected_sha=78ba3154c202a9a9fa0a08e241a4affd132f1ba0, with the safe-containment baseline kept intact and no broad router redesign introduced. The confidence model is explicit: curated and provisional values participate only when properly classified; unknown models do not get treated as safe auto-routing truth; and the reserved inherited state remains intentionally non-authoritative until a future explicit design decision is made.",
+			"validation": "2026-08-18 authoritative remote proof: pimmink/gsd-pi-ci run 32169179561 completed successfully with build success, lifecycle shadow gate success, all four sharded test jobs success, and aggregate totals 14322 passed / 0 failed / 31 skipped. Manifest coverage proved 1291 canonical files, zero omissions, zero duplicates, and the exact feature SHA 78ba3154c202a9a9fa0a08e241a4affd132f1ba0 was validated before checkout and again in the run metadata. Local proof remained green: 53/53 targeted tests passed, pnpm run typecheck:extensions succeeded, and pnpm run verify:fast succeeded. Duration was approximately 11m39s from 2026-08-18T18:06:20Z to 2026-08-18T18:17:59Z.",
+			"nextAction": "Phase K is the next step. Continue with /models why in the correct architecture boundary; it belongs to the next phase and does not block the completed Phase J routing-safety contract. Keep the safe-containment baseline and avoid broadening the branch beyond the exact confidence semantics already proven here."
 		},
 		{
 			"id": "GSD-W013",
