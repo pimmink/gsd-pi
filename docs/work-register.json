@@ -230,23 +230,24 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "GitHub Copilot model-catalog sync (/gsd copilot-models)",
-			"status": "in-progress",
+			"status": "complete",
 			"issues": [],
 			"pullRequests": [],
-			"relatedRefs": [],
+			"relatedRefs": [
+				"remote:run:32158384362",
+				"sha:4a9b98ac8012db29c335f05e0c2bf24e202ec5d7",
+				"phase-i:complete",
+				"phase-j:next"
+			],
 			"branches": [
 				"feat/github-copilot-model-catalog-sync"
 			],
 			"commits": [
-				"28dd2521",
-				"935c5b2b",
-				"5e204ae7",
-				"a69d39d7",
-				"f0992fcd"
+				"4a9b98ac8012db29c335f05e0c2bf24e202ec5d7"
 			],
-			"context": "Adds a GSD-extension-side /gsd copilot-models command that fetches GET /models from the authenticated GitHub Copilot account, sanitizes and diffs against a last-known-good snapshot, dedupes shell notifications, annotates new models with known GSD capability-tier status, and currently includes an opt-in --register overlay writer. Reuses existing registry/OAuth seams (packages/pi-ai github-copilot OAuth, model-registry). Scoped as GSD-extension-only per CONTRIBUTING.md's scope-area table; not auto-mode, so no RFC required. Branch hygiene fixed: re-based off a fresh upstream/main worktree/branch (feat/github-copilot-model-catalog-sync) instead of the retired fix/mai-cost-table-provider-section, which is left untouched as historical GSD-W011 reference only. CORRECTED SCOPE 2026-08-18: GSD-W014 remains the GitHub Copilot catalog-sync workstream described by the local .plans files. The read-only drift-check slice is stable, but registration/synchronization remains part of GSD-W014; the current --register implementation is not PR-ready and requires redesign because it only writes after a prior in-memory snapshot creates diff.added and because it persists unknown metadata as concrete placeholder values. A later PR split may choose read-only reporting as PR 1, but that is a delivery decision after redesign/testing, not a reduction of the workstream scope.",
-			"validation": "As of 2026-08-18, remotes were refreshed and branch HEAD f0992fcd is clean and pushed to origin/feat/github-copilot-model-catalog-sync. Current branch delta against upstream/main is 11 files/1270 insertions and includes the --register overlay writer that now needs redesign. Previous focused validation passed: 32/32 targeted tests (copilot-model-catalog.test.ts, copilot-models-handler.test.ts, copilot-overlay-writer.test.ts, copilot-catalog-manual-selection.test.ts, provider-equality-allowlist.test.ts) and pnpm run typecheck:extensions; those tests prove the current behavior, not readiness of the registration semantics. GitHub MCP overlap search found no existing upstream issue or PR for GitHub Copilot live model catalog/drift sync. Earlier local pnpm run verify:pr and remote CI totals (14176 passed/0 failed/31 skipped) were measured against the prior retired-branch commit and remain historical context only, not current-HEAD evidence.",
-			"nextAction": "Do not delete the registration path as a scope decision. Reconcile the local .plans/github-copilot-model-catalog-sync-execution.md as the phase guide, then redesign --register tests-first: compute registration candidates from remote live catalog minus the effective local catalog (bundled catalog + models-catalog overlay + models.json/custom entries), avoid writing unknown economics/capability/limit fields as authoritative zero/false/fixed values, and keep incomplete discoveries read-only or quarantined/non-routable until complete enough for safe selection. Then run targeted catalog/handler/overlay/manual-selection/provider-allowlist tests, pnpm run typecheck:extensions, and pnpm run verify:fast. GSD-W014 is the overarching GitHub Copilot catalog-sync workstream: Phase H is the current active implementation phase; Phase I provider-aware runtime economics and Phase J routing/profile-confidence safety remain later phases within GSD-W014 and are preserved as implementation evidence on branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9 (GSD-W016), which must be re-reviewed hunk-by-hunk before reuse and never wholesale cherry-picked. First commit the current Phase-H working tree and verify it remotely, then decide whether the first PR is read-only-only or includes redesigned registration. Per user direction, do not create or claim an upstream issue during implementation; treat issue/PR policy only as a final pre-PR check, and do not perform any GitHub write without explicit authorization."
+			"context": "Phase I economics are complete in the current feature worktree: provider-aware runtime model economics were restored against the current architecture with provider-qualified identity preserved, unknown costs remaining unknown instead of zero, and the catalog/diff path kept read-only and safe. The feature branch is feat/github-copilot-model-catalog-sync at SHA 4a9b98ac8012db29c335f05e0c2bf24e202ec5d7. Local proof: 53/53 targeted tests passed, pnpm run typecheck:extensions is green, and pnpm run verify:fast is green. Remote proof: pimmink/gsd-pi-ci run 32158384362 succeeded with build + lifecycle shadow gate + all 4 shards green, aggregate totals 14,318 passed / 0 failed / 31 skipped, and manifest coverage 1,291 canonical test files with zero omissions and zero duplicates. Phase J is the next phase; no production router code changes were introduced as part of this closeout.",
+			"validation": "2026-08-18 remote evidence: run 32158384362 concluded success with build success, lifecycle shadow gate success, shards 1/4-4/4 all success, and aggregate success. The exact feature SHA under test was 4a9b98ac8012db29c335f05e0c2bf24e202ec5d7; expected_sha was validated before checkout and the run name itself pinned the branch + SHA. Local verification also passed: 53/53 targeted tests, typecheck:extensions, and verify:fast. All proofs are recorded here as the governing evidence for Phase I complete and Phase J next.",
+			"nextAction": "Phase J: continue the routing-safety follow-up only as a read-only contract/architecture pass or a separately scoped branch. Do not broaden into production router implementation; keep the safe-containment baseline and record the next-phase evidence before any further code change."
 		},
 		{
 			"id": "GSD-W013",
