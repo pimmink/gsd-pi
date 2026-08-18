@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-08-17",
+	"evidenceAsOf": "2026-08-18",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -40,14 +40,14 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Markdown renderer output must satisfy markdownlint",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [1600],
 			"pullRequests": [1610],
 			"branches": ["fix/markdownlint-table-separators"],
-			"commits": [],
+			"commits": ["e7b6f291ac680f1b00fe1cb6ca246b8cbcac3aac"],
 			"context": "Generated markdown contained invalid heading, spacing, and table separator forms including MD055, MD056, and MD060 failures.",
-			"validation": "PR #1610 remains open at 61b608de. GitHub reports merge state DIRTY; fast-gates and ci-gate fail while downstream build jobs are skipped.",
-			"nextAction": "Re-evaluate against current upstream renderer, then rebase and fix checks or close as superseded."
+			"validation": "PR #1610 is state MERGED (2026-08-16T23:44:17Z) at merge commit e7b6f291ac680f1b00fe1cb6ca246b8cbcac3aac; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
 		},
 		{
 			"id": "GSD-W003",
@@ -122,7 +122,7 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Package-manager-aware verification commands and bootstrap recovery",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [],
 			"pullRequests": [1706],
 			"branches": ["fix/verification-gate-package-manager"],
@@ -130,11 +130,12 @@
 				"a4c63862",
 				"65b77ec8",
 				"d9ddb5a0",
-				"8b986a9b2953ee56467194bb9b2fa62d2246542e"
+				"8b986a9b2953ee56467194bb9b2fa62d2246542e",
+				"85b334d4c0d77fe8c88ec5e000966f4ca8ba7092"
 			],
 			"context": "Centralizes npm, pnpm, yarn, and bun command construction. Follow-up commit 8b986a9b restores stale shim backups after interrupted bootstrap runs and writes new backups atomically.",
-			"validation": "PR #1706 remains open at 8b986a9b. Bootstrap recovery regression tests and the real pi-coding-agent bootstrap build passed locally. GitHub reports merge state DIRTY; only security checks are currently present for the latest head.",
-			"nextAction": "Rebase onto current upstream, restore required CI coverage, and split bootstrap recovery if maintainers require narrower scope."
+			"validation": "PR #1706 is state MERGED (2026-08-16T23:38:38Z) at merge commit 85b334d4c0d77fe8c88ec5e000966f4ca8ba7092; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
 		},
 		{
 			"id": "GSD-W008",
@@ -142,14 +143,14 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Isolate canonical reads from the global workflow database handle",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [1727],
 			"pullRequests": [1731],
 			"branches": ["fix/canonical-read-db-isolation"],
-			"commits": ["31af02a7", "e329a411"],
+			"commits": ["31af02a7", "e329a411", "10aa03954444e51390160f00a1d97a59d4a8604f"],
 			"context": "Routes canonical native and MCP reads through isolated per-project adapters to prevent implicit database creation and global handle mutation.",
-			"validation": "PR #1731 remains open at e329a411 with merge state CLEAN. Fast gates, contract tests, build, node22 smoke, and ci-gate pass; Windows and code review automation are skipped.",
-			"nextAction": "Await maintainer review without combining the SQL predicate or error parity concerns."
+			"validation": "PR #1731 is state MERGED (2026-08-14T13:01:34Z) at merge commit 10aa03954444e51390160f00a1d97a59d4a8604f; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
 		},
 		{
 			"id": "GSD-W009",
@@ -157,14 +158,14 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Apply canonical list predicates before SQL limit",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [1728],
 			"pullRequests": [1732],
 			"branches": ["fix/canonical-sql-predicates"],
-			"commits": ["27167552"],
+			"commits": ["27167552", "da908349835815274d2b2d097da50880d3c44f33"],
 			"context": "Moves requirement class filtering and decision tombstone exclusion into SQL before LIMIT to prevent under-returning and deleted decision leakage.",
-			"validation": "PR #1732 remains open at 27167552 with merge state UNSTABLE. Build and ci-gate fail; seven other checks pass and Windows/node22 jobs are skipped.",
-			"nextAction": "Diagnose the build failure, restore ci-gate, and resolve review independently of database isolation."
+			"validation": "PR #1732 is state MERGED (2026-08-16T23:38:38Z) at merge commit da908349835815274d2b2d097da50880d3c44f33; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
 		},
 		{
 			"id": "GSD-W010",
@@ -172,14 +173,14 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Canonical read error parity between native and MCP surfaces",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [1729],
 			"pullRequests": [1734],
 			"branches": ["fix/canonical-read-error-parity"],
-			"commits": ["c4e6aa75", "c547bc73"],
+			"commits": ["c4e6aa75", "c547bc73", "e728a95714c7fa78cb2f41c91d978a93e6e56a5f"],
 			"context": "Centralizes db_unavailable, not_found, and query_error semantics and replaces simulated tests with behavioral native-versus-MCP fixtures.",
-			"validation": "PR #1734 remains open at c547bc73 with merge state CLEAN. Fast gates, contract tests, build, node22 smoke, and ci-gate pass; Windows and code review automation are skipped.",
-			"nextAction": "Await maintainer review while preserving the shared error contract."
+			"validation": "PR #1734 is state MERGED (2026-08-16T23:31:55Z) at merge commit e728a95714c7fa78cb2f41c91d978a93e6e56a5f; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
 		},
 		{
 			"id": "GSD-W011",
@@ -205,8 +206,8 @@
 				"c4f785534924f55eb644c451e8668969a875ab1c"
 			],
 			"context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Fork PR pimmink/gsd-pi#1 was squash-merged into fork main; upstream PR #1758 was opened from fork main. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
-			"validation": "Upstream PR #1758 is state MERGED as of 2026-08-15 at head c4f78553 (fork main). All CI checks (fast-gates, build, node22-smoke, ci-gate, GitGuardian, Socket) report SUCCESS; windows-portability SKIPPED. The earlier build/ci-gate failure from the headless-auto provider-error pause E2E test was resolved before merge.",
-			"nextAction": "None; contribution merged upstream. Note: branch fix/mai-cost-table-provider-section had unrelated new commits (GSD-W014) added on top of it in the fork worktree after this PR's content was already squash-merged into fork main. That has since been fixed: GSD-W014 was moved to its own clean feat/github-copilot-model-catalog-sync branch based on fresh upstream/main, and fix/mai-cost-table-provider-section is left untouched as historical reference only \u2014 do not reset, rebase, force-push, or delete it."
+			"validation": "Upstream PR #1758 is state MERGED as of 2026-08-15 at head c4f78553 (fork main). All CI checks (fast-gates, build, node22-smoke, ci-gate, GitGuardian, Socket) report SUCCESS; windows-portability SKIPPED. The earlier build/ci-gate failure from the headless-auto provider-error pause E2E test was resolved before merge. As of 2026-08-18 the MAI Code 1.1 Flash cost table is present upstream and fork main was fast-forwarded to upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream. The retired fix/mai-cost-table-provider-section branch is no longer an active MAI branch: its unique local Phase-I/J spike commit e8e46fe9 is now archived as branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9 (tracked under GSD-W016). Do not treat fix/mai-cost-table-provider-section as the MAI contribution branch; the merged MAI work lives on fork main / upstream PR #1758."
 		},
 		{
 			"id": "GSD-W012",
@@ -228,7 +229,7 @@
 			"type": "feature",
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
-			"title": "Live GitHub Copilot model-catalog check (/gsd copilot-models)",
+			"title": "GitHub Copilot model-catalog sync (/gsd copilot-models)",
 			"status": "in-progress",
 			"issues": [],
 			"pullRequests": [],
@@ -238,11 +239,14 @@
 			],
 			"commits": [
 				"28dd2521",
-				"935c5b2b"
+				"935c5b2b",
+				"5e204ae7",
+				"a69d39d7",
+				"f0992fcd"
 			],
-			"context": "Adds a GSD-extension-side /gsd copilot-models command that fetches GET /models from the authenticated GitHub Copilot account, sanitizes and diffs against a last-known-good snapshot, and dedupes shell notifications, without mutating provider registration, routing, policy, or credentials. Reuses existing registry/OAuth seams (packages/pi-ai github-copilot OAuth, model-registry). Scoped as GSD-extension-only per CONTRIBUTING.md's scope-area table; not auto-mode, so no RFC required. Branch hygiene fixed: re-based off a fresh upstream/main worktree/branch (feat/github-copilot-model-catalog-sync) instead of the retired fix/mai-cost-table-provider-section, which is left untouched as historical GSD-W011 reference only. IMPORTANT SCOPE NOTE: this is a manual, session-scoped, read-only drift-check only \u2014 a first slice of the fuller catalog-sync vision (provider-owned live catalog refresh, router integration, automatic cost-table updates, interactive drift signaling) described in this feature's own local execution plan, not the complete feature. Do not present this entry as covering that fuller scope.",
-			"validation": "Ported cleanly (git am, no conflicts) onto fresh upstream/main (09ae3c22c3286d3e988ccb94cee27279e026b329). 15/15 targeted unit tests pass (copilot-model-catalog.test.ts, copilot-models-handler.test.ts, ADR-012 provider-equality-allowlist) and typecheck:extensions is clean against the current architecture. Earlier local pnpm run verify:pr and remote CI totals (14176 passed/0 failed/31 skipped) were measured against the prior commit on the retired branch and remain informative but are not re-verified against this new branch's exact HEAD.",
-			"nextAction": "Do not open an issue or PR without explicit authorization. Before any PR: (1) decide and document whether the drift-check slice ships as the whole feature or whether router/cost-table/interactive-signaling work continues first; (2) confirm whether CONTRIBUTING.md rule 3 (issue-first for new features) applies (likely yes \u2014 the first-time-contributor exemption no longer applies since PR #1758/GSD-W011 is merged, but this is a new feature, not an obvious bug fix). Branch is pushed to pimmink/gsd-pi as a WIP backup only, not for review."
+			"context": "Adds a GSD-extension-side /gsd copilot-models command that fetches GET /models from the authenticated GitHub Copilot account, sanitizes and diffs against a last-known-good snapshot, dedupes shell notifications, annotates new models with known GSD capability-tier status, and currently includes an opt-in --register overlay writer. Reuses existing registry/OAuth seams (packages/pi-ai github-copilot OAuth, model-registry). Scoped as GSD-extension-only per CONTRIBUTING.md's scope-area table; not auto-mode, so no RFC required. Branch hygiene fixed: re-based off a fresh upstream/main worktree/branch (feat/github-copilot-model-catalog-sync) instead of the retired fix/mai-cost-table-provider-section, which is left untouched as historical GSD-W011 reference only. CORRECTED SCOPE 2026-08-18: GSD-W014 remains the GitHub Copilot catalog-sync workstream described by the local .plans files. The read-only drift-check slice is stable, but registration/synchronization remains part of GSD-W014; the current --register implementation is not PR-ready and requires redesign because it only writes after a prior in-memory snapshot creates diff.added and because it persists unknown metadata as concrete placeholder values. A later PR split may choose read-only reporting as PR 1, but that is a delivery decision after redesign/testing, not a reduction of the workstream scope.",
+			"validation": "As of 2026-08-18, remotes were refreshed and branch HEAD f0992fcd is clean and pushed to origin/feat/github-copilot-model-catalog-sync. Current branch delta against upstream/main is 11 files/1270 insertions and includes the --register overlay writer that now needs redesign. Previous focused validation passed: 32/32 targeted tests (copilot-model-catalog.test.ts, copilot-models-handler.test.ts, copilot-overlay-writer.test.ts, copilot-catalog-manual-selection.test.ts, provider-equality-allowlist.test.ts) and pnpm run typecheck:extensions; those tests prove the current behavior, not readiness of the registration semantics. GitHub MCP overlap search found no existing upstream issue or PR for GitHub Copilot live model catalog/drift sync. Earlier local pnpm run verify:pr and remote CI totals (14176 passed/0 failed/31 skipped) were measured against the prior retired-branch commit and remain historical context only, not current-HEAD evidence.",
+			"nextAction": "Do not delete the registration path as a scope decision. Reconcile the local .plans/github-copilot-model-catalog-sync-execution.md as the phase guide, then redesign --register tests-first: compute registration candidates from remote live catalog minus the effective local catalog (bundled catalog + models-catalog overlay + models.json/custom entries), avoid writing unknown economics/capability/limit fields as authoritative zero/false/fixed values, and keep incomplete discoveries read-only or quarantined/non-routable until complete enough for safe selection. Then run targeted catalog/handler/overlay/manual-selection/provider-allowlist tests, pnpm run typecheck:extensions, and pnpm run verify:fast. GSD-W014 is the overarching GitHub Copilot catalog-sync workstream: Phase H is the current active implementation phase; Phase I provider-aware runtime economics and Phase J routing/profile-confidence safety remain later phases within GSD-W014 and are preserved as implementation evidence on branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9 (GSD-W016), which must be re-reviewed hunk-by-hunk before reuse and never wholesale cherry-picked. First commit the current Phase-H working tree and verify it remotely, then decide whether the first PR is read-only-only or includes redesigned registration. Per user direction, do not create or claim an upstream issue during implementation; treat issue/PR policy only as a final pre-PR check, and do not perform any GitHub write without explicit authorization."
 		},
 		{
 			"id": "GSD-W013",
@@ -281,6 +285,22 @@
 			"context": "Lives entirely in the separate, fully user-owned pimmink/gsd-pi-ci harness repository, not in pimmink/gsd-pi \u2014 no upstream/fork PR is applicable. Adds .github/workflows/remote-pr-verification-sharded.yml, an experimental workflow_dispatch-only workflow that splits pimmink/gsd-pi's test:unit:compiled across 4 parallel shards using Node's native --test-shard=<index>/<total>, after independently validating locally (synthetic multi-glob fixture, exact production flag combination) that the flag must be placed before the glob patterns and is deterministic/complete/non-overlapping. Left the stable remote-pr-verification.yml completely untouched.",
 			"validation": "Two real dispatches against pimmink/gsd-pi commit 28a2c92c3835e61f5fd19beffc6b8b4c6476bfc6 (fix/mai-cost-table-provider-section, historical GSD-W011/W014 spike commit, used only as a fixed measurement target). First dispatch (run 32015752880) failed fast and safely at an intentional file-count safety check (1274 actual vs an incorrectly hand-counted 1272 expected) before any shard ran. Corrective dispatch (run 32016308055) succeeded: all 4 shards + lifecycle-gate + aggregate green; aggregate totals across shards exactly matched the known unsharded baseline (14176 passed/0 failed/31 skipped), proving no test file was skipped or duplicated; total wall clock ~12m04s vs the 19m11s unsharded baseline (~37% reduction, run 31857969918). Merged to gsd-pi-ci:main (fast-forward, no PR needed for this private single-owner repo).",
 			"nextAction": "None required to consider this workstream done. Optional future follow-up: consider promoting the sharded workflow from experimental to the primary remote-pr-verification path once used a few more times, and revisit shard_count if the real suite's size/composition changes materially."
+		},
+		{
+			"id": "GSD-W016",
+			"type": "recovery",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Recovery artifact for GSD-W014 Phase I/J economics and routing spike",
+			"status": "superseded",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": ["recovery/github-copilot-catalog-phase-i-j-e8e46fe9"],
+			"commits": ["e8e46fe9450f326641fccf7bbf3929f10be80f09"],
+			"context": "Not an independent feature or workstream. This is the recovery/provenance record for the stranded Phase-I/J spike commit e8e46fe9, which was built on top of the retired historical fix/mai-cost-table-provider-section branch (base fork main c4f78553, pre-1.16) rather than the clean feat/github-copilot-model-catalog-sync branch. Content is conceptually part of the GSD-W014 roadmap: provider-aware Copilot runtime economics (Phase I) in model-cost-table.ts and Copilot economics/drift handling in the copilot-models handler, plus router profile-confidence safety (Phase J) in model-router.ts, with accompanying tests. Because it sits on the wrong historical base it is not directly mergeable. The commit is archived on branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9, pushed to origin at the same SHA.",
+			"validation": "As of 2026-08-18: git show --stat reports 7 files changed, 615 insertions and 48 deletions; git show --check is clean; a secret/PII scan over the commit diff found only false positives (a runtime token variable and dummy 'token-abc' test fixtures), no real credentials. Ancestry: origin/fix/mai-cost-table-provider-section (28a2c92c) and d700abcf are ancestors of e8e46fe9; e8e46fe9 is NOT an ancestor of feat/github-copilot-model-catalog-sync or upstream/main; merge-base with upstream/main is c4f78553. Per-file divergence vs the committed catalog-sync branch: model-cost-table.ts and its test, model-router.ts and its test are Phase I/J content absent from catalog-sync; the copilot-models handler and its test diverged (Phase H parts superseded on catalog-sync, Phase I economics/drift unique to the spike); catalog.ts is largely superseded on catalog-sync. Local branch ref and origin remote ref both point to e8e46fe9450f326641fccf7bbf3929f10be80f09.",
+			"nextAction": "Do not merge or cherry-pick wholesale. After the current GSD-W014 Phase-H working tree is committed and remotely verified, compare e8e46fe9 hunk-by-hunk against current upstream/main and reconstruct only the still-relevant, proven Phase-I/J pieces onto appropriate fresh upstream/main-based reviewable branches with their own scope, tests, and validation. The historical fix/mai-cost-table-provider-section branch and its dirty worktree were left untouched (ARCHIVE/EXTRACT_FIRST) because that worktree was not clean."
 		}
 	]
 }
