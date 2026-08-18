@@ -8,6 +8,7 @@ import { getProviderCapabilities, type ProviderCapabilities } from "@gsd/pi-ai";
 import { getToolCompatibility, getAllToolCompatibility } from "@gsd/pi-coding-agent";
 import type { ToolCompatibility } from "@gsd/pi-coding-agent";
 import { incrementLegacyTelemetry } from "./legacy-telemetry.js";
+import { resolveModelEconomics } from "./model-cost-table.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -51,6 +52,18 @@ export interface RoutingDecision {
   filteredTools?: string[];
   /** Task requirement vector used for scoring */
   taskRequirements?: Partial<Record<string, number>>;
+  /**
+   * Capability-profile confidence of the auto-selected model
+   * (capability-scored path only). See {@link CapabilityProfileConfidence}.
+   */
+  profileConfidence?: CapabilityProfileConfidence;
+  /**
+   * Candidates considered but not chosen, each with a human-readable reason.
+   * Populated on the capability-scored path so routing decisions can be
+   * explained (e.g. "why <model>"). Unprofiled candidates that were held back
+   * from automatic routing are reported here.
+   */
+  rejected?: Array<{ modelId: string; reason: string }>;
 }
 
 // ─── Capability Profiles ─────────────────────────────────────────────────────
@@ -64,6 +77,57 @@ export interface ModelCapabilities {
   speed: number;
   longContext: number;
   instruction: number;
+}
+
+/**
+ * How much we trust a model's capability profile for AUTOMATIC routing.
+ *
+ *  - `curated`:     a hand-maintained built-in profile exists.
+ *  - `inherited`:   derived from a known model family baseline (reserved; not
+ *                   yet produced — a conservative successor profile).
+ *  - `provisional`: a complete user-supplied capability override exists (the
+ *                   user vouched for it) but no built-in profile.
+ *  - `unknown`:     no profile at all — scored with a neutral 50 placeholder.
+ *
+ * Phase J routing safety: `unknown`-confidence models stay available for
+ * manual/explicit selection, but are not chosen automatically when a
+ * higher-confidence alternative is eligible. A neutral 50 is the absence of
+ * evidence, not evidence of quality, so price alone must never promote an
+ * unprofiled model over a profiled one.
+ */
+export type CapabilityProfileConfidence =
+  | "curated"
+  | "inherited"
+  | "provisional"
+  | "unknown";
+
+const PROFILE_CONFIDENCE_ORDINAL: Record<CapabilityProfileConfidence, number> = {
+  curated: 3,
+  inherited: 2,
+  provisional: 1,
+  unknown: 0,
+};
+
+const CAPABILITY_DIMENSIONS: ReadonlyArray<keyof ModelCapabilities> = [
+  "coding", "debugging", "research", "reasoning",
+  "speed", "longContext", "instruction",
+];
+
+/**
+ * Resolve the capability-profile confidence for a model ID. Provider-qualified
+ * IDs are matched by their bare ID, mirroring capability scoring.
+ */
+export function getModelProfileConfidence(
+  modelId: string,
+  capabilityOverrides?: Record<string, Partial<ModelCapabilities>>,
+): CapabilityProfileConfidence {
+  const bareId = bareModelId(modelId);
+  if (MODEL_CAPABILITY_PROFILES[bareId] !== undefined) return "curated";
+  const override = capabilityOverrides?.[modelId] ?? capabilityOverrides?.[bareId];
+  if (override && CAPABILITY_DIMENSIONS.every(d => typeof override[d] === "number")) {
+    return "provisional";
+  }
+  return "unknown";
 }
 
 // ─── Known Model Tiers ───────────────────────────────────────────────────────
@@ -314,7 +378,7 @@ export function scoreEligibleModels(
   eligibleModelIds: string[],
   requirements: Partial<Record<keyof ModelCapabilities, number>>,
   capabilityOverrides?: Record<string, Partial<ModelCapabilities>>,
-): Array<{ modelId: string; score: number }> {
+): Array<{ modelId: string; score: number; confidence: CapabilityProfileConfidence }> {
   const scored = eligibleModelIds.map(modelId => {
     const bareId = bareModelId(modelId);
     const builtin = MODEL_CAPABILITY_PROFILES[bareId];
@@ -322,13 +386,21 @@ export function scoreEligibleModels(
     const profile: ModelCapabilities = builtin
       ? override ? { ...builtin, ...override } : builtin
       : { coding: 50, debugging: 50, research: 50, reasoning: 50, speed: 50, longContext: 50, instruction: 50 };
-    return { modelId, score: scoreModel(profile, requirements) };
+    return {
+      modelId,
+      score: scoreModel(profile, requirements),
+      confidence: getModelProfileConfidence(modelId, capabilityOverrides),
+    };
   });
   scored.sort((a, b) => {
     const scoreDiff = b.score - a.score;
     if (Math.abs(scoreDiff) > 2) return scoreDiff;
-    const costA = MODEL_COST_PER_1K_INPUT[a.modelId] ?? Infinity;
-    const costB = MODEL_COST_PER_1K_INPUT[b.modelId] ?? Infinity;
+    // Within the tie band, never let a lower-confidence model win on price
+    // alone: a neutral 50 is the absence of evidence, not evidence of quality.
+    const confDiff = PROFILE_CONFIDENCE_ORDINAL[b.confidence] - PROFILE_CONFIDENCE_ORDINAL[a.confidence];
+    if (confDiff !== 0) return confDiff;
+    const costA = getModelCost(a.modelId);
+    const costB = getModelCost(b.modelId);
     if (costA !== costB) return costA - costB;
     return a.modelId.localeCompare(b.modelId);
   });
@@ -535,10 +607,26 @@ export function resolveModelForComplexity(
   if (routingConfig.capability_routing !== false && eligible.length > 1 && unitType) {
     const requirements = computeTaskRequirements(unitType, taskMetadata);
     const scored = scoreEligibleModels(eligible, requirements, capabilityOverrides);
-    const winner = scored[0];
+
+    // Phase J routing safety: do not AUTOMATICALLY route to a model with no
+    // capability profile (unknown confidence) when a profiled alternative is
+    // eligible. Unprofiled models remain available for manual/explicit
+    // selection (honored earlier via tier_models / preferred paths), but are
+    // only auto-selected here as a last resort when nothing profiled qualifies.
+    const profiled = scored.filter(s => s.confidence !== "unknown");
+    const pool = profiled.length > 0 ? profiled : scored;
+    const winner = pool[0];
     if (winner) {
       const capScores: Record<string, number> = {};
       for (const s of scored) capScores[s.modelId] = s.score;
+      const rejected = scored
+        .filter(s => s.modelId !== winner.modelId)
+        .map(s => ({
+          modelId: s.modelId,
+          reason: profiled.length > 0 && s.confidence === "unknown"
+            ? "no GSD capability profile (unknown confidence) — manual selection only, not auto-routed"
+            : `lower capability match (${s.score.toFixed(1)} vs ${winner.score.toFixed(1)})`,
+        }));
       const fallbacks = buildFallbackChain(winner.modelId, phaseConfig);
       return {
         modelId: winner.modelId,
@@ -549,6 +637,8 @@ export function resolveModelForComplexity(
         capabilityScores: capScores,
         taskRequirements: requirements,
         selectionMethod: "capability-scored",
+        profileConfidence: winner.confidence,
+        ...(rejected.length > 0 ? { rejected } : {}),
       };
     }
   }
@@ -809,11 +899,28 @@ function isKnownModel(modelId: string): boolean {
 }
 
 function getModelCost(modelId: string): number {
+  const provider = modelProvider(modelId) ?? "unknown";
   const bareId = bareModelId(modelId);
+  const fallbackEconomics = {
+    source: "bundled-fallback" as const,
+    stale: false,
+    billingUnit: "tokens" as const,
+    tokenPrices: {
+      default: {
+        inputPer1k: MODEL_COST_PER_1K_INPUT[bareId] ?? 999,
+        outputPer1k: 0,
+      },
+    },
+  };
 
-  if (MODEL_COST_PER_1K_INPUT[bareId] !== undefined) {
-    return MODEL_COST_PER_1K_INPUT[bareId];
-  }
+  const resolved = resolveModelEconomics({
+    provider,
+    modelId: bareId,
+    fallbackEconomics,
+  });
+
+  const inputPer1k = resolved.tokenPrices?.default.inputPer1k ?? 999;
+  if (inputPer1k !== 999) return inputPer1k;
 
   // Check partial matches
   for (const [knownId, cost] of Object.entries(MODEL_COST_PER_1K_INPUT)) {

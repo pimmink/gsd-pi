@@ -17,7 +17,7 @@ export interface GsdCommandDefinition {
 type CompletionMap = Record<string, readonly GsdCommandDefinition[]>;
 
 export const GSD_COMMAND_DESCRIPTION =
-  "GSD — Git Ship Done: /gsd help|start|templates|next|auto|stop|pause|status|widget|visualize|brief|report|queue|quick|discuss|capture|triage|dispatch|verdict|history|undo|undo-task|reset-slice|rate|skip|export|cleanup|closeout|rebuild|db|model|mode|prefs|config|keys|hooks|run-hook|skill-health|doctor|debug|logs|forensics|changelog|migrate|remote|steer|knowledge|memory|new-milestone|new-project|parallel|cmux|park|unpark|init|setup|onboarding|inspect|extensions|update|upgrade|fast|mcp|rethink|workflow|codebase|notifications|ship|do|usage|context|session-report|backlog|pr-branch|add-tests|scan|language|worktree|eval-review";
+  "GSD — Git Ship Done: /gsd help|start|templates|next|auto|stop|pause|status|widget|visualize|brief|report|queue|quick|discuss|capture|triage|dispatch|verdict|history|undo|undo-task|reset-slice|rate|skip|export|cleanup|closeout|rebuild|db|model|mode|prefs|config|keys|hooks|run-hook|skill-health|doctor|copilot-models|debug|logs|forensics|changelog|migrate|remote|steer|knowledge|memory|new-milestone|new-project|parallel|cmux|park|unpark|init|setup|onboarding|inspect|extensions|update|upgrade|fast|mcp|rethink|workflow|codebase|notifications|ship|do|usage|context|session-report|backlog|pr-branch|add-tests|scan|language|worktree|eval-review";
 
 export const TOP_LEVEL_SUBCOMMANDS: readonly GsdCommandDefinition[] = [
   { cmd: "help", desc: "Categorized command reference with descriptions" },
@@ -163,6 +163,14 @@ const NESTED_COMPLETIONS: CompletionMap = {
     { cmd: "debug", desc: "List or view debug log files" },
     { cmd: "tail", desc: "Show last N activity log summaries" },
     { cmd: "clear", desc: "Remove old activity and debug logs" },
+  ],
+  "copilot-models": [
+    { cmd: "sync", desc: "Fetch and diff the live GitHub Copilot model catalog" },
+    { cmd: "changes", desc: "Show the most recent drift summary for the live catalog" },
+    { cmd: "pricing", desc: "Show bundled pricing for live Copilot models" },
+    { cmd: "promos", desc: "Check for active Copilot promos or price notes" },
+    { cmd: "doctor", desc: "Check Copilot catalog health and account status" },
+    { cmd: "why <model>", desc: "Explain a model's tier, confidence, and pricing" },
   ],
   debug: [
     { cmd: "list", desc: "List persisted debug sessions" },

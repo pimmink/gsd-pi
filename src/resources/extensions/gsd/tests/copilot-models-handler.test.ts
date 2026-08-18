@@ -163,6 +163,61 @@ test("handleCopilotModels: fetch failure preserves last-known-good snapshot", as
   assert.match(notifications[2].message, /\+ gpt-5\.5 added/);
 });
 
+test("handleCopilotModels: why <model> explains profile confidence and pricing", async () => {
+  _resetCopilotModelsSessionStateForTests();
+  const { ctx, notifications } = createFakeCtx({
+    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+    apiKey: "token-abc",
+  });
+
+  await handleCopilotModels("sync", ctx, {
+    fetchImpl: jsonResponse([
+      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+    ]) as unknown as typeof fetch,
+  });
+
+  await handleCopilotModels("why gpt-5.4", ctx, {
+    fetchImpl: jsonResponse([
+      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+    ]) as unknown as typeof fetch,
+  });
+
+  const message = notifications[notifications.length - 1]?.message ?? "";
+  assert.match(message, /gpt-5\.4/i);
+  assert.match(message, /heavy|standard/i);
+  assert.match(message, /pricing/i);
+  assert.match(message, /automatic routing|manual selection only|eligible/i);
+});
+
+test("handleCopilotModels: pricing view reports the bundled cost snapshot for live catalog models", async () => {
+  _resetCopilotModelsSessionStateForTests();
+  const { ctx, notifications } = createFakeCtx({
+    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+    apiKey: "token-abc",
+  });
+
+  await handleCopilotModels("sync", ctx, {
+    fetchImpl: jsonResponse([
+      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+    ]) as unknown as typeof fetch,
+  });
+
+  await handleCopilotModels("pricing", ctx, {
+    fetchImpl: jsonResponse([
+      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+    ]) as unknown as typeof fetch,
+  });
+
+  const message = notifications[notifications.length - 1]?.message ?? "";
+  assert.match(message, /pricing/i);
+  assert.match(message, /gpt-5\.4/i);
+  assert.match(message, /\$0?\.005|0\.005/i);
+});
+
 test("handleCopilotModels: empty response never overwrites the cached catalog", async () => {
   _resetCopilotModelsSessionStateForTests();
   const { ctx, notifications } = createFakeCtx({

@@ -16,6 +16,7 @@ import {
   computeTaskRequirements,
   scoreEligibleModels,
   getEligibleModels,
+  getModelProfileConfidence,
   MODEL_CAPABILITY_PROFILES,
   MODEL_CAPABILITY_TIER,
 } from "../model-router.js";
@@ -1510,5 +1511,93 @@ describe("model-router registry keys", () => {
       getEligibleModels("standard", ["claude-sonnet-5", "gemini-2.5-pro"], defaultRoutingConfig()),
       ["gemini-2.5-pro", "claude-sonnet-5"],
     );
+  });
+});
+
+// ─── Phase J: routing safety (profile-confidence gating) ───────────────────────
+// A live-discovered model can carry real (cheap) economics but no curated GSD
+// capability profile. Price alone must never promote such an unprofiled model
+// over a profiled one in AUTOMATIC routing; it stays available for manual use.
+
+describe("Phase J routing safety", () => {
+  // A cheap, light-tier model that resolves cost/tier via partial match to
+  // "mai-code-1.1-flash" but has NO exact capability profile → unknown confidence.
+  const UNPROFILED_CHEAP_LIGHT = "mai-code-1.1-flash-preview";
+
+  test("getModelProfileConfidence classifies curated, provisional, and unknown", () => {
+    assert.equal(getModelProfileConfidence("gpt-4o"), "curated");
+    // Provider-qualified IDs match on the bare ID.
+    assert.equal(getModelProfileConfidence("anthropic/claude-opus-4-6"), "curated");
+    assert.equal(getModelProfileConfidence(UNPROFILED_CHEAP_LIGHT), "unknown");
+    // A complete user-supplied override is explicit evidence → provisional.
+    const fullOverride: Record<string, Partial<ModelCapabilities>> = {
+      "brand-new-model": {
+        coding: 70, debugging: 60, research: 55, reasoning: 60,
+        speed: 80, longContext: 60, instruction: 75,
+      },
+    };
+    assert.equal(getModelProfileConfidence("brand-new-model", fullOverride), "provisional");
+    // A partial override is not enough to vouch for auto-routing.
+    assert.equal(
+      getModelProfileConfidence("brand-new-model", { "brand-new-model": { coding: 70 } }),
+      "unknown",
+    );
+  });
+
+  test("scoreEligibleModels annotates confidence per candidate", () => {
+    const scored = scoreEligibleModels(["gpt-4o", UNPROFILED_CHEAP_LIGHT], { coding: 1.0 });
+    const gpt = scored.find(s => s.modelId === "gpt-4o");
+    const unprofiled = scored.find(s => s.modelId === UNPROFILED_CHEAP_LIGHT);
+    assert.equal(gpt?.confidence, "curated");
+    assert.equal(unprofiled?.confidence, "unknown");
+  });
+
+  test("within the score band, a profiled model beats a cheaper unprofiled one", () => {
+    // Empty requirements → every model scores a neutral 50 (all within band), so
+    // only the confidence/cost tie-breaks decide. gpt-4o ($0.0025) is ~12x more
+    // expensive than the unprofiled cheap model ($0.0002), yet must still win.
+    const scored = scoreEligibleModels([UNPROFILED_CHEAP_LIGHT, "gpt-4o"], {});
+    assert.equal(scored[0].modelId, "gpt-4o", "curated confidence must outrank price");
+    assert.equal(scored[0].confidence, "curated");
+    assert.equal(scored[1].confidence, "unknown");
+  });
+
+  test("resolveModelForComplexity does not auto-route to an unprofiled model when a profiled one is eligible", () => {
+    const config: DynamicRoutingConfig = { ...defaultRoutingConfig(), enabled: true, capability_routing: true };
+    // research-slice weights research/longContext/reasoning — gpt-4o-mini scores
+    // BELOW the unprofiled model's flat 50 on these, so without the safety gate
+    // the unprofiled model would win on raw score. The gate must hold it back.
+    const result = resolveModelForComplexity(
+      { tier: "light", reason: "test", downgraded: false },
+      { primary: "claude-opus-4-6", fallbacks: [] },
+      config,
+      ["gpt-4o-mini", UNPROFILED_CHEAP_LIGHT],
+      "research-slice",
+    );
+    assert.equal(result.selectionMethod, "capability-scored");
+    assert.equal(result.modelId, "gpt-4o-mini", "profiled model must be chosen for auto-routing");
+    assert.equal(result.profileConfidence, "curated");
+    const held = result.rejected?.find(r => r.modelId === UNPROFILED_CHEAP_LIGHT);
+    assert.ok(held, "unprofiled candidate should be reported as rejected");
+    assert.match(held!.reason, /capability profile/i);
+  });
+
+  test("unprofiled models are still routed when no profiled alternative is eligible", () => {
+    const config: DynamicRoutingConfig = { ...defaultRoutingConfig(), enabled: true, capability_routing: true };
+    const result = resolveModelForComplexity(
+      { tier: "light", reason: "test", downgraded: false },
+      { primary: "claude-opus-4-6", fallbacks: [] },
+      config,
+      ["mai-code-1.1-flash-beta", UNPROFILED_CHEAP_LIGHT],
+      "research-slice",
+    );
+    // The gate must not deadlock: last-resort auto-routing still picks a model,
+    // and flags its unknown confidence so callers can warn.
+    assert.equal(result.selectionMethod, "capability-scored");
+    assert.ok(
+      ["mai-code-1.1-flash-beta", UNPROFILED_CHEAP_LIGHT].includes(result.modelId),
+      `expected an eligible model, got ${result.modelId}`,
+    );
+    assert.equal(result.profileConfidence, "unknown");
   });
 });

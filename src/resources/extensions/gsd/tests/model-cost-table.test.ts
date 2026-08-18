@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { lookupModelCost, compareModelCost, BUNDLED_COST_TABLE } from "../model-cost-table.js";
+import {
+  lookupModelCost,
+  compareModelCost,
+  BUNDLED_COST_TABLE,
+  resolveModelEconomics,
+} from "../model-cost-table.js";
 
 // ─── lookupModelCost ─────────────────────────────────────────────────────────
 
@@ -35,6 +40,53 @@ test("lookupModelCost finds MAI Code 1.1 Flash pricing", () => {
   assert.ok(entry);
   assert.equal(entry.inputPer1k, 0.0002);
   assert.equal(entry.outputPer1k, 0.0012);
+});
+
+test("resolveModelEconomics prefers explicit user overrides over bundled cost data", () => {
+  const resolved = resolveModelEconomics({
+    provider: "github-copilot",
+    modelId: "mai-code-1.1-flash",
+    userOverride: {
+      source: "user",
+      tokenPrices: { default: { inputPer1k: 0.00008, outputPer1k: 0.0008 } },
+      stale: false,
+    },
+    liveEconomics: {
+      source: "provider-live",
+      tokenPrices: { default: { inputPer1k: 0.00015, outputPer1k: 0.0011 } },
+      stale: false,
+    },
+    staticEconomics: {
+      source: "provider-static",
+      tokenPrices: { default: { inputPer1k: 0.0002, outputPer1k: 0.0012 } },
+      stale: false,
+    },
+    fallbackEconomics: {
+      source: "bundled-fallback",
+      tokenPrices: { default: { inputPer1k: 0.0003, outputPer1k: 0.0015 } },
+      stale: false,
+    },
+  });
+
+  assert.equal(resolved.source, "user");
+  assert.equal(resolved.tokenPrices?.default.inputPer1k, 0.00008);
+  assert.equal(resolved.tokenPrices?.default.outputPer1k, 0.0008);
+});
+
+test("resolveModelEconomics keeps a provider-qualified identity instead of collapsing bare IDs", () => {
+  const resolved = resolveModelEconomics({
+    provider: "github-copilot",
+    modelId: "mai-code-1.1-flash",
+    fallbackEconomics: {
+      source: "bundled-fallback",
+      tokenPrices: { default: { inputPer1k: 0.0002, outputPer1k: 0.0012 } },
+      stale: false,
+    },
+  });
+
+  assert.equal(resolved.provider, "github-copilot");
+  assert.equal(resolved.modelId, "mai-code-1.1-flash");
+  assert.equal(resolved.source, "bundled-fallback");
 });
 
 // ─── compareModelCost ────────────────────────────────────────────────────────
