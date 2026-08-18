@@ -8,245 +8,284 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
-  _resetCopilotModelsSessionStateForTests,
-  handleCopilotModels,
+	_resetCopilotModelsSessionStateForTests,
+	handleCopilotModels,
 } from "../commands/handlers/copilot-models.js";
 
 interface FakeModel {
-  id: string;
-  provider: string;
+	id: string;
+	provider: string;
 }
 
 function createFakeCtx(options: {
-  models?: FakeModel[];
-  apiKey?: string | undefined;
+	models?: FakeModel[];
+	apiKey?: string | undefined;
 }): { ctx: any; notifications: Array<{ message: string; level: string }> } {
-  const notifications: Array<{ message: string; level: string }> = [];
-  const models = options.models ?? [];
-  const ctx = {
-    modelRegistry: {
-      getAvailable: () => models,
-      getApiKey: async (_model: FakeModel) => options.apiKey,
-    },
-    ui: {
-      notify: (message: string, level: string = "info") => {
-        notifications.push({ message, level });
-      },
-    },
-  };
-  return { ctx, notifications };
+	const notifications: Array<{ message: string; level: string }> = [];
+	const models = options.models ?? [];
+	const ctx = {
+		modelRegistry: {
+			getAvailable: () => models,
+			getApiKey: async (_model: FakeModel) => options.apiKey,
+		},
+		ui: {
+			notify: (message: string, level: string = "info") => {
+				notifications.push({ message, level });
+			},
+		},
+	};
+	return { ctx, notifications };
 }
 
 function jsonResponse(data: Array<Record<string, unknown>>) {
-  return async () => ({ ok: true, json: async () => ({ data }) }) as unknown as Response;
+	return async () =>
+		({ ok: true, json: async () => ({ data }) }) as unknown as Response;
 }
 
 test("handleCopilotModels: no Copilot model available makes zero network requests", async () => {
-  _resetCopilotModelsSessionStateForTests();
-  let fetchCalled = false;
-  const { ctx, notifications } = createFakeCtx({ models: [] });
+	_resetCopilotModelsSessionStateForTests();
+	let fetchCalled = false;
+	const { ctx, notifications } = createFakeCtx({ models: [] });
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: (async () => {
-      fetchCalled = true;
-      throw new Error("must not be called");
-    }) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("", ctx, {
+		fetchImpl: (async () => {
+			fetchCalled = true;
+			throw new Error("must not be called");
+		}) as unknown as typeof fetch,
+	});
 
-  assert.equal(fetchCalled, false, "no network request without a configured Copilot credential");
-  assert.equal(notifications.length, 1);
-  assert.match(notifications[0].message, /not configured/);
-  assert.equal(notifications[0].level, "info");
+	assert.equal(
+		fetchCalled,
+		false,
+		"no network request without a configured Copilot credential",
+	);
+	assert.equal(notifications.length, 1);
+	assert.match(notifications[0].message, /not configured/);
+	assert.equal(notifications[0].level, "info");
 });
 
 test("handleCopilotModels: missing API key warns without a network request", async () => {
-  _resetCopilotModelsSessionStateForTests();
-  let fetchCalled = false;
-  const { ctx, notifications } = createFakeCtx({
-    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
-    apiKey: undefined,
-  });
+	_resetCopilotModelsSessionStateForTests();
+	let fetchCalled = false;
+	const { ctx, notifications } = createFakeCtx({
+		models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+		apiKey: undefined,
+	});
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: (async () => {
-      fetchCalled = true;
-      return { ok: true, json: async () => ({ data: [] }) } as unknown as Response;
-    }) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("", ctx, {
+		fetchImpl: (async () => {
+			fetchCalled = true;
+			return {
+				ok: true,
+				json: async () => ({ data: [] }),
+			} as unknown as Response;
+		}) as unknown as typeof fetch,
+	});
 
-  assert.equal(fetchCalled, false);
-  assert.equal(notifications[0].level, "warning");
-  assert.match(notifications[0].message, /no access token/);
+	assert.equal(fetchCalled, false);
+	assert.equal(notifications[0].level, "warning");
+	assert.match(notifications[0].message, /no access token/);
 });
 
 test("handleCopilotModels: first successful check reports model count and caches snapshot", async () => {
-  _resetCopilotModelsSessionStateForTests();
-  const { ctx, notifications } = createFakeCtx({
-    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
-    apiKey: "token-abc",
-  });
+	_resetCopilotModelsSessionStateForTests();
+	const { ctx, notifications } = createFakeCtx({
+		models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+		apiKey: "token-abc",
+	});
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: jsonResponse([
-      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
-      { id: "claude-sonnet-5", name: "Claude Sonnet 5", tool_call: true },
-    ]) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "claude-sonnet-5", name: "Claude Sonnet 5", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
 
-  assert.equal(notifications.length, 1);
-  assert.equal(notifications[0].level, "info");
-  assert.match(notifications[0].message, /2 model\(s\) available/);
+	assert.equal(notifications.length, 1);
+	assert.equal(notifications[0].level, "info");
+	assert.match(notifications[0].message, /2 model\(s\) available/);
 });
 
 test("handleCopilotModels: reports added/removed/changed drift and dedupes repeats", async () => {
-  _resetCopilotModelsSessionStateForTests();
-  const { ctx, notifications } = createFakeCtx({
-    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
-    apiKey: "token-abc",
-  });
+	_resetCopilotModelsSessionStateForTests();
+	const { ctx, notifications } = createFakeCtx({
+		models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+		apiKey: "token-abc",
+	});
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: jsonResponse([
-      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
-      { id: "claude-sonnet-5", name: "Claude Sonnet 5", tool_call: true },
-    ]) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "claude-sonnet-5", name: "Claude Sonnet 5", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: jsonResponse([
-      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
-      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
-    ]) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
 
-  const drift = notifications[1];
-  assert.equal(drift.level, "info");
-  assert.match(drift.message, /\+ mai-code-1\.1-flash added/);
-  assert.match(drift.message, /- claude-sonnet-5 removed/);
+	const drift = notifications[1];
+	assert.equal(drift.level, "info");
+	assert.match(drift.message, /\+ mai-code-1\.1-flash added/);
+	assert.match(drift.message, /- claude-sonnet-5 removed/);
 
-  // Re-running the identical fetch should not repeat the same drift notice.
-  await handleCopilotModels("", ctx, {
-    fetchImpl: jsonResponse([
-      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
-      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
-    ]) as unknown as typeof fetch,
-  });
-  assert.equal(notifications.length, 3);
-  assert.match(notifications[2].message, /no new changes/);
+	// Re-running the identical fetch should not repeat the same drift notice.
+	await handleCopilotModels("", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
+	assert.equal(notifications.length, 3);
+	assert.match(notifications[2].message, /no new changes/);
 });
 
 test("handleCopilotModels: fetch failure preserves last-known-good snapshot", async () => {
-  _resetCopilotModelsSessionStateForTests();
-  const { ctx, notifications } = createFakeCtx({
-    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
-    apiKey: "token-abc",
-  });
+	_resetCopilotModelsSessionStateForTests();
+	const { ctx, notifications } = createFakeCtx({
+		models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+		apiKey: "token-abc",
+	});
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: jsonResponse([{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true }]) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: (async () => ({ ok: false, status: 500 }) as unknown as Response) as unknown as typeof fetch,
-  });
-  assert.equal(notifications[1].level, "warning");
-  assert.match(notifications[1].message, /refresh failed/);
+	await handleCopilotModels("", ctx, {
+		fetchImpl: (async () =>
+			({
+				ok: false,
+				status: 500,
+			}) as unknown as Response) as unknown as typeof fetch,
+	});
+	assert.equal(notifications[1].level, "warning");
+	assert.match(notifications[1].message, /refresh failed/);
 
-  // A subsequent successful call must diff against the pre-failure baseline,
-  // proving the failed attempt never clobbered the cached snapshot.
-  await handleCopilotModels("", ctx, {
-    fetchImpl: jsonResponse([
-      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
-      { id: "gpt-5.5", name: "GPT-5.5", tool_call: true },
-    ]) as unknown as typeof fetch,
-  });
-  assert.match(notifications[2].message, /\+ gpt-5\.5 added/);
+	// A subsequent successful call must diff against the pre-failure baseline,
+	// proving the failed attempt never clobbered the cached snapshot.
+	await handleCopilotModels("", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "gpt-5.5", name: "GPT-5.5", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
+	assert.match(notifications[2].message, /\+ gpt-5\.5 added/);
 });
 
 test("handleCopilotModels: why <model> explains profile confidence and pricing", async () => {
-  _resetCopilotModelsSessionStateForTests();
-  const { ctx, notifications } = createFakeCtx({
-    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
-    apiKey: "token-abc",
-  });
+	_resetCopilotModelsSessionStateForTests();
+	const { ctx, notifications } = createFakeCtx({
+		models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+		apiKey: "token-abc",
+	});
 
-  await handleCopilotModels("sync", ctx, {
-    fetchImpl: jsonResponse([
-      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
-      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
-    ]) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("sync", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
 
-  await handleCopilotModels("why gpt-5.4", ctx, {
-    fetchImpl: jsonResponse([
-      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
-      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
-    ]) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("why gpt-5.4", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
 
-  const message = notifications[notifications.length - 1]?.message ?? "";
-  assert.match(message, /gpt-5\.4/i);
-  assert.match(message, /heavy|standard/i);
-  assert.match(message, /pricing/i);
-  assert.match(message, /automatic routing|manual selection only|eligible/i);
+	const message = notifications[notifications.length - 1]?.message ?? "";
+	assert.match(message, /gpt-5\.4/i);
+	assert.match(message, /heavy|standard/i);
+	assert.match(message, /pricing/i);
+	assert.match(message, /automatic routing|manual selection only|eligible/i);
 });
 
 test("handleCopilotModels: pricing view reports the bundled cost snapshot for live catalog models", async () => {
-  _resetCopilotModelsSessionStateForTests();
-  const { ctx, notifications } = createFakeCtx({
-    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
-    apiKey: "token-abc",
-  });
+	_resetCopilotModelsSessionStateForTests();
+	const { ctx, notifications } = createFakeCtx({
+		models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+		apiKey: "token-abc",
+	});
 
-  await handleCopilotModels("sync", ctx, {
-    fetchImpl: jsonResponse([
-      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
-      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
-    ]) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("sync", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
 
-  await handleCopilotModels("pricing", ctx, {
-    fetchImpl: jsonResponse([
-      { id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
-      { id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
-    ]) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("pricing", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
 
-  const message = notifications[notifications.length - 1]?.message ?? "";
-  assert.match(message, /pricing/i);
-  assert.match(message, /gpt-5\.4/i);
-  assert.match(message, /\$0?\.005|0\.005/i);
+	const message = notifications[notifications.length - 1]?.message ?? "";
+	assert.match(message, /pricing/i);
+	assert.match(message, /gpt-5\.4/i);
+	assert.match(message, /\$0?\.005|0\.005/i);
 });
 
 test("handleCopilotModels: empty response never overwrites the cached catalog", async () => {
-  _resetCopilotModelsSessionStateForTests();
-  const { ctx, notifications } = createFakeCtx({
-    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
-    apiKey: "token-abc",
-  });
+	_resetCopilotModelsSessionStateForTests();
+	const { ctx, notifications } = createFakeCtx({
+		models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+		apiKey: "token-abc",
+	});
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: jsonResponse([{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true }]) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: jsonResponse([]) as unknown as typeof fetch,
-  });
-  assert.equal(notifications[1].level, "warning");
-  assert.match(notifications[1].message, /empty response/);
+	await handleCopilotModels("", ctx, {
+		fetchImpl: jsonResponse([]) as unknown as typeof fetch,
+	});
+	assert.equal(notifications[1].level, "warning");
+	assert.match(notifications[1].message, /empty response/);
+});
+
+test("handleCopilotModels: register keeps remote-only models quarantined and never persists placeholders", async () => {
+	_resetCopilotModelsSessionStateForTests();
+	const { ctx, notifications } = createFakeCtx({
+		models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+		apiKey: "token-abc",
+	});
+
+	await handleCopilotModels("register", ctx, {
+		fetchImpl: jsonResponse([
+			{ id: "gpt-5.4", name: "GPT-5.4", tool_call: true },
+			{ id: "mai-code-1.1-flash", name: "MAI Code 1.1 Flash", tool_call: true },
+		]) as unknown as typeof fetch,
+	});
+
+	assert.equal(notifications.length, 1);
+	assert.match(notifications[0].message, /quarantined|remote-only|not persisted/i);
+	assert.doesNotMatch(notifications[0].message, /cost.*0|contextWindow.*128000|maxTokens.*8192/i);
 });
 
 test("handleCopilotModels: failure with no cached catalog yet reports clearly", async () => {
-  _resetCopilotModelsSessionStateForTests();
-  const { ctx, notifications } = createFakeCtx({
-    models: [{ id: "gpt-5.4", provider: "github-copilot" }],
-    apiKey: "token-abc",
-  });
+	_resetCopilotModelsSessionStateForTests();
+	const { ctx, notifications } = createFakeCtx({
+		models: [{ id: "gpt-5.4", provider: "github-copilot" }],
+		apiKey: "token-abc",
+	});
 
-  await handleCopilotModels("", ctx, {
-    fetchImpl: (async () => ({ ok: false, status: 401 }) as unknown as Response) as unknown as typeof fetch,
-  });
+	await handleCopilotModels("", ctx, {
+		fetchImpl: (async () =>
+			({
+				ok: false,
+				status: 401,
+			}) as unknown as Response) as unknown as typeof fetch,
+	});
 
-  assert.equal(notifications[0].level, "warning");
-  assert.match(notifications[0].message, /no cached catalog yet/);
+	assert.equal(notifications[0].level, "warning");
+	assert.match(notifications[0].message, /no cached catalog yet/);
 });

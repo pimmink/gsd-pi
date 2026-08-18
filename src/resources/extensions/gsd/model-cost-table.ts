@@ -6,109 +6,123 @@
 // Updated with GSD releases. Users can override via preferences.
 
 export interface ModelCostEntry {
-  /** Model ID (bare, without provider prefix) */
-  id: string;
-  /** Approximate cost per 1K input tokens in USD */
-  inputPer1k: number;
-  /** Approximate cost per 1K output tokens in USD */
-  outputPer1k: number;
-  /** Input-token-based long-context pricing tiers, when published */
-  tiers?: Array<{
-    inputTokensAbove: number;
-    inputPer1k: number;
-    outputPer1k: number;
-  }>;
-  /** Last updated date */
-  updatedAt: string;
+	/** Model ID (bare, without provider prefix) */
+	id: string;
+	/** Approximate cost per 1K input tokens in USD */
+	inputPer1k: number;
+	/** Approximate cost per 1K output tokens in USD */
+	outputPer1k: number;
+	/** Input-token-based long-context pricing tiers, when published */
+	tiers?: Array<{
+		inputTokensAbove: number;
+		inputPer1k: number;
+		outputPer1k: number;
+	}>;
+	/** Last updated date */
+	updatedAt: string;
 }
 
 export type RuntimeEconomicsSource =
-  | "user"
-  | "provider-live"
-  | "provider-static"
-  | "bundled-fallback"
-  | "unknown";
+	| "user"
+	| "provider-live"
+	| "provider-static"
+	| "bundled-fallback"
+	| "unknown";
 
 export interface TokenPriceTier {
-  inputPer1k: number;
-  outputPer1k: number;
-  cachedInputPer1k?: number;
-  cachedOutputPer1k?: number;
+	inputPer1k: number;
+	outputPer1k: number;
+	cachedInputPer1k?: number;
+	cachedOutputPer1k?: number;
 }
 
 export interface RuntimeModelEconomics {
-  provider: string;
-  modelId: string;
-  source: RuntimeEconomicsSource;
-  fetchedAt?: number;
-  stale: boolean;
-  billingUnit: "tokens" | "request" | "unknown";
-  tokenPrices?: {
-    default: TokenPriceTier;
-    longContext?: TokenPriceTier;
-  };
-  requestMultiplier?: number;
-  promotion?: {
-    discountPercent?: number;
-    endsAt?: string;
-    message?: string;
-  };
+	provider: string;
+	modelId: string;
+	source: RuntimeEconomicsSource;
+	fetchedAt?: number;
+	stale: boolean;
+	billingUnit: "tokens" | "request" | "unknown";
+	tokenPrices?: {
+		default: TokenPriceTier;
+		longContext?: TokenPriceTier;
+	};
+	requestMultiplier?: number;
+	promotion?: {
+		discountPercent?: number;
+		endsAt?: string;
+		message?: string;
+	};
 }
 
 export interface ResolveModelEconomicsInput {
-  provider: string;
-  modelId: string;
-  userOverride?: Partial<RuntimeModelEconomics>;
-  liveEconomics?: Partial<RuntimeModelEconomics>;
-  staticEconomics?: Partial<RuntimeModelEconomics>;
-  fallbackEconomics?: Partial<RuntimeModelEconomics>;
+	provider: string;
+	modelId: string;
+	userOverride?: Partial<RuntimeModelEconomics>;
+	liveEconomics?: Partial<RuntimeModelEconomics>;
+	staticEconomics?: Partial<RuntimeModelEconomics>;
+	fallbackEconomics?: Partial<RuntimeModelEconomics>;
 }
 
 function stripProviderPrefix(modelId: string): string {
-  if (!modelId.includes("/")) return modelId;
-  return modelId.split("/").pop() ?? modelId;
+	if (!modelId.includes("/")) return modelId;
+	return modelId.split("/").pop() ?? modelId;
 }
 
-function buildDefaultTokenPricesFromBundle(modelId: string): RuntimeModelEconomics["tokenPrices"] | undefined {
-  const bareId = stripProviderPrefix(modelId);
-  const costEntry = lookupModelCost(bareId) ?? lookupModelCost(`${bareId}`);
-  if (!costEntry) return undefined;
+function buildDefaultTokenPricesFromBundle(
+	modelId: string,
+): RuntimeModelEconomics["tokenPrices"] | undefined {
+	const bareId = stripProviderPrefix(modelId);
+	const costEntry = lookupModelCost(bareId) ?? lookupModelCost(`${bareId}`);
+	if (!costEntry) return undefined;
 
-  return {
-    default: {
-      inputPer1k: costEntry.inputPer1k,
-      outputPer1k: costEntry.outputPer1k,
-    },
-  };
+	return {
+		default: {
+			inputPer1k: costEntry.inputPer1k,
+			outputPer1k: costEntry.outputPer1k,
+		},
+	};
 }
 
-function resolveEconomicsSource(input: ResolveModelEconomicsInput): RuntimeEconomicsSource {
-  if (input.userOverride) return "user";
-  if (input.liveEconomics) return "provider-live";
-  if (input.staticEconomics) return "provider-static";
-  if (input.fallbackEconomics) return "bundled-fallback";
-  return "unknown";
+function resolveEconomicsSource(
+	input: ResolveModelEconomicsInput,
+): RuntimeEconomicsSource {
+	if (input.userOverride) return "user";
+	if (input.liveEconomics) return "provider-live";
+	if (input.staticEconomics) return "provider-static";
+	if (input.fallbackEconomics) return "bundled-fallback";
+	return "unknown";
 }
 
-export function resolveModelEconomics(input: ResolveModelEconomicsInput): RuntimeModelEconomics {
-  const chosen = input.userOverride ?? input.liveEconomics ?? input.staticEconomics ?? input.fallbackEconomics ?? {};
-  const provider = input.provider || chosen.provider || "unknown";
-  const modelId = stripProviderPrefix(input.modelId || chosen.modelId || "unknown");
-  const tokenPrices = chosen.tokenPrices ?? buildDefaultTokenPricesFromBundle(modelId) ?? {
-    default: { inputPer1k: 0, outputPer1k: 0 },
-  };
+export function resolveModelEconomics(
+	input: ResolveModelEconomicsInput,
+): RuntimeModelEconomics {
+	const chosen =
+		input.userOverride ??
+		input.liveEconomics ??
+		input.staticEconomics ??
+		input.fallbackEconomics ??
+		{};
+	const provider = input.provider || chosen.provider || "unknown";
+	const modelId = stripProviderPrefix(
+		input.modelId || chosen.modelId || "unknown",
+	);
+	const tokenPrices = chosen.tokenPrices ??
+		buildDefaultTokenPricesFromBundle(modelId) ?? {
+			default: { inputPer1k: 0, outputPer1k: 0 },
+		};
 
-  return {
-    provider,
-    modelId,
-    source: resolveEconomicsSource(input),
-    fetchedAt: chosen.fetchedAt,
-    stale: chosen.stale ?? true,
-    billingUnit: chosen.billingUnit ?? "tokens",
-    tokenPrices,
-    requestMultiplier: chosen.requestMultiplier,
-    promotion: chosen.promotion,
-  };
+	return {
+		provider,
+		modelId,
+		source: resolveEconomicsSource(input),
+		fetchedAt: chosen.fetchedAt,
+		stale: chosen.stale ?? true,
+		billingUnit: chosen.billingUnit ?? "tokens",
+		tokenPrices,
+		requestMultiplier: chosen.requestMultiplier,
+		promotion: chosen.promotion,
+	};
 }
 
 /**
@@ -116,82 +130,292 @@ export function resolveModelEconomics(input: ResolveModelEconomicsInput): Runtim
  * Updated periodically with GSD releases.
  */
 export const BUNDLED_COST_TABLE: ModelCostEntry[] = [
-  // Anthropic
-  { id: "claude-opus-4-6", inputPer1k: 0.005, outputPer1k: 0.025, updatedAt: "2026-04-16" },
-  { id: "claude-opus-4-7", inputPer1k: 0.005, outputPer1k: 0.025, updatedAt: "2026-04-16" },
-  { id: "claude-opus-4-8", inputPer1k: 0.005, outputPer1k: 0.025, updatedAt: "2026-05-28" },
-  { id: "claude-opus-5", inputPer1k: 0.005, outputPer1k: 0.025, updatedAt: "2026-08-12" },
-  { id: "claude-fable-5", inputPer1k: 0.010, outputPer1k: 0.050, updatedAt: "2026-06-09" },
-  { id: "claude-sonnet-4-6", inputPer1k: 0.003, outputPer1k: 0.015, updatedAt: "2025-03-15" },
-  { id: "claude-haiku-4-5", inputPer1k: 0.0008, outputPer1k: 0.004, updatedAt: "2025-03-15" },
-  { id: "claude-sonnet-4-5-20250514", inputPer1k: 0.003, outputPer1k: 0.015, updatedAt: "2025-03-15" },
-  { id: "claude-3-5-sonnet-latest", inputPer1k: 0.003, outputPer1k: 0.015, updatedAt: "2025-03-15" },
-  { id: "claude-3-5-haiku-latest", inputPer1k: 0.0008, outputPer1k: 0.004, updatedAt: "2025-03-15" },
-  { id: "claude-3-opus-latest", inputPer1k: 0.015, outputPer1k: 0.075, updatedAt: "2025-03-15" },
+	// Anthropic
+	{
+		id: "claude-opus-4-6",
+		inputPer1k: 0.005,
+		outputPer1k: 0.025,
+		updatedAt: "2026-04-16",
+	},
+	{
+		id: "claude-opus-4-7",
+		inputPer1k: 0.005,
+		outputPer1k: 0.025,
+		updatedAt: "2026-04-16",
+	},
+	{
+		id: "claude-opus-4-8",
+		inputPer1k: 0.005,
+		outputPer1k: 0.025,
+		updatedAt: "2026-05-28",
+	},
+	{
+		id: "claude-opus-5",
+		inputPer1k: 0.005,
+		outputPer1k: 0.025,
+		updatedAt: "2026-08-12",
+	},
+	{
+		id: "claude-fable-5",
+		inputPer1k: 0.01,
+		outputPer1k: 0.05,
+		updatedAt: "2026-06-09",
+	},
+	{
+		id: "claude-sonnet-4-6",
+		inputPer1k: 0.003,
+		outputPer1k: 0.015,
+		updatedAt: "2025-03-15",
+	},
+	{
+		id: "claude-haiku-4-5",
+		inputPer1k: 0.0008,
+		outputPer1k: 0.004,
+		updatedAt: "2025-03-15",
+	},
+	{
+		id: "claude-sonnet-4-5-20250514",
+		inputPer1k: 0.003,
+		outputPer1k: 0.015,
+		updatedAt: "2025-03-15",
+	},
+	{
+		id: "claude-3-5-sonnet-latest",
+		inputPer1k: 0.003,
+		outputPer1k: 0.015,
+		updatedAt: "2025-03-15",
+	},
+	{
+		id: "claude-3-5-haiku-latest",
+		inputPer1k: 0.0008,
+		outputPer1k: 0.004,
+		updatedAt: "2025-03-15",
+	},
+	{
+		id: "claude-3-opus-latest",
+		inputPer1k: 0.015,
+		outputPer1k: 0.075,
+		updatedAt: "2025-03-15",
+	},
 
-  // OpenAI
-  { id: "gpt-4o", inputPer1k: 0.0025, outputPer1k: 0.01, updatedAt: "2025-03-15" },
-  { id: "gpt-4o-mini", inputPer1k: 0.00015, outputPer1k: 0.0006, updatedAt: "2025-03-15" },
-  { id: "gpt-4.1", inputPer1k: 0.002, outputPer1k: 0.008, updatedAt: "2026-03-29" },
-  { id: "gpt-4.1-mini", inputPer1k: 0.0004, outputPer1k: 0.0016, updatedAt: "2026-03-29" },
-  { id: "gpt-4.1-nano", inputPer1k: 0.0001, outputPer1k: 0.0004, updatedAt: "2026-03-29" },
-  { id: "gpt-5", inputPer1k: 0.01, outputPer1k: 0.04, updatedAt: "2026-03-29" },
-  { id: "gpt-5-mini", inputPer1k: 0.0003, outputPer1k: 0.0012, updatedAt: "2026-03-29" },
-  { id: "gpt-5-nano", inputPer1k: 0.0001, outputPer1k: 0.0004, updatedAt: "2026-03-29" },
-  { id: "gpt-5-pro", inputPer1k: 0.015, outputPer1k: 0.06, updatedAt: "2026-03-29" },
-  { id: "o1", inputPer1k: 0.015, outputPer1k: 0.06, updatedAt: "2025-03-15" },
-  { id: "o3", inputPer1k: 0.015, outputPer1k: 0.06, updatedAt: "2025-03-15" },
-  { id: "o4-mini", inputPer1k: 0.005, outputPer1k: 0.02, updatedAt: "2026-03-29" },
-  { id: "o4-mini-deep-research", inputPer1k: 0.005, outputPer1k: 0.02, updatedAt: "2026-03-29" },
-  { id: "gpt-4-turbo", inputPer1k: 0.01, outputPer1k: 0.03, updatedAt: "2025-03-15" },
+	// OpenAI
+	{
+		id: "gpt-4o",
+		inputPer1k: 0.0025,
+		outputPer1k: 0.01,
+		updatedAt: "2025-03-15",
+	},
+	{
+		id: "gpt-4o-mini",
+		inputPer1k: 0.00015,
+		outputPer1k: 0.0006,
+		updatedAt: "2025-03-15",
+	},
+	{
+		id: "gpt-4.1",
+		inputPer1k: 0.002,
+		outputPer1k: 0.008,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-4.1-mini",
+		inputPer1k: 0.0004,
+		outputPer1k: 0.0016,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-4.1-nano",
+		inputPer1k: 0.0001,
+		outputPer1k: 0.0004,
+		updatedAt: "2026-03-29",
+	},
+	{ id: "gpt-5", inputPer1k: 0.01, outputPer1k: 0.04, updatedAt: "2026-03-29" },
+	{
+		id: "gpt-5-mini",
+		inputPer1k: 0.0003,
+		outputPer1k: 0.0012,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5-nano",
+		inputPer1k: 0.0001,
+		outputPer1k: 0.0004,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5-pro",
+		inputPer1k: 0.015,
+		outputPer1k: 0.06,
+		updatedAt: "2026-03-29",
+	},
+	{ id: "o1", inputPer1k: 0.015, outputPer1k: 0.06, updatedAt: "2025-03-15" },
+	{ id: "o3", inputPer1k: 0.015, outputPer1k: 0.06, updatedAt: "2025-03-15" },
+	{
+		id: "o4-mini",
+		inputPer1k: 0.005,
+		outputPer1k: 0.02,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "o4-mini-deep-research",
+		inputPer1k: 0.005,
+		outputPer1k: 0.02,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-4-turbo",
+		inputPer1k: 0.01,
+		outputPer1k: 0.03,
+		updatedAt: "2025-03-15",
+	},
 
-  // OpenAI Codex
-  { id: "gpt-5.1", inputPer1k: 0.005, outputPer1k: 0.02, updatedAt: "2026-03-29" },
-  { id: "gpt-5.1-codex-max", inputPer1k: 0.003, outputPer1k: 0.012, updatedAt: "2026-03-29" },
-  { id: "gpt-5.1-codex-mini", inputPer1k: 0.0003, outputPer1k: 0.0012, updatedAt: "2026-03-29" },
-  { id: "gpt-5.2", inputPer1k: 0.005, outputPer1k: 0.02, updatedAt: "2026-03-29" },
-  { id: "gpt-5.2-codex", inputPer1k: 0.005, outputPer1k: 0.02, updatedAt: "2026-03-29" },
-  { id: "gpt-5.3-codex", inputPer1k: 0.005, outputPer1k: 0.02, updatedAt: "2026-03-29" },
-  { id: "gpt-5.3-codex-spark", inputPer1k: 0.0003, outputPer1k: 0.0012, updatedAt: "2026-03-29" },
-  { id: "gpt-5.4", inputPer1k: 0.005, outputPer1k: 0.02, updatedAt: "2026-03-29" },
-  { id: "gpt-5.4-mini", inputPer1k: 0.00075, outputPer1k: 0.0045, updatedAt: "2026-04-18" },
-  // GPT-5.5 API list price, also used for live Codex OAuth routing.
-  // Source: https://openai.com/api/pricing/
-  { id: "gpt-5.5", inputPer1k: 0.005, outputPer1k: 0.03, updatedAt: "2026-04-23" },
-  { id: "gpt-5.6-sol", inputPer1k: 0.005, outputPer1k: 0.03, tiers: [{ inputTokensAbove: 272000, inputPer1k: 0.01, outputPer1k: 0.045 }], updatedAt: "2026-07-11" },
-  { id: "gpt-5.6-terra", inputPer1k: 0.0025, outputPer1k: 0.015, tiers: [{ inputTokensAbove: 272000, inputPer1k: 0.005, outputPer1k: 0.0225 }], updatedAt: "2026-07-11" },
-  { id: "gpt-5.6-luna", inputPer1k: 0.001, outputPer1k: 0.006, tiers: [{ inputTokensAbove: 272000, inputPer1k: 0.002, outputPer1k: 0.009 }], updatedAt: "2026-07-11" },
+	// OpenAI Codex
+	{
+		id: "gpt-5.1",
+		inputPer1k: 0.005,
+		outputPer1k: 0.02,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5.1-codex-max",
+		inputPer1k: 0.003,
+		outputPer1k: 0.012,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5.1-codex-mini",
+		inputPer1k: 0.0003,
+		outputPer1k: 0.0012,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5.2",
+		inputPer1k: 0.005,
+		outputPer1k: 0.02,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5.2-codex",
+		inputPer1k: 0.005,
+		outputPer1k: 0.02,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5.3-codex",
+		inputPer1k: 0.005,
+		outputPer1k: 0.02,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5.3-codex-spark",
+		inputPer1k: 0.0003,
+		outputPer1k: 0.0012,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5.4",
+		inputPer1k: 0.005,
+		outputPer1k: 0.02,
+		updatedAt: "2026-03-29",
+	},
+	{
+		id: "gpt-5.4-mini",
+		inputPer1k: 0.00075,
+		outputPer1k: 0.0045,
+		updatedAt: "2026-04-18",
+	},
+	// GPT-5.5 API list price, also used for live Codex OAuth routing.
+	// Source: https://openai.com/api/pricing/
+	{
+		id: "gpt-5.5",
+		inputPer1k: 0.005,
+		outputPer1k: 0.03,
+		updatedAt: "2026-04-23",
+	},
+	{
+		id: "gpt-5.6-sol",
+		inputPer1k: 0.005,
+		outputPer1k: 0.03,
+		tiers: [{ inputTokensAbove: 272000, inputPer1k: 0.01, outputPer1k: 0.045 }],
+		updatedAt: "2026-07-11",
+	},
+	{
+		id: "gpt-5.6-terra",
+		inputPer1k: 0.0025,
+		outputPer1k: 0.015,
+		tiers: [
+			{ inputTokensAbove: 272000, inputPer1k: 0.005, outputPer1k: 0.0225 },
+		],
+		updatedAt: "2026-07-11",
+	},
+	{
+		id: "gpt-5.6-luna",
+		inputPer1k: 0.001,
+		outputPer1k: 0.006,
+		tiers: [
+			{ inputTokensAbove: 272000, inputPer1k: 0.002, outputPer1k: 0.009 },
+		],
+		updatedAt: "2026-07-11",
+	},
 
-  // GitHub Copilot
-  { id: "mai-code-1.1-flash", inputPer1k: 0.0002, outputPer1k: 0.0012, updatedAt: "2026-08-14" },
+	// GitHub Copilot
+	{
+		id: "mai-code-1.1-flash",
+		inputPer1k: 0.0002,
+		outputPer1k: 0.0012,
+		updatedAt: "2026-08-14",
+	},
 
-  // Google
-  { id: "gemini-2.0-flash", inputPer1k: 0.0001, outputPer1k: 0.0004, updatedAt: "2025-03-15" },
-  { id: "gemini-flash-2.0", inputPer1k: 0.0001, outputPer1k: 0.0004, updatedAt: "2025-03-15" },
-  { id: "gemini-2.5-pro", inputPer1k: 0.00125, outputPer1k: 0.005, updatedAt: "2025-03-15" },
+	// Google
+	{
+		id: "gemini-2.0-flash",
+		inputPer1k: 0.0001,
+		outputPer1k: 0.0004,
+		updatedAt: "2025-03-15",
+	},
+	{
+		id: "gemini-flash-2.0",
+		inputPer1k: 0.0001,
+		outputPer1k: 0.0004,
+		updatedAt: "2025-03-15",
+	},
+	{
+		id: "gemini-2.5-pro",
+		inputPer1k: 0.00125,
+		outputPer1k: 0.005,
+		updatedAt: "2025-03-15",
+	},
 
-  // DeepSeek
-  { id: "deepseek-chat", inputPer1k: 0.00014, outputPer1k: 0.00028, updatedAt: "2025-03-15" },
+	// DeepSeek
+	{
+		id: "deepseek-chat",
+		inputPer1k: 0.00014,
+		outputPer1k: 0.00028,
+		updatedAt: "2025-03-15",
+	},
 ];
 
 /**
  * Lookup cost for a model ID. Returns undefined if not found.
  */
 export function lookupModelCost(modelId: string): ModelCostEntry | undefined {
-  const bareId = modelId.includes("/") ? modelId.split("/").pop()! : modelId;
-  return BUNDLED_COST_TABLE.find(e => e.id === bareId)
-    ?? BUNDLED_COST_TABLE.find(e =>
-      bareId.startsWith(`${e.id}-`) ||
-      bareId.startsWith(`${e.id}:`) ||
-      bareId.startsWith(`${e.id}@`)
-    );
+	const bareId = modelId.includes("/") ? modelId.split("/").pop()! : modelId;
+	return (
+		BUNDLED_COST_TABLE.find((e) => e.id === bareId) ??
+		BUNDLED_COST_TABLE.find(
+			(e) =>
+				bareId.startsWith(`${e.id}-`) ||
+				bareId.startsWith(`${e.id}:`) ||
+				bareId.startsWith(`${e.id}@`),
+		)
+	);
 }
 
 /**
  * Compare two models by input cost. Returns negative if a is cheaper.
  */
 export function compareModelCost(modelIdA: string, modelIdB: string): number {
-  const costA = lookupModelCost(modelIdA)?.inputPer1k ?? 999;
-  const costB = lookupModelCost(modelIdB)?.inputPer1k ?? 999;
-  return costA - costB;
+	const costA = lookupModelCost(modelIdA)?.inputPer1k ?? 999;
+	const costB = lookupModelCost(modelIdB)?.inputPer1k ?? 999;
+	return costA - costB;
 }
