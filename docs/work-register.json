@@ -234,8 +234,10 @@
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [
-				"remote:run:32199524656",
-				"sha:4bdb8909bfb6cbb4d137cb178137a37f2b91abf4",
+				"remote:run:32203423874",
+				"sha:26ae1e55d972781db4dbaf475f566fe3d746affe",
+				"superseded:remote:run:32199524656",
+				"superseded:sha:4bdb8909bfb6cbb4d137cb178137a37f2b91abf4",
 				"phase-k:complete",
 				"phase-j:complete"
 			],
@@ -244,11 +246,12 @@
 			],
 			"commits": [
 				"4bdb8909bfb6cbb4d137cb178137a37f2b91abf4",
-				"78ba3154c202a9a9fa0a08e241a4affd132f1ba0"
+				"78ba3154c202a9a9fa0a08e241a4affd132f1ba0",
+				"26ae1e55d972781db4dbaf475f566fe3d746affe"
 			],
-			"context": "Phase J routing-safety work remains complete on the feature branch feat/github-copilot-model-catalog-sync, and Phase K corrective follow-up is complete as the final local-first /models why fix at SHA 4bdb8909bfb6cbb4d137cb178137a37f2b91abf4. The current run uses the fail-closed exact-sha verification flow: source_ref=feat/github-copilot-model-catalog-sync, expected_sha=4bdb8909bfb6cbb4d137cb178137a37f2b91abf4. The fix is intentionally narrow: it keeps why local, read-only, and truthful; it rejects wrong-provider ids before any auth/network path; and it avoids synthetic fallback pricing or broad router redesign.",
-			"validation": "2026-08-19 authoritative remote proof: pimmink/gsd-pi-ci run 32199524656 completed successfully with conclusion success. The job reached build success, typecheck success, compiled-test artifact generation success, and the unit-test plus lifecycle-shadow gate success path. Local proof remained green: the targeted regression run reported 15 passed / 0 failed, and the exact post-fix SHA 4bdb8909bfb6cbb4d137cb178137a37f2b91abf4 is the checked-out branch head. This follow-up commit is the Phase-K corrective repair to the earlier published 24ca12c2 commit without rewriting history.",
-			"nextAction": "The Phase-K repair is complete and published on feat/github-copilot-model-catalog-sync. Keep the safe-containment contract and do not broaden the branch beyond the local-first /models why semantics already proven here. The governance branch update is the only remaining step after green verification."
+			"context": "Phase J routing-safety work remains complete on the feature branch feat/github-copilot-model-catalog-sync. Phase K is now genuinely complete at SHA 26ae1e55d972781db4dbaf475f566fe3d746affe (commit 'fix(gsd): complete Copilot model explanation contract'), which supersedes the narrower local-first fix previously recorded at 4bdb8909. The 4bdb8909 fix only corrected the auth/network-safety half of the contract (why stays local, read-only, and rejects wrong-provider ids before any auth path); it still had a buggy `startsWith(\"why\")` parser (misparsed strings like \"whywhatever\"), a default-model fallback that could silently substitute a different model, and an output format missing effective-local/session-available/live-catalog-status/economics-source/economics-freshness/routing-eligibility fields. The 26ae1e55 commit replaces the parser with a strict first-token match, removes the default-model fallback entirely, and adds a fully structured explanation (identity, effective-local, session-available, last-known live-catalog status yes/no/unknown, capability tier, profile confidence, economics summary/source/freshness with no synthetic $0.0000 placeholders, automatic-routing eligibility, reason, guidance) plus catalog completions and help text for `why <model>`. The verification run now uses the fail-closed exact-sha sharded flow: source_ref=feat/github-copilot-model-catalog-sync, expected_sha=26ae1e55d972781db4dbaf475f566fe3d746affe.",
+			"validation": "2026-08-19 authoritative remote proof (sharded, superseding the earlier stable-only run): pimmink/gsd-pi-ci run 32203423874 (workflow 'Remote PR verification (gsd-pi) - sharded', displayTitle 'Sharded verify: feat/github-copilot-model-catalog-sync @ 26ae1e55d972781db4dbaf475f566fe3d746affe (run #11)') completed with conclusion success; all 7 jobs green (build (once), lifecycle shadow gate (once, not sharded), test-shard 1/4 through 4/4), createdAt 2026-08-19T01:01:22Z, updatedAt 2026-08-19T01:13:39Z. Local proof: the full copilot-models-handler.test.ts suite (35 tests, including 22 new execution-based tests for the why contract) plus the related copilot-model-catalog/copilot-overlay-writer/copilot-catalog-manual-selection/model-cost-table/model-router/capability-router suites (222 tests total) all passed 0 failed; `tsc --noEmit --project tsconfig.extensions.json` (typecheck:extensions) reported no errors; `pnpm run verify:fast` passed (ci-fast-gates: all checks passed); `git diff --check` reported no whitespace errors. Commit 26ae1e55d972781db4dbaf475f566fe3d746affe was pushed fast-forward (4bdb8909..26ae1e55) to origin/feat/github-copilot-model-catalog-sync and confirmed via `git ls-remote` to match exactly. The prior run 32199524656 only exercised the non-sharded 'Remote PR verification (gsd-pi)' (stable) workflow at SHA 4bdb8909 and is retained here as superseded preliminary evidence, not as proof of the full contract.",
+			"nextAction": "Phase K is complete, corrected, and published on feat/github-copilot-model-catalog-sync at 26ae1e55d972781db4dbaf475f566fe3d746affe, with sharded exact-sha CI verification green. Keep the safe-containment contract (why stays local-only, no network, no default-model substitution) and do not broaden the branch beyond the now-complete /models why contract already proven here. Next: prepare the PR against upstream/main per CONTRIBUTING.md."
 		},
 		{
 			"id": "GSD-W013",
