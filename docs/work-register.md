@@ -3,7 +3,7 @@
 # Contributor Work Register
 
 Human-readable projection of [`work-register.json`](./work-register.json), which is the
-canonical source. GitHub and local Git evidence was refreshed on **2026-08-18**.
+canonical source. GitHub and local Git evidence was refreshed on **2026-08-19**.
 
 - **Upstream / PR required**: intended for contribution to `open-gsd/gsd-pi`.
 - **Fork-local / No PR planned**: tooling, recovery, or workflow used only by this fork;
@@ -15,7 +15,7 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-18**.
 | ID | Work | Scope | Upstream | Issue | PR | Branch | Status | Next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | GSD-W013 | Fork-native VS Code and Copilot workspace | Fork-local | No PR planned | — | — | `docs/copilot-workspace-governance` | Complete | Maintain profile/templates/register from governance anchor; keep feature worktrees clean |
-| GSD-W014 | GitHub Copilot model-catalog sync (`/gsd copilot-models`) | Upstream | PR required | — | — | `feat/github-copilot-model-catalog-sync` | Complete — exact-sha remote sharded verification passed on SHA `78ba3154c202a9a9fa0a08e241a4affd132f1ba0` with build + lifecycle gate + all shards green. | Phase K is next; continue with `/models why` in the correct architecture boundary and keep the fail-closed routing-safety baseline without broadening into a production router redesign. |
+| GSD-W014 | GitHub Copilot model-catalog sync (`/gsd copilot-models`) | Upstream | PR required | — | — | `feat/github-copilot-model-catalog-sync` | Complete — exact-sha remote verification passed on SHA `4bdb8909bfb6cbb4d137cb178137a37f2b91abf4` with build + typecheck + unit-test + lifecycle-shadow gate green. | Phase K corrective repair is complete; keep the local-first `/models why` semantics and do not broaden the branch beyond the proven fail-closed routing-safety behavior. |
 | GSD-W015 | Sharded remote pr-verification harness (test-efficiency) | Fork-local (lives in `pimmink/gsd-pi-ci`, not this repo) | No PR planned | — | — | `perf/unit-test-sharding` (gsd-pi-ci) | Complete | None required; optional future promotion from experimental to primary |
 
 ## Completed or historical work

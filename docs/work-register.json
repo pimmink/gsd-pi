@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-08-18",
+	"evidenceAsOf": "2026-08-19",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -234,20 +234,21 @@
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [
-				"remote:run:32169179561",
-				"sha:78ba3154c202a9a9fa0a08e241a4affd132f1ba0",
-				"phase-j:complete",
-				"phase-k:next"
+				"remote:run:32199524656",
+				"sha:4bdb8909bfb6cbb4d137cb178137a37f2b91abf4",
+				"phase-k:complete",
+				"phase-j:complete"
 			],
 			"branches": [
 				"feat/github-copilot-model-catalog-sync"
 			],
 			"commits": [
+				"4bdb8909bfb6cbb4d137cb178137a37f2b91abf4",
 				"78ba3154c202a9a9fa0a08e241a4affd132f1ba0"
 			],
-			"context": "Phase J routing-safety work is complete on the feature branch feat/github-copilot-model-catalog-sync at SHA 78ba3154c202a9a9fa0a08e241a4affd132f1ba0. The run used the fail-closed exact-sha verification flow: source_ref=feat/github-copilot-model-catalog-sync, expected_sha=78ba3154c202a9a9fa0a08e241a4affd132f1ba0, with the safe-containment baseline kept intact and no broad router redesign introduced. The confidence model is explicit: curated and provisional values participate only when properly classified; unknown models do not get treated as safe auto-routing truth; and the reserved inherited state remains intentionally non-authoritative until a future explicit design decision is made.",
-			"validation": "2026-08-18 authoritative remote proof: pimmink/gsd-pi-ci run 32169179561 completed successfully with build success, lifecycle shadow gate success, all four sharded test jobs success, and aggregate totals 14322 passed / 0 failed / 31 skipped. Manifest coverage proved 1291 canonical files, zero omissions, zero duplicates, and the exact feature SHA 78ba3154c202a9a9fa0a08e241a4affd132f1ba0 was validated before checkout and again in the run metadata. Local proof remained green: 53/53 targeted tests passed, pnpm run typecheck:extensions succeeded, and pnpm run verify:fast succeeded. Duration was approximately 11m39s from 2026-08-18T18:06:20Z to 2026-08-18T18:17:59Z.",
-			"nextAction": "Phase K is the next step. Continue with /models why in the correct architecture boundary; it belongs to the next phase and does not block the completed Phase J routing-safety contract. Keep the safe-containment baseline and avoid broadening the branch beyond the exact confidence semantics already proven here."
+			"context": "Phase J routing-safety work remains complete on the feature branch feat/github-copilot-model-catalog-sync, and Phase K corrective follow-up is complete as the final local-first /models why fix at SHA 4bdb8909bfb6cbb4d137cb178137a37f2b91abf4. The current run uses the fail-closed exact-sha verification flow: source_ref=feat/github-copilot-model-catalog-sync, expected_sha=4bdb8909bfb6cbb4d137cb178137a37f2b91abf4. The fix is intentionally narrow: it keeps why local, read-only, and truthful; it rejects wrong-provider ids before any auth/network path; and it avoids synthetic fallback pricing or broad router redesign.",
+			"validation": "2026-08-19 authoritative remote proof: pimmink/gsd-pi-ci run 32199524656 completed successfully with conclusion success. The job reached build success, typecheck success, compiled-test artifact generation success, and the unit-test plus lifecycle-shadow gate success path. Local proof remained green: the targeted regression run reported 15 passed / 0 failed, and the exact post-fix SHA 4bdb8909bfb6cbb4d137cb178137a37f2b91abf4 is the checked-out branch head. This follow-up commit is the Phase-K corrective repair to the earlier published 24ca12c2 commit without rewriting history.",
+			"nextAction": "The Phase-K repair is complete and published on feat/github-copilot-model-catalog-sync. Keep the safe-containment contract and do not broaden the branch beyond the local-first /models why semantics already proven here. The governance branch update is the only remaining step after green verification."
 		},
 		{
 			"id": "GSD-W013",
