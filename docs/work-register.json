@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-08-19",
+	"evidenceAsOf": "2026-08-21",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -26,7 +26,9 @@
 			"upstreamDisposition": "historical",
 			"title": "Extension registry lockSync ESYNC failure",
 			"status": "merged",
-			"issues": [1598],
+			"issues": [
+				1598
+			],
 			"pullRequests": [],
 			"branches": [],
 			"commits": [],
@@ -41,10 +43,18 @@
 			"upstreamDisposition": "pr-required",
 			"title": "Markdown renderer output must satisfy markdownlint",
 			"status": "merged",
-			"issues": [1600],
-			"pullRequests": [1610],
-			"branches": ["fix/markdownlint-table-separators"],
-			"commits": ["e7b6f291ac680f1b00fe1cb6ca246b8cbcac3aac"],
+			"issues": [
+				1600
+			],
+			"pullRequests": [
+				1610
+			],
+			"branches": [
+				"fix/markdownlint-table-separators"
+			],
+			"commits": [
+				"e7b6f291ac680f1b00fe1cb6ca246b8cbcac3aac"
+			],
 			"context": "Generated markdown contained invalid heading, spacing, and table separator forms including MD055, MD056, and MD060 failures.",
 			"validation": "PR #1610 is state MERGED (2026-08-16T23:44:17Z) at merge commit e7b6f291ac680f1b00fe1cb6ca246b8cbcac3aac; the merge is contained in current upstream/main (09ae3c22).",
 			"nextAction": "None; contribution merged upstream."
@@ -56,7 +66,9 @@
 			"upstreamDisposition": "historical",
 			"title": "Milestone status exposes persisted dependencies",
 			"status": "merged",
-			"issues": [1601],
+			"issues": [
+				1601
+			],
 			"pullRequests": [],
 			"branches": [],
 			"commits": [],
@@ -71,10 +83,19 @@
 			"upstreamDisposition": "historical",
 			"title": "Legacy migration consistency for completed slices and structured decisions",
 			"status": "merged",
-			"issues": [1606, 1607],
-			"pullRequests": [1611],
-			"branches": ["fix/migrate-slice-decision-consistency"],
-			"commits": ["8d1d2067b1ec5b0b06e8772033b6f6f848b7613d"],
+			"issues": [
+				1606,
+				1607
+			],
+			"pullRequests": [
+				1611
+			],
+			"branches": [
+				"fix/migrate-slice-decision-consistency"
+			],
+			"commits": [
+				"8d1d2067b1ec5b0b06e8772033b6f6f848b7613d"
+			],
 			"context": "Legacy migration could produce completed slices with pending tasks and lose structured decision semantics through title-only extraction.",
 			"validation": "PR #1611 merged upstream.",
 			"nextAction": "Retain migration corpus regression coverage."
@@ -86,10 +107,21 @@
 			"upstreamDisposition": "historical",
 			"title": "Canonical requirement and decision read tools",
 			"status": "closed-unmerged",
-			"issues": [1608],
-			"pullRequests": [1613, 1682],
-			"branches": ["feat/canonical-read-tools", "pr-1613"],
-			"commits": ["af34c4e4", "8eeed156"],
+			"issues": [
+				1608
+			],
+			"pullRequests": [
+				1613,
+				1682
+			],
+			"branches": [
+				"feat/canonical-read-tools",
+				"pr-1613"
+			],
+			"commits": [
+				"af34c4e4",
+				"8eeed156"
+			],
 			"context": "Added canonical requirement and decision list/get tools and addressed adversarial review findings. The original and follow-up PRs were closed without merge; related behavior later appeared in the v1.15 line and generated three follow-up correctness issues.",
 			"validation": "PR #1613 and PR #1682 are closed without merge. Follow-up issues #1727-#1729 remain tracked separately.",
 			"nextAction": "Use the active canonical-read follow-up PRs as the current authority."
@@ -101,8 +133,14 @@
 			"upstreamDisposition": "historical",
 			"title": "Claude Sonnet 5 routing catalog and Copilot startup fallback",
 			"status": "merged",
-			"issues": [1612],
-			"pullRequests": [1609, 1703, 1705],
+			"issues": [
+				1612
+			],
+			"pullRequests": [
+				1609,
+				1703,
+				1705
+			],
 			"branches": [
 				"fix/model-router-sonnet5-catalog",
 				"fix/copilot-sonnet5-startup-fallback"
@@ -124,8 +162,12 @@
 			"title": "Package-manager-aware verification commands and bootstrap recovery",
 			"status": "merged",
 			"issues": [],
-			"pullRequests": [1706],
-			"branches": ["fix/verification-gate-package-manager"],
+			"pullRequests": [
+				1706
+			],
+			"branches": [
+				"fix/verification-gate-package-manager"
+			],
 			"commits": [
 				"a4c63862",
 				"65b77ec8",
@@ -144,10 +186,20 @@
 			"upstreamDisposition": "pr-required",
 			"title": "Isolate canonical reads from the global workflow database handle",
 			"status": "merged",
-			"issues": [1727],
-			"pullRequests": [1731],
-			"branches": ["fix/canonical-read-db-isolation"],
-			"commits": ["31af02a7", "e329a411", "10aa03954444e51390160f00a1d97a59d4a8604f"],
+			"issues": [
+				1727
+			],
+			"pullRequests": [
+				1731
+			],
+			"branches": [
+				"fix/canonical-read-db-isolation"
+			],
+			"commits": [
+				"31af02a7",
+				"e329a411",
+				"10aa03954444e51390160f00a1d97a59d4a8604f"
+			],
 			"context": "Routes canonical native and MCP reads through isolated per-project adapters to prevent implicit database creation and global handle mutation.",
 			"validation": "PR #1731 is state MERGED (2026-08-14T13:01:34Z) at merge commit 10aa03954444e51390160f00a1d97a59d4a8604f; the merge is contained in current upstream/main (09ae3c22).",
 			"nextAction": "None; contribution merged upstream."
@@ -159,10 +211,19 @@
 			"upstreamDisposition": "pr-required",
 			"title": "Apply canonical list predicates before SQL limit",
 			"status": "merged",
-			"issues": [1728],
-			"pullRequests": [1732],
-			"branches": ["fix/canonical-sql-predicates"],
-			"commits": ["27167552", "da908349835815274d2b2d097da50880d3c44f33"],
+			"issues": [
+				1728
+			],
+			"pullRequests": [
+				1732
+			],
+			"branches": [
+				"fix/canonical-sql-predicates"
+			],
+			"commits": [
+				"27167552",
+				"da908349835815274d2b2d097da50880d3c44f33"
+			],
 			"context": "Moves requirement class filtering and decision tombstone exclusion into SQL before LIMIT to prevent under-returning and deleted decision leakage.",
 			"validation": "PR #1732 is state MERGED (2026-08-16T23:38:38Z) at merge commit da908349835815274d2b2d097da50880d3c44f33; the merge is contained in current upstream/main (09ae3c22).",
 			"nextAction": "None; contribution merged upstream."
@@ -174,10 +235,20 @@
 			"upstreamDisposition": "pr-required",
 			"title": "Canonical read error parity between native and MCP surfaces",
 			"status": "merged",
-			"issues": [1729],
-			"pullRequests": [1734],
-			"branches": ["fix/canonical-read-error-parity"],
-			"commits": ["c4e6aa75", "c547bc73", "e728a95714c7fa78cb2f41c91d978a93e6e56a5f"],
+			"issues": [
+				1729
+			],
+			"pullRequests": [
+				1734
+			],
+			"branches": [
+				"fix/canonical-read-error-parity"
+			],
+			"commits": [
+				"c4e6aa75",
+				"c547bc73",
+				"e728a95714c7fa78cb2f41c91d978a93e6e56a5f"
+			],
 			"context": "Centralizes db_unavailable, not_found, and query_error semantics and replaces simulated tests with behavioral native-versus-MCP fixtures.",
 			"validation": "PR #1734 is state MERGED (2026-08-16T23:31:55Z) at merge commit e728a95714c7fa78cb2f41c91d978a93e6e56a5f; the merge is contained in current upstream/main (09ae3c22).",
 			"nextAction": "None; contribution merged upstream."
@@ -190,8 +261,13 @@
 			"title": "MAI Code 1.1 Flash support for GitHub Copilot routing",
 			"status": "merged",
 			"issues": [],
-			"pullRequests": [1758],
-			"relatedRefs": ["pimmink/gsd-pi#1", "open-gsd/gsd-pi#1758"],
+			"pullRequests": [
+				1758
+			],
+			"relatedRefs": [
+				"pimmink/gsd-pi#1",
+				"open-gsd/gsd-pi#1758"
+			],
 			"branches": [
 				"main",
 				"feat/mai-code-1-1-flash-copilot",
@@ -218,8 +294,12 @@
 			"status": "superseded",
 			"issues": [],
 			"pullRequests": [],
-			"branches": ["recovery/pre-fork-model-routing-20260813"],
-			"commits": ["788ef30621f06e951a9d866dc049c9eb2545b6d6"],
+			"branches": [
+				"recovery/pre-fork-model-routing-20260813"
+			],
+			"commits": [
+				"788ef30621f06e951a9d866dc049c9eb2545b6d6"
+			],
 			"context": "Preserves the unique auto-commit from the retired backup clone. Most Opus 5 and Sonnet 5 content is upstream; MAI catalog work moved to GSD-W011. The recovery snapshot retains additional MAI Copilot provider tests for comparison.",
 			"validation": "Commit object was fetched into the active fork before the 1.5 GB backup clone was deleted.",
 			"nextAction": "Do not merge wholesale. Extract only tests or code proven missing from GSD-W011, then delete the recovery branch after explicit confirmation."
@@ -230,13 +310,17 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "GitHub Copilot model-catalog sync (/gsd copilot-models)",
-			"status": "complete",
+			"status": "in-progress",
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [
-				"remote:run:32309145810",
-				"remote:run:32278615586",
-				"sha:6d0ccb73176841c927e5f16a34d73db0d97011f1",
+				"sha:7a81883a1187c07a3ce7dfd770caf2c520e7173b",
+				"rebased-from:6d0ccb73176841c927e5f16a34d73db0d97011f1",
+				"base:6a310619c187a3d940adc29e282c7d39246739b1",
+				"recovery:recovery/w014-pre-rebase-20260821-114156",
+				"superseded:remote:run:32309145810",
+				"superseded:remote:run:32278615586",
+				"superseded:sha:6d0ccb73176841c927e5f16a34d73db0d97011f1",
 				"superseded:remote:run:32300432844",
 				"superseded:remote:run:32297655570",
 				"superseded:remote:run:32242571833",
@@ -257,13 +341,11 @@
 				"feat/github-copilot-model-catalog-sync"
 			],
 			"commits": [
-				"fc301c06c5e057f5e923ab79bdc08d9a89ced035",
-				"adde7ac96f9dbe724b17aed8f4c8482b7f5dab9c",
-				"6d0ccb73176841c927e5f16a34d73db0d97011f1"
+				"7a81883a1187c07a3ce7dfd770caf2c520e7173b"
 			],
-			"context": "W014 is now genuinely complete on feat/github-copilot-model-catalog-sync at SHA 6d0ccb73176841c927e5f16a34d73db0d97011f1, rebased cleanly (zero conflicts) onto a fresh upstream/main at 4bbfb31fa5f57bba8d977f4da2ee68ded56355ae (previously 281abbce), superseding the prior 'complete' entry recorded against 3f1bcf0f79a27a6a25f40c6407aa1c153b91c474 -- that entry's own validation text never actually recorded a terminal verify:pr or verify:merge result, only test:unit-equivalent remote CI and a narrower local suite. This 2026-08-19 closeout pass re-audited all A-N ledger phases against the live rebased code, found and fixed two real gaps test-first (see validation), and assembled genuine terminal evidence for every verify:pr and verify:merge sub-step, substituting cloud CI for the local verify:pr scope only after an unrecoverable local memory-pressure crash and explicit user authorization ('lets do it, dit gaat lokaal hier niet werken'). The feature itself is unchanged in intent: rich /models normalization with provider-static fallbacks and per-field provenance, distinct fetch-failure classes, account-isolated last-known-good snapshots, suspicious-shrink rejection, safe opt-in registration of complete remote-only models into models-catalog.json, quarantine of incomplete/preview-disabled/policy-restricted candidates, provider-aware economics freshness and promotion reporting, fail-closed routing for unknown-confidence models, and the expanded /gsd copilot-models sync/changes/pricing/promos/doctor/strict why surface plus docs/help/completions. The separately-scoped feat/copilot-cheaper-model-suggestions feature was deliberately NOT started during this closeout, per explicit task scope. No overlapping open upstream issue or PR was found; local issue and PR drafts were refreshed with final evidence, but no outward GitHub write was performed without explicit authorization.",
-			"validation": "2026-08-19 definitive closeout evidence, all against final SHA 6d0ccb73176841c927e5f16a34d73db0d97011f1 (rebase-complete baseline fc301c06c5e057f5e923ab79bdc08d9a89ced035, plus two closeout fixes adde7ac96f9dbe724b17aed8f4c8482b7f5dab9c and 6d0ccb73176841c927e5f16a34d73db0d97011f1). Rebase proof: `git rebase upstream/main` succeeded with zero conflicts; `git range-diff` showed all 16 pre-existing commits as content-identical (only SHA changed); merge-base equals upstream/main exactly. A-N ledger re-audit against live code found and fixed two real gaps test-first: (1) the `pricing <model>` command resolved GitHub Copilot auth before validating the model's provider prefix, violating the fail-closed-before-network-access principle that `why` already honored correctly -- added a regression test confirmed failing before the fix (44/45, apiKeyCalled=true) and passing after (45/45), fixed in adde7ac9; (2) ADR-012 did not document the new provider-comparison call sites in copilot-model-catalog.ts/copilot-overlay-writer.ts/copilot-models.ts -- documented in 6d0ccb73. Broadened regression suite: 250/250 pass, 0 fail, 18 suites. `typecheck:extensions`: clean, 0 errors. `verify:fast`: all checks passed. `git diff --check`: clean. Exact-SHA sharded remote CI: pimmink/gsd-pi-ci run 32278615586, conclusion success, all 7 jobs green, aggregate 14422 passed / 0 failed / 31 skipped (shard sums independently re-verified by arithmetic). **DEFINITIVE remote evidence for the literal, unmodified named scripts (2026-08-20 follow-up)**: pimmink/gsd-pi-ci run 32309145810 (`remote-full-gate.yml`, two independent jobs each with its own fresh checkout on this exact SHA) -- `verify-pr` job: conclusion success, literal `pnpm run verify:pr` printed `14422 passed, 0 failed, 31 skipped`; `verify-merge` job: conclusion success, literal `pnpm run verify:merge` completed every sub-step (validate-pack, verify:workspace-coverage, verify:extension-coverage, test:unit 14422/0/31, test:packages incl. 360/360 for @opengsd/mcp-server, test:pi-ai vitest 80/0, test:integration 1257/1263/0fail/6skip, test:e2e 17/20/0fail/3skip) and printed its own final line `verify:merge: all checks passed`. Reaching this took 4 dispatch attempts, each root-caused and fixed rather than worked around: attempt 1 (superseded run 32297655570) failed on a pre-existing, already-tracked gap (open-gsd/gsd-pi#1582) where a genuinely fresh checkout never builds the native addon's test-fault-injection profile, unrelated to this feature; attempts 2-3 (superseded run 32300432844, plus a 3rd identical failure) failed identically (same 5 tests in pre-execution-checks.test.ts, unrelated to this feature, confirmed via a clean 118/118 standalone local rerun) due to a double-invocation-in-one-job artifact from chaining both scripts sequentially in one checkout; both fixed in the harness (native-build+mirror step added; verify:pr and verify:merge split into two independent jobs) rather than in gsd-pi's own code. The run 32278615586 evidence below remains valid supplementary evidence of the same underlying facts, retained for the full debugging trail. This CI run is treated as substitute evidence for the LOCAL verify:pr scope (build:core + typecheck:extensions + test:unit + lifecycle-gate) only, because two consecutive local verify:pr attempts on this contributor's 8GB machine crashed (entire process tree vanished, no exit code) under severe, persistent memory pressure (15-330MB free, dominated by this session's own long-running VS Code conversation) -- not a code defect; the user explicitly authorized this pivot ('lets do it, dit gaat lokaal hier niet werken'). verify:merge's full scope (beyond verify:pr, which has no cloud-harness equivalent) was assembled from genuine individual local terminal runs rather than one monolithic invocation, to survive/diagnose the same memory constraint: build:core, build:web-host (5m53s), typecheck:extensions (reused), validate-pack (passed after clearing a stale local tsconfig.tsbuildinfo incremental-build cache -- confirmed a local build-cache artifact, not a code defect), verify:workspace-coverage, verify:extension-coverage, test:packages (360/360 for @opengsd/mcp-server and all other packages clean, using the script's own pre-existing PACKAGE_TEST_TIMEOUT_MS env override after two prior attempts hit the same package's 180s wrapper timeout under memory pressure), test:integration (1257/1263 pass, 0 fail, 6 skip, clean on the 3rd attempt after two prior attempts each hit ONE different test's hardcoded per-CLI-spawn timeout budget in e2e-smoke.test.ts under memory pressure -- non-deterministic resource contention, not a code regression), test:e2e (17/20 pass, 0 fail, 3 skip, clean on the first attempt). Push: `--force-with-lease` with the exact prior SHA, confirmed via `git ls-remote` that origin/feat/github-copilot-model-catalog-sync matches HEAD exactly.",
-			"nextAction": "Keep the branch frozen at 6d0ccb73176841c927e5f16a34d73db0d97011f1 until the upstream contribution is opened. If upstream policy still requires an issue, open or claim it first, then prepare the PR against upstream/main only after explicit authorization for GitHub writes. The separately-scoped feat/copilot-cheaper-model-suggestions feature remains deliberately unstarted and is not part of this work item."
+			"context": "W014 remains the same upstream feature, but its prior exact-SHA closeout evidence became stale once upstream/main advanced from 4bbfb31fa5f57bba8d977f4da2ee68ded56355ae to 6a310619c187a3d940adc29e282c7d39246739b1. The branch feat/github-copilot-model-catalog-sync has now been rebased cleanly onto that live upstream/main and currently points at 7a81883a1187c07a3ce7dfd770caf2c520e7173b. The range-diff preserved the prior W014 commit series one-to-one, so the feature intent and scope are unchanged: live GitHub Copilot /models normalization, account-isolated last-known-good snapshots, safe remote-only registration/quarantine, provider-aware economics, fail-closed unknown-confidence routing behavior, and the expanded /gsd copilot-models sync/changes/pricing/promos/doctor/why surface. No overlapping upstream issue or PR was found; the local W014 issue and PR drafts have now been refreshed to the rebased SHA/base, but exact-SHA remote full-gate evidence still needs to be rerun for the new head before any GitHub write.",
+			"validation": "2026-08-21 live-state refresh for rebased head 7a81883a1187c07a3ce7dfd770caf2c520e7173b. Rebase proof: git rebase upstream/main succeeded with zero conflicts; git range-diff showed the W014 series preserved one-to-one on top of the new base; git merge-base upstream/main HEAD equals 6a310619c187a3d940adc29e282c7d39246739b1; git rev-list --left-right --count upstream/main...HEAD returned 0 18. Current local validation on this rebased head: focused W014 regression command passed 209 tests with 0 failures, and pnpm run typecheck:extensions passed cleanly. Historical exact-SHA remote evidence remains available but is now superseded: pimmink/gsd-pi-ci run 32309145810 proved the literal pnpm run verify:pr and pnpm run verify:merge scripts on prior head 6d0ccb73176841c927e5f16a34d73db0d97011f1, and run 32278615586 provided matching sharded proof on that same superseded SHA. A fresh exact-SHA remote full-gate run has not yet been dispatched for 7a81883a1187c07a3ce7dfd770caf2c520e7173b.",
+			"nextAction": "Rerun exact-SHA verify:pr and verify:merge evidence for rebased head 7a81883a1187c07a3ce7dfd770caf2c520e7173b before any GitHub write. Keep cheaper-model suggestions isolated under GSD-W017."
 		},
 		{
 			"id": "GSD-W013",
@@ -274,7 +356,9 @@
 			"status": "complete",
 			"issues": [],
 			"pullRequests": [],
-			"branches": ["docs/copilot-workspace-governance"],
+			"branches": [
+				"docs/copilot-workspace-governance"
+			],
 			"commits": [
 				"1dc21a2026a80241961a5cc408e322088f48ba98",
 				"6a6356f7",
@@ -297,9 +381,15 @@
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [],
-			"branches": ["perf/unit-test-sharding"],
-			"commits": ["a381d55", "3667f8d", "87648c0"],
-			"context": "Lives entirely in the separate, fully user-owned pimmink/gsd-pi-ci harness repository, not in pimmink/gsd-pi \u2014 no upstream/fork PR is applicable. Adds .github/workflows/remote-pr-verification-sharded.yml, an experimental workflow_dispatch-only workflow that splits pimmink/gsd-pi's test:unit:compiled across 4 parallel shards using Node's native --test-shard=<index>/<total>, after independently validating locally (synthetic multi-glob fixture, exact production flag combination) that the flag must be placed before the glob patterns and is deterministic/complete/non-overlapping. Left the stable remote-pr-verification.yml completely untouched.",
+			"branches": [
+				"perf/unit-test-sharding"
+			],
+			"commits": [
+				"a381d55",
+				"3667f8d",
+				"87648c0"
+			],
+			"context": "Lives entirely in the separate, fully user-owned pimmink/gsd-pi-ci harness repository, not in pimmink/gsd-pi — no upstream/fork PR is applicable. Adds .github/workflows/remote-pr-verification-sharded.yml, an experimental workflow_dispatch-only workflow that splits pimmink/gsd-pi's test:unit:compiled across 4 parallel shards using Node's native --test-shard=<index>/<total>, after independently validating locally (synthetic multi-glob fixture, exact production flag combination) that the flag must be placed before the glob patterns and is deterministic/complete/non-overlapping. Left the stable remote-pr-verification.yml completely untouched.",
 			"validation": "Two real dispatches against pimmink/gsd-pi commit 28a2c92c3835e61f5fd19beffc6b8b4c6476bfc6 (fix/mai-cost-table-provider-section, historical GSD-W011/W014 spike commit, used only as a fixed measurement target). First dispatch (run 32015752880) failed fast and safely at an intentional file-count safety check (1274 actual vs an incorrectly hand-counted 1272 expected) before any shard ran. Corrective dispatch (run 32016308055) succeeded: all 4 shards + lifecycle-gate + aggregate green; aggregate totals across shards exactly matched the known unsharded baseline (14176 passed/0 failed/31 skipped), proving no test file was skipped or duplicated; total wall clock ~12m04s vs the 19m11s unsharded baseline (~37% reduction, run 31857969918). Merged to gsd-pi-ci:main (fast-forward, no PR needed for this private single-owner repo).",
 			"nextAction": "None required to consider this workstream done. Optional future follow-up: consider promoting the sharded workflow from experimental to the primary remote-pr-verification path once used a few more times, and revisit shard_count if the real suite's size/composition changes materially."
 		},
@@ -313,11 +403,37 @@
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [],
-			"branches": ["recovery/github-copilot-catalog-phase-i-j-e8e46fe9"],
-			"commits": ["e8e46fe9450f326641fccf7bbf3929f10be80f09"],
+			"branches": [
+				"recovery/github-copilot-catalog-phase-i-j-e8e46fe9"
+			],
+			"commits": [
+				"e8e46fe9450f326641fccf7bbf3929f10be80f09"
+			],
 			"context": "Not an independent feature or workstream. This is the recovery/provenance record for the stranded Phase-I/J spike commit e8e46fe9, which was built on top of the retired historical fix/mai-cost-table-provider-section branch (base fork main c4f78553, pre-1.16) rather than the clean feat/github-copilot-model-catalog-sync branch. Content is conceptually part of the GSD-W014 roadmap: provider-aware Copilot runtime economics (Phase I) in model-cost-table.ts and Copilot economics/drift handling in the copilot-models handler, plus router profile-confidence safety (Phase J) in model-router.ts, with accompanying tests. Because it sits on the wrong historical base it is not directly mergeable. The commit is archived on branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9, pushed to origin at the same SHA.",
 			"validation": "As of 2026-08-18: git show --stat reports 7 files changed, 615 insertions and 48 deletions; git show --check is clean; a secret/PII scan over the commit diff found only false positives (a runtime token variable and dummy 'token-abc' test fixtures), no real credentials. Ancestry: origin/fix/mai-cost-table-provider-section (28a2c92c) and d700abcf are ancestors of e8e46fe9; e8e46fe9 is NOT an ancestor of feat/github-copilot-model-catalog-sync or upstream/main; merge-base with upstream/main is c4f78553. Per-file divergence vs the committed catalog-sync branch: model-cost-table.ts and its test, model-router.ts and its test are Phase I/J content absent from catalog-sync; the copilot-models handler and its test diverged (Phase H parts superseded on catalog-sync, Phase I economics/drift unique to the spike); catalog.ts is largely superseded on catalog-sync. Local branch ref and origin remote ref both point to e8e46fe9450f326641fccf7bbf3929f10be80f09.",
 			"nextAction": "Do not merge or cherry-pick wholesale. After the current GSD-W014 Phase-H working tree is committed and remotely verified, compare e8e46fe9 hunk-by-hunk against current upstream/main and reconstruct only the still-relevant, proven Phase-I/J pieces onto appropriate fresh upstream/main-based reviewable branches with their own scope, tests, and validation. The historical fix/mai-cost-table-provider-section branch and its dirty worktree were left untouched (ARCHIVE/EXTRACT_FIRST) because that worktree was not clean."
+		},
+		{
+			"id": "GSD-W017",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Cheaper same-tier Copilot suggestions in pricing/why",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [
+				"depends-on:GSD-W014",
+				"base:7a81883a1187c07a3ce7dfd770caf2c520e7173b",
+				"recovery:recovery/feat-copilot-cheaper-model-suggestions-pre-rebase-20260821-115118"
+			],
+			"branches": [
+				"feat/copilot-cheaper-model-suggestions"
+			],
+			"commits": [],
+			"context": "Separate follow-up feature branch on top of the rebased W014 tip. Adds explicit cheaper same-tier GitHub Copilot suggestions to /gsd copilot-models pricing and why output only; it does not alter routing policy, automatic model selection, background notifications, or network behavior. The implementation also adds the missing bundled claude-sonnet-5 pricing fallback required for local-only economics comparison, plus focused handler and cost-table regression tests.",
+			"validation": "Local validation on feat/copilot-cheaper-model-suggestions: the focused copilot-models handler suite passed 47/47, the focused handler plus cost-table suites passed 69/69, pnpm run typecheck:extensions passed, and pnpm run verify:fast completed with ci-fast-gates: all checks passed. The first green runs in this extra worktree reused the passing W014 activation layers via symlinked node_modules and packages/pi-ai/dist because a fresh install failed offline with ERR_PNPM_NO_OFFLINE_TARBALL for @google/genai and then online with ERR_PNPM_ENOSPC on this laptop; verify:fast followed that symlinked dependency setup and recreated the source worktree node_modules before passing. No remote CI run, commit, or GitHub write has been performed yet.",
+			"nextAction": "Decide whether to keep this as an upstream feature, then commit it on a clean branch, satisfy current issue-first policy if still required, and prefer clean-runner remote verification for submission-grade evidence before any PR is opened."
 		}
 	]
 }
