@@ -310,11 +310,12 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "GitHub Copilot model-catalog sync (/gsd copilot-models)",
-			"status": "in-progress",
+			"status": "complete",
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [
 				"sha:7a81883a1187c07a3ce7dfd770caf2c520e7173b",
+				"remote:run:32476902861",
 				"rebased-from:6d0ccb73176841c927e5f16a34d73db0d97011f1",
 				"base:6a310619c187a3d940adc29e282c7d39246739b1",
 				"recovery:recovery/w014-pre-rebase-20260821-114156",
@@ -343,9 +344,9 @@
 			"commits": [
 				"7a81883a1187c07a3ce7dfd770caf2c520e7173b"
 			],
-			"context": "W014 remains the same upstream feature, but its prior exact-SHA closeout evidence became stale once upstream/main advanced from 4bbfb31fa5f57bba8d977f4da2ee68ded56355ae to 6a310619c187a3d940adc29e282c7d39246739b1. The branch feat/github-copilot-model-catalog-sync has now been rebased cleanly onto that live upstream/main and currently points at 7a81883a1187c07a3ce7dfd770caf2c520e7173b. The range-diff preserved the prior W014 commit series one-to-one, so the feature intent and scope are unchanged: live GitHub Copilot /models normalization, account-isolated last-known-good snapshots, safe remote-only registration/quarantine, provider-aware economics, fail-closed unknown-confidence routing behavior, and the expanded /gsd copilot-models sync/changes/pricing/promos/doctor/why surface. No overlapping upstream issue or PR was found; the local W014 issue and PR drafts have now been refreshed to the rebased SHA/base, but exact-SHA remote full-gate evidence still needs to be rerun for the new head before any GitHub write.",
-			"validation": "2026-08-21 live-state refresh for rebased head 7a81883a1187c07a3ce7dfd770caf2c520e7173b. Rebase proof: git rebase upstream/main succeeded with zero conflicts; git range-diff showed the W014 series preserved one-to-one on top of the new base; git merge-base upstream/main HEAD equals 6a310619c187a3d940adc29e282c7d39246739b1; git rev-list --left-right --count upstream/main...HEAD returned 0 18. Current local validation on this rebased head: focused W014 regression command passed 209 tests with 0 failures, and pnpm run typecheck:extensions passed cleanly. Historical exact-SHA remote evidence remains available but is now superseded: pimmink/gsd-pi-ci run 32309145810 proved the literal pnpm run verify:pr and pnpm run verify:merge scripts on prior head 6d0ccb73176841c927e5f16a34d73db0d97011f1, and run 32278615586 provided matching sharded proof on that same superseded SHA. A fresh exact-SHA remote full-gate run has not yet been dispatched for 7a81883a1187c07a3ce7dfd770caf2c520e7173b.",
-			"nextAction": "Rerun exact-SHA verify:pr and verify:merge evidence for rebased head 7a81883a1187c07a3ce7dfd770caf2c520e7173b before any GitHub write. Keep cheaper-model suggestions isolated under GSD-W017."
+			"context": "W014 remains the same upstream feature, but its prior exact-SHA closeout evidence became stale once upstream/main advanced from 4bbfb31fa5f57bba8d977f4da2ee68ded56355ae to 6a310619c187a3d940adc29e282c7d39246739b1. The branch feat/github-copilot-model-catalog-sync was rebased cleanly onto that live upstream/main and now points at 7a81883a1187c07a3ce7dfd770caf2c520e7173b. The range-diff preserved the prior W014 commit series one-to-one, so the feature intent and scope are unchanged: live GitHub Copilot /models normalization, account-isolated last-known-good snapshots, safe remote-only registration/quarantine, provider-aware economics, fail-closed unknown-confidence routing behavior, and the expanded /gsd copilot-models sync/changes/pricing/promos/doctor/why surface. A fresh exact-SHA remote full-gate run (32476902861) has now confirmed both verify:pr and verify:merge pass on this exact rebased head. No overlapping upstream issue or PR was found; the local W014 issue and PR drafts are refreshed to the rebased SHA/base and updated to cite this new green run.",
+			"validation": "2026-08-21 rebased head 7a81883a1187c07a3ce7dfd770caf2c520e7173b. Rebase proof: git rebase upstream/main succeeded with zero conflicts; git range-diff showed the W014 series preserved one-to-one on top of the new base; git merge-base upstream/main HEAD equals 6a310619c187a3d940adc29e282c7d39246739b1; git rev-list --left-right --count upstream/main...HEAD returned 0 18. Local validation: focused W014 regression command passed 209 tests with 0 failures, pnpm run typecheck:extensions passed cleanly. DEFINITIVE exact-SHA remote evidence: pimmink/gsd-pi-ci run 32476902861 (remote-full-gate.yml, two independent fresh-checkout jobs) on this exact SHA 7a81883a1187c07a3ce7dfd770caf2c520e7173b -- both verify-pr (literal) and verify-merge (literal) jobs completed with conclusion success. Historical exact-SHA remote evidence for the now-superseded prior head 6d0ccb73176841c927e5f16a34d73db0d97011f1 remains available (runs 32309145810, 32278615586) but is no longer the current-head evidence.",
+			"nextAction": "Keep the branch frozen at 7a81883a1187c07a3ce7dfd770caf2c520e7173b until the upstream contribution is opened. If upstream policy still requires an issue, open or claim it first, then prepare the PR against upstream/main only after explicit authorization for GitHub writes. Keep GSD-W018 (session refresh) and GSD-W017 (cheaper-model suggestions) as separate stacked follow-ups, not part of this work item."
 		},
 		{
 			"id": "GSD-W013",
@@ -434,6 +435,31 @@
 			"context": "Separate follow-up feature branch on top of the rebased W014 tip. Adds explicit cheaper same-tier GitHub Copilot suggestions to /gsd copilot-models pricing and why output only; it does not alter routing policy, automatic model selection, background notifications, or network behavior. The implementation also adds the missing bundled claude-sonnet-5 pricing fallback required for local-only economics comparison, plus focused handler and cost-table regression tests.",
 			"validation": "Local validation on feat/copilot-cheaper-model-suggestions: the focused copilot-models handler suite passed 47/47, the focused handler plus cost-table suites passed 69/69, pnpm run typecheck:extensions passed, and pnpm run verify:fast completed with ci-fast-gates: all checks passed. The first green runs in this extra worktree reused the passing W014 activation layers via symlinked node_modules and packages/pi-ai/dist because a fresh install failed offline with ERR_PNPM_NO_OFFLINE_TARBALL for @google/genai and then online with ERR_PNPM_ENOSPC on this laptop; verify:fast followed that symlinked dependency setup and recreated the source worktree node_modules before passing. No remote CI run, commit, or GitHub write has been performed yet.",
 			"nextAction": "Decide whether to keep this as an upstream feature, then commit it on a clean branch, satisfy current issue-first policy if still required, and prefer clean-runner remote verification for submission-grade evidence before any PR is opened."
+		},
+		{
+			"id": "GSD-W018",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Session-start GitHub Copilot catalog refresh and runtime model activation",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [
+				"depends-on:GSD-W014",
+				"base:7a81883a1187c07a3ce7dfd770caf2c520e7173b",
+				"sha:693ebc5885ab70247099def1c2c42de53814bfd7",
+				"remote:run:32482885693"
+			],
+			"branches": [
+				"feat/copilot-catalog-session-refresh"
+			],
+			"commits": [
+				"693ebc5885ab70247099def1c2c42de53814bfd7"
+			],
+			"context": "Separate follow-up feature branch stacked on the W014 tip (W014 is not yet merged upstream). Adds an opt-in automatic refresh of the GitHub Copilot live model catalog at GSD session start, gated by a new copilot_catalog preference block (refresh_on_session_start: off|if_stale|always, default off; notify_on_changes default true; stale_after_ms default 6h). The coordinator reuses W014's existing fetch/last-known-good pipeline rather than duplicating it, is fire-and-forget only (never blocks ordinary startup), deduplicates concurrent triggers per basePath, applies a bounded timeout, and never triggers or waits on an OAuth/login flow. Also implements 3-tier runtime model classification (trusted / manual-only / quarantined) directly from the live CopilotModelRecord's availability/execution/billing/conflicts fields, without fabricating capability or pricing data. Wired into the session_start extension hook only: both a terminal/CLI session and the first @gsd invocation from the VS Code chat participant converge on this same event, since the chat participant (vscode-extension/src/chat-participant.ts) talks over RPC to the same daemon-hosted pi-coding-agent session lifecycle rather than running its own.",
+			"validation": "32 new tests (25 for the coordinator/classifier, 7 for the new preference validation block), all passing. pnpm run typecheck:extensions clean. Local iteration reused the W014 worktree's activation layer via symlinked node_modules and packages/pi-ai/dist (not used as final evidence). Exact-SHA remote full-gate dispatched for SHA 693ebc5885ab70247099def1c2c42de53814bfd7: pimmink/gsd-pi-ci run 32482885693 (result pending at time of this entry).",
+			"nextAction": "Await the exact-SHA remote full-gate result for run 32482885693; if green, this becomes the submission-grade evidence. GSD-W017 (cheaper-model suggestions) is expected to rebase onto this branch's tip once it reaches a stable SHA, per the intended W014 -> W018 -> W017 upstream contribution order."
 		}
 	]
 }
