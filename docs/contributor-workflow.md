@@ -169,6 +169,25 @@ A documentation-only or metadata-only follow-up needs a repeat only when current
 policy requires it or the change affects a verified surface. If uncertain, rerun the narrower
 relevant checks first and explain the risk-based decision.
 
+### CI observability and clean-runner workflow
+
+Treat slow or failing verification as an observability problem first, not a log-reading contest.
+
+1. For `verify:pr`, `verify:merge`, and GitHub Actions failures, use `repo-actions-hub` and
+   `pr-artifact-explorer` from the `GSD Pi Contributor` profile before manually digging through
+   raw logs.
+2. Use GitHub MCP or the GitHub PR extension to inspect check runs, per-job logs, and artifacts
+   in context.
+3. Once a branch is stable enough to push, prefer the sharded clean-runner flow from
+   `/Users/pimmink/Klanten/gsd-pi-ci/docs/remote-verification-guide.md` via
+   `scripts/remote-verify.sh dispatch --mode sharded --source-ref <branch> --expected-sha <sha>`.
+4. Fall back to `--mode stable` only when the sharded harness itself is under suspicion.
+5. Report the slowest gate or failing job explicitly (`build:web-host`, `validate-pack`,
+   `test:integration`, etc.) together with the run ID or URL instead of pasting only raw output.
+
+Use the clean-runner signal to distinguish genuine regressions from local laptop contention
+before spending time on local forensics.
+
 ## GitHub issue and PR flow
 
 GitHub writes always require explicit authorization.

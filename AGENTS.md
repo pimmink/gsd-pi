@@ -103,6 +103,14 @@ Merge/review loop:
    CI-blocking parity.
 4. Push only after authorization, then use GitHub CI as the remote authority.
 
+- For slow or failing `verify:pr`, `verify:merge`, or remote Actions runs, use the profile's
+  CI observability tools first: `repo-actions-hub`, `pr-artifact-explorer`, GitHub MCP, and
+  the GitHub PR extension when available.
+- Once a branch is stable enough to push, prefer the sharded clean-runner verification flow
+  documented in `/Users/pimmink/Klanten/gsd-pi-ci/docs/remote-verification-guide.md` before
+  manually digging through raw logs; fall back to the stable unsharded tier only when the
+  sharded harness itself is suspect.
+
 `verify:merge` is not an after-every-edit command. Repeat a prior successful
 `verify:merge` when subsequent changes can invalidate its evidence, including relevant
 source, tests, dependencies, lockfiles, generated output, build or packaging logic, native
