@@ -310,7 +310,7 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "GitHub Copilot model-catalog sync (/gsd copilot-models)",
-			"status": "in-progress",
+			"status": "complete",
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [
@@ -342,8 +342,8 @@
 				"9c84c780a13f0a1ac1036600601a8a3dbdd33002"
 			],
 			"context": "W014 remains the same upstream feature. upstream/main advanced a FOURTH time (60f6919 -> c84f72b79f0bad21002be8d0988a912056e204a6, 4 commits, zero overlap with any Copilot-catalog file); the branch was rebased a fourth time. git range-diff confirmed all 18 feature commits content-identical across this rebase too, so scope and intent remain unchanged: live GitHub Copilot /models normalization, account-isolated last-known-good snapshots, safe remote-only registration/quarantine, provider-aware economics, fail-closed unknown-confidence routing behavior, and the expanded /gsd copilot-models sync/changes/pricing/promos/doctor/why surface. Fast-forwarded local and origin main to the new upstream/main tip first (live ancestry proof each time, four times total). Older rebase generations (1st: base 6a310619, head 7a81883a, green run 32476902861; 2nd: base b5ff8ced, head fa4672fc, green redispatch run 32648668119 after an unrelated transient flake on run 32646186707) remain historical evidence of the same content passing the same gate, condensed here for readability -- full detail for those generations exists in prior governance commits and local .plans/ drafts. No overlapping upstream issue or PR was found.",
-			"validation": "2026-08-23 fourth rebase to head 9c84c780a13f0a1ac1036600601a8a3dbdd33002. Rebase proof: git rebase upstream/main succeeded with zero conflicts; git range-diff (old-base..recovery-ref vs new-base..HEAD) showed all 18 W014 commits content-identical; git merge-base upstream/main HEAD equals c84f72b79f0bad21002be8d0988a912056e204a6; git rev-list --left-right --count upstream/main...HEAD returned 0 18. Local validation: focused W014 regression command (including auto-start-copilot-sonnet-fallback.test.js) passed 209 tests with 0 failures on the first attempt this time, pnpm run typecheck:extensions passed cleanly. Exact-SHA remote full-gate dispatched: pimmink/gsd-pi-ci run 32663412416 (result pending at the time of this entry).",
-			"nextAction": "Await the exact-SHA remote full-gate result for run 32663412416. If green, mark complete; this becomes the submission-grade evidence and W018/W017 (already rebased a fourth time onto this new tip and pushed, per the required W014->W018->W017 order) can then have their own full-gates dispatched. If it fails, diagnose root cause first before assuming flake."
+			"validation": "2026-08-23 fourth rebase to head 9c84c780a13f0a1ac1036600601a8a3dbdd33002. Rebase proof: git rebase upstream/main succeeded with zero conflicts; git range-diff (old-base..recovery-ref vs new-base..HEAD) showed all 18 W014 commits content-identical; git merge-base upstream/main HEAD equals c84f72b79f0bad21002be8d0988a912056e204a6; git rev-list --left-right --count upstream/main...HEAD returned 0 18. Local validation: focused W014 regression command (including auto-start-copilot-sonnet-fallback.test.js) passed 209 tests with 0 failures on the first attempt this time, pnpm run typecheck:extensions passed cleanly. Exact-SHA remote full-gate run 32663412416 came back fully GREEN: verify-pr (literal) success, verify-merge (literal) success. This is the submission-grade exact-SHA evidence for the current head.",
+			"nextAction": "W014 is done. GSD-W018's own fourth-rebase full-gate has now been dispatched as run 32666347203 -- await that result next, then GSD-W017's. Once all three are green, refresh all local .plans/ drafts to this generation's SHAs/runs, do one more live upstream ancestry check, then (per explicit user authorization) open the 3-PR stacked submission per the 'Submission strategy' section already written into each PR-DRAFT.md."
 		},
 		{
 			"id": "GSD-W013",
@@ -458,6 +458,7 @@
 				"depends-on:GSD-W014",
 				"base:9c84c780a13f0a1ac1036600601a8a3dbdd33002",
 				"sha:886c4b41c3db3cb244de4ea6215c9f0771230b1d",
+				"remote:run:32666347203",
 				"recovery:recovery/w018-pre-rebase4-20260823",
 				"superseded:base:4339e623c048f0289b717a38f9b01fa916358f44",
 				"superseded:sha:995518351238ddaf1b3d9273b51481b41ea74029",
@@ -476,7 +477,7 @@
 			],
 			"context": "Separate follow-up feature branch stacked on the W014 tip (W014 is not yet merged upstream). Adds an opt-in automatic refresh of the GitHub Copilot live model catalog at GSD session start, gated by a new copilot_catalog preference block (refresh_on_session_start: off|if_stale|always, default off; notify_on_changes default true; stale_after_ms default 6h). The coordinator reuses W014's existing fetch/last-known-good pipeline rather than duplicating it, is fire-and-forget only (never blocks ordinary startup), deduplicates concurrent triggers per basePath, applies a bounded timeout, and never triggers or waits on an OAuth/login flow. Also implements 3-tier runtime model classification (trusted / manual-only / quarantined) directly from the live CopilotModelRecord's availability/execution/billing/conflicts fields, without fabricating capability or pricing data. Wired into the session_start extension hook only. upstream/main advanced a FOURTH time (60f6919 -> c84f72b79f0bad21002be8d0988a912056e204a6), so W014 was rebased a fourth time and this branch was rebased onto the new W014 tip via `git rebase --onto`; git range-diff confirmed both feature commits content-identical again.",
 			"validation": "A rebase mistake was made and immediately caught with zero downstream impact: the first --onto attempt used W018's own prior SHA as the oldbase argument instead of W014's prior tip, which produced an empty replay range and silently fast-forwarded to the new base, dropping W018's own 2 commits from the branch tip. Caught instantly via the standard post-rebase check `git rev-list --left-right --count <newbase>...HEAD` returning `0 0` instead of the expected `0 2` (documented in repo memory as a new gotcha). Fixed via `git reset --hard` to the just-created recovery ref, then redone with the correct oldbase (W014's actual prior tip, 4339e623c048f0289b717a38f9b01fa916358f44). Nothing was lost (recovery ref) and nothing bad was pushed (caught before the push step). After the fix: git range-diff confirmed both W018 commits content-identical across the fourth rebase; git merge-base origin/feat/github-copilot-model-catalog-sync HEAD equals 9c84c780a13f0a1ac1036600601a8a3dbdd33002 (0 behind, 2 ahead); pnpm run typecheck:extensions passed cleanly. GSD-W014's own fourth-rebase full-gate is pending; W018's own exact-SHA full-gate is not yet dispatched, per the required W014->W018->W017 order.",
-			"nextAction": "Waiting on GSD-W014's own fourth-rebase full-gate (run 32663412416) to confirm green first, per the required W014->W018->W017 verification order. Once green, dispatch an exact-SHA remote full-gate for 886c4b41c3db3cb244de4ea6215c9f0771230b1d."
+			"nextAction": "GSD-W014's own fourth-rebase full-gate confirmed green (run 32663412416). W018's own exact-SHA full-gate has now been dispatched as run 32666347203 -- await that result next, then dispatch GSD-W017's."
 		}
 	]
 }
