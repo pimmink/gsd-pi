@@ -427,16 +427,20 @@
 				"depends-on:GSD-W014",
 				"depends-on:GSD-W018",
 				"base:7961ebfa23e3732f97586192458af8f35f3e565d",
+				"sha:6530030cd1a0b5cadc0f5222c35d2fc9f11d8422",
+				"remote:run:32645096655",
 				"superseded:base:693ebc5885ab70247099def1c2c42de53814bfd7",
 				"recovery:recovery/feat-copilot-cheaper-model-suggestions-pre-rebase-20260821-115118"
 			],
 			"branches": [
 				"feat/copilot-cheaper-model-suggestions"
 			],
-			"commits": [],
-			"context": "Separate follow-up feature branch, now rebuilt on top of the confirmed-green GSD-W018 tip (7961ebfa23e3732f97586192458af8f35f3e565d) rather than the earlier pre-fix W018 SHA. Adds explicit cheaper same-tier GitHub Copilot suggestions to /gsd copilot-models pricing and why output; it does not yet alter routing policy or automatic model selection. The implementation also adds the bundled claude-sonnet-5 pricing fallback required for local-only economics comparison (independently confirmed authoritative against packages/pi-ai/src/models.generated.ts under GSD-W018), plus focused handler and cost-table regression tests. Proactive non-blocking notifications (on manual model selection and on post-refresh detection of a cheaper/better alternative) are the remaining scope item -- not yet implemented.",
-			"validation": "Local validation on the rebuilt worktree (base 7961ebfa): the focused copilot-models handler suite passed 47/47, the focused handler plus cost-table suites passed 69/69, and pnpm run typecheck:extensions passed cleanly. No remote CI run, commit, or GitHub write has been performed yet for this rebuilt state.",
-			"nextAction": "Implement the real notification feature (manual-selection trigger, post-session-refresh trigger, fingerprint-based dedup, no automatic switching), add its tests, then commit, push, and dispatch an exact-SHA remote full-gate run before considering this complete."
+			"commits": [
+				"6530030cd1a0b5cadc0f5222c35d2fc9f11d8422"
+			],
+			"context": "Separate follow-up feature branch, rebuilt on top of the confirmed-green GSD-W018 tip (7961ebfa23e3732f97586192458af8f35f3e565d). Adds explicit cheaper same-tier GitHub Copilot suggestions to /gsd copilot-models pricing and why output (unchanged from the original patch), plus the real proactive notification feature: a new copilot-catalog-notifications.ts fires a non-blocking, deduplicated notification when the user manually selects/cycles to a GitHub Copilot model (never on restore, never on automatic/dynamic routing, which never emits the underlying model_select event) that has a qualifying cheaper or better-and-cheaper same-tier alternative, or when a GSD-W018 session-start refresh completes and the currently active model has one. Distinguishes \"cheaper equivalent\" from \"better, cheaper alternative\" messaging via a pure capability-score comparison, never fabricates data when either profile is missing. Does not alter routing policy or automatic model selection, and never switches the active model. The bundled claude-sonnet-5 pricing fallback was independently confirmed authoritative against packages/pi-ai/src/models.generated.ts under GSD-W018.",
+			"validation": "81 total tests for this feature (69 existing + 10 new for the notification module), all passing. pnpm run typecheck:extensions clean. Committed 6530030cd1a0b5cadc0f5222c35d2fc9f11d8422, pushed to origin. Exact-SHA remote full-gate dispatched: pimmink/gsd-pi-ci run 32645096655 (result pending at time of this entry).",
+			"nextAction": "Await the exact-SHA remote full-gate result for run 32645096655. If green, this becomes the submission-grade evidence and GSD-W017 is considered feature-complete pending PR-readiness review. If it fails, diagnose and fix test-first as with W018's own first attempt."
 		},
 		{
 			"id": "GSD-W018",
