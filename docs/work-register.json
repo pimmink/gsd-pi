@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-08-21",
+	"evidenceAsOf": "2026-08-23",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -425,16 +425,18 @@
 			"pullRequests": [],
 			"relatedRefs": [
 				"depends-on:GSD-W014",
-				"base:7a81883a1187c07a3ce7dfd770caf2c520e7173b",
+				"depends-on:GSD-W018",
+				"base:7961ebfa23e3732f97586192458af8f35f3e565d",
+				"superseded:base:693ebc5885ab70247099def1c2c42de53814bfd7",
 				"recovery:recovery/feat-copilot-cheaper-model-suggestions-pre-rebase-20260821-115118"
 			],
 			"branches": [
 				"feat/copilot-cheaper-model-suggestions"
 			],
 			"commits": [],
-			"context": "Separate follow-up feature branch on top of the rebased W014 tip. Adds explicit cheaper same-tier GitHub Copilot suggestions to /gsd copilot-models pricing and why output only; it does not alter routing policy, automatic model selection, background notifications, or network behavior. The implementation also adds the missing bundled claude-sonnet-5 pricing fallback required for local-only economics comparison, plus focused handler and cost-table regression tests.",
-			"validation": "Local validation on feat/copilot-cheaper-model-suggestions: the focused copilot-models handler suite passed 47/47, the focused handler plus cost-table suites passed 69/69, pnpm run typecheck:extensions passed, and pnpm run verify:fast completed with ci-fast-gates: all checks passed. The first green runs in this extra worktree reused the passing W014 activation layers via symlinked node_modules and packages/pi-ai/dist because a fresh install failed offline with ERR_PNPM_NO_OFFLINE_TARBALL for @google/genai and then online with ERR_PNPM_ENOSPC on this laptop; verify:fast followed that symlinked dependency setup and recreated the source worktree node_modules before passing. No remote CI run, commit, or GitHub write has been performed yet.",
-			"nextAction": "Decide whether to keep this as an upstream feature, then commit it on a clean branch, satisfy current issue-first policy if still required, and prefer clean-runner remote verification for submission-grade evidence before any PR is opened."
+			"context": "Separate follow-up feature branch, now rebuilt on top of the confirmed-green GSD-W018 tip (7961ebfa23e3732f97586192458af8f35f3e565d) rather than the earlier pre-fix W018 SHA. Adds explicit cheaper same-tier GitHub Copilot suggestions to /gsd copilot-models pricing and why output; it does not yet alter routing policy or automatic model selection. The implementation also adds the bundled claude-sonnet-5 pricing fallback required for local-only economics comparison (independently confirmed authoritative against packages/pi-ai/src/models.generated.ts under GSD-W018), plus focused handler and cost-table regression tests. Proactive non-blocking notifications (on manual model selection and on post-refresh detection of a cheaper/better alternative) are the remaining scope item -- not yet implemented.",
+			"validation": "Local validation on the rebuilt worktree (base 7961ebfa): the focused copilot-models handler suite passed 47/47, the focused handler plus cost-table suites passed 69/69, and pnpm run typecheck:extensions passed cleanly. No remote CI run, commit, or GitHub write has been performed yet for this rebuilt state.",
+			"nextAction": "Implement the real notification feature (manual-selection trigger, post-session-refresh trigger, fingerprint-based dedup, no automatic switching), add its tests, then commit, push, and dispatch an exact-SHA remote full-gate run before considering this complete."
 		},
 		{
 			"id": "GSD-W018",
@@ -442,7 +444,7 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Session-start GitHub Copilot catalog refresh and runtime model activation",
-			"status": "in-progress",
+			"status": "complete",
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [
@@ -461,8 +463,8 @@
 				"7961ebfa23e3732f97586192458af8f35f3e565d"
 			],
 			"context": "Separate follow-up feature branch stacked on the W014 tip (W014 is not yet merged upstream). Adds an opt-in automatic refresh of the GitHub Copilot live model catalog at GSD session start, gated by a new copilot_catalog preference block (refresh_on_session_start: off|if_stale|always, default off; notify_on_changes default true; stale_after_ms default 6h). The coordinator reuses W014's existing fetch/last-known-good pipeline rather than duplicating it, is fire-and-forget only (never blocks ordinary startup), deduplicates concurrent triggers per basePath, applies a bounded timeout, and never triggers or waits on an OAuth/login flow. Also implements 3-tier runtime model classification (trusted / manual-only / quarantined) directly from the live CopilotModelRecord's availability/execution/billing/conflicts fields, without fabricating capability or pricing data. Wired into the session_start extension hook only: both a terminal/CLI session and the first @gsd invocation from the VS Code chat participant converge on this same event, since the chat participant (vscode-extension/src/chat-participant.ts) talks over RPC to the same daemon-hosted pi-coding-agent session lifecycle rather than running its own. The first exact-SHA remote full-gate run (32482885693, SHA 693ebc58) failed on two genuine gaps, both fixed test-first in follow-up commit 7961ebfa: the prefs-wizard fixture didn't cover the new copilot_catalog key, and the new coordinator's github-copilot provider-equality check wasn't yet in the ADR-012 allowlist.",
-			"validation": "32 new tests (25 for the coordinator/classifier, 7 for the new preference validation block), all passing locally before the corruption below. pnpm run typecheck:extensions clean on 693ebc58. Local iteration reused the W014 worktree's activation layer via symlinked node_modules and packages/pi-ai/dist (not used as final evidence); a later verify:fast dispatched from a different symlinked worktree corrupted ~622 top-level node_modules entries in the W014 worktree by redirecting them to a worktree that was subsequently removed, which made further local typecheck/test runs in these borrowed-activation-layer worktrees unreliable -- deliberately NOT repaired locally (an offline pnpm install hung indefinitely); the clean-runner remote full-gate is the authoritative evidence instead. Exact-SHA remote full-gate history: run 32482885693 on 693ebc5885ab70247099def1c2c42de53814bfd7 FAILED (2 real gaps, see context); fix commit 7961ebfa23e3732f97586192458af8f35f3e565d addresses both; the ADR-012 allowlist test was independently re-verified passing via a direct node --test invocation after the fix. Fresh exact-SHA remote full-gate redispatched for 7961ebfa23e3732f97586192458af8f35f3e565d: pimmink/gsd-pi-ci run 32485730290 (result pending at time of this entry). Separately audited the claude-sonnet-5 bundled pricing fallback added under GSD-W017: packages/pi-ai/src/models.generated.ts's own anthropic-vertex claude-sonnet-5 entry has cost {input:3, output:15} per million tokens, exactly matching the bundled fallback value -- confirmed authoritative, not fabricated.",
-			"nextAction": "Await the exact-SHA remote full-gate result for run 32485730290; if green, this becomes the submission-grade evidence and GSD-W017 should rebase onto SHA 7961ebfa. If it fails again, diagnose and fix test-first as with the first run."
+			"validation": "32 new tests (25 for the coordinator/classifier, 7 for the new preference validation block), all passing. pnpm run typecheck:extensions clean. Exact-SHA remote full-gate history: run 32482885693 on 693ebc5885ab70247099def1c2c42de53814bfd7 FAILED (2 real gaps, see context); fix commit 7961ebfa23e3732f97586192458af8f35f3e565d addresses both. Fresh exact-SHA remote full-gate for 7961ebfa23e3732f97586192458af8f35f3e565d: pimmink/gsd-pi-ci run 32485730290 -- both verify-pr (literal) and verify-merge (literal) jobs completed with conclusion success. This is the submission-grade evidence for GSD-W018. Separately audited the claude-sonnet-5 bundled pricing fallback added under GSD-W017: packages/pi-ai/src/models.generated.ts's own anthropic-vertex claude-sonnet-5 entry has cost {input:3, output:15} per million tokens, exactly matching the bundled fallback value -- confirmed authoritative, not fabricated. A prior local symlinked-worktree corruption (a verify:fast run from a since-removed sibling worktree redirected ~926 of the W014 worktree's own node_modules entries, both top-level and scoped @x/y packages, into that sibling) was never load-bearing for this evidence -- the remote full-gate always ran on a clean GitHub-hosted checkout -- and has since been fully repaired locally by stripping the dead worktree path segment from each affected symlink and relinking within the W014 worktree's own already-intact .pnpm store; local typecheck and focused tests in both the W014 and W017 worktrees are confirmed green again after the repair.",
+			"nextAction": "None further required for W018 itself. Rebase/rebuild GSD-W017 onto this confirmed-green SHA 7961ebfa23e3732f97586192458af8f35f3e565d (done), then implement its real notification feature and carry it through the same exact-SHA remote full-gate process before considering W017 complete."
 		}
 	]
 }
