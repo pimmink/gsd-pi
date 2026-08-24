@@ -84,7 +84,57 @@
 					},
 					"context": { "type": "string", "minLength": 1 },
 					"validation": { "type": "string", "minLength": 1 },
-					"nextAction": { "type": "string", "minLength": 1 }
+					"nextAction": { "type": "string", "minLength": 1 },
+					"localExtensionPatchRef": {
+						"type": "string",
+						"minLength": 1,
+						"description": "extensionId of a localExtensionPatches[] entry that reimplements this item's user-facing behavior as a temporary local community extension."
+					}
+				},
+				"additionalProperties": false
+			}
+		},
+		"localExtensionPatches": {
+			"type": "array",
+			"description": "Temporary local gsd-pi community extensions (in ~/.gsd/agent/extensions/ or .gsd/extensions/) that reimplement not-yet-merged PR behavior for personal/team use. Never part of any PR branch.",
+			"items": {
+				"type": "object",
+				"required": [
+					"extensionId",
+					"path",
+					"scope",
+					"relatedWorkItems",
+					"reimplementation",
+					"branchHeadsAtLastSync",
+					"syncPolicy",
+					"retireWhen",
+					"status"
+				],
+				"properties": {
+					"extensionId": { "type": "string", "minLength": 1 },
+					"path": { "type": "string", "minLength": 1 },
+					"scope": { "enum": ["global", "project-local"] },
+					"installedAt": { "type": "string", "format": "date" },
+					"relatedWorkItems": {
+						"type": "array",
+						"uniqueItems": true,
+						"items": { "type": "string", "pattern": "^GSD-W[0-9]{3}$" }
+					},
+					"reimplementation": { "type": "boolean" },
+					"reimplementationNote": { "type": "string", "minLength": 1 },
+					"installedProjects": {
+						"type": "array",
+						"uniqueItems": true,
+						"items": { "type": "string", "minLength": 1 }
+					},
+					"knownIssue": { "type": "string", "minLength": 1 },
+					"branchHeadsAtLastSync": {
+						"type": "object",
+						"additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" }
+					},
+					"syncPolicy": { "type": "string", "minLength": 1 },
+					"retireWhen": { "type": "string", "minLength": 1 },
+					"status": { "enum": ["active", "retired"] }
 				},
 				"additionalProperties": false
 			}

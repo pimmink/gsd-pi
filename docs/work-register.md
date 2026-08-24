@@ -63,6 +63,51 @@ canonical source. GitHub and local Git evidence was refreshed on **2026-08-23**.
   `6ea9ffe9d8ffb95074acf711365b7066a043763a` — fork-native VS Code/Copilot
   governance workspace bootstrap and profile setup.
 
+## Local extension patches (temporary, not part of any PR)
+
+Human-readable projection of `work-register.json`'s `localExtensionPatches[]`. These are
+personal, machine-local gsd-pi community extensions that reimplement not-yet-merged PR
+behavior so the feature can be used day-to-day before the real PR ships. They are never
+committed to any PR branch and are not upstream contributions in their own right.
+
+| Extension ID | Path | Related work | Reimplementation | Retire when |
+| --- | --- | --- | --- | --- |
+| `copilot-catalog-patch` | `~/.gsd/agent/extensions/copilot-catalog-patch` (global — all projects, requires gsd-pi >=1.16.1) | GSD-W014, GSD-W017, GSD-W018 | Yes — scoped-down read-only reimplementation, not a copy of the PR diffs (community extensions cannot touch gsd's own core files those PRs modify: `model-router.ts`, `preferences-types.ts`, `bootstrap/register-hooks.ts`). Provides `/copilot-catalog [all\|pricing\|why]` and a best-effort hourly session-start change notification. Does **not** register fetched models as selectable/routable, and does **not** auto-suggest cheaper models on `before_model_select` — both were judged too risky to reimplement without the real PRs' tested logic. Verified working end-to-end 2026-08-24 from Edelman_Studio (live fetch of 56 Copilot models). | Delete once PR #1978, #1979, and #1980 have all merged and shipped in a released `@opengsd/gsd-pi` version |
+
+**Known gsd-pi issue (fixed in 1.16.1)**: on gsd-pi `<=1.16.0`, the documented global location
+(`~/.gsd/agent/extensions/<id>/`, per `manifest-spec.md`/`building-extensions.md`) was
+silently destroyed on every session start — `pruneRemovedBundledExtensions()` in
+`src/resource-loader.ts` ran a "sweep" that `rmSync()`s (recursive, force) any subdirectory
+under `~/.gsd/agent/extensions/` whose name isn't part of gsd's own currently-bundled
+extension set, with no exclusion for `tier: "community"` manifests. Reproduced 2026-08-24 with
+a trivial, harmless test extension — gsd silently deleted the whole directory after one
+`gsd --print` session (no stderr). Temporarily worked around via a project-local
+`.gsd/extensions/<name>.js` install in Edelman_Studio only. After upgrading the global install
+from `1.16.0` to `1.16.1` (`npm install -g @opengsd/gsd-pi@latest`), re-ran the exact same
+reproduction with a fresh dummy extension and it survived — **confirmed fixed**. Reverted to
+the documented global location as the sole install and removed the project-local workaround.
+`requires.platform` in the manifest is now `>=1.16.1` to self-document the minimum safe
+version. Plausibly worth an upstream bug report/doc note someday for anyone still on
+`<=1.16.0` (not filed — needs explicit authorization first).
+
+**Sync policy**: whenever `feat/github-copilot-model-catalog-sync`,
+`feat/copilot-catalog-session-refresh`, or `feat/copilot-cheaper-model-suggestions` receive
+new commits (review fixes, another rebase, anything), check whether
+`~/.gsd/agent/extensions/copilot-catalog-patch/index.ts` needs a matching behavior update,
+then update `branchHeadsAtLastSync` in `work-register.json` regardless — even a "no change
+needed" review should bump the recorded SHA so drift never goes unnoticed.
+
+Quick drift check (run from `worktrees/workspace-governance`, or any worktree with all three
+branches fetched):
+
+```sh
+jq -r '.localExtensionPatches[] | .branchHeadsAtLastSync | to_entries[] | "\(.key) \(.value)"' \
+  docs/work-register.json | while read -r branch expected; do
+    actual=$(git rev-parse "$branch" 2>/dev/null || echo "MISSING")
+    [ "$actual" = "$expected" ] && echo "OK    $branch" || echo "DRIFT $branch expected=$expected actual=$actual"
+  done
+```
+
 ## Register maintenance
 
 For every status change:
@@ -72,6 +117,8 @@ For every status change:
 3. Update `work-register.json` first.
 4. Update this projection in the same commit.
 5. Include validation evidence and one concrete next action.
+6. If the item has a `localExtensionPatchRef`, also run the drift check above and update
+   `branchHeadsAtLastSync` for that patch in the same commit.
 
 Do not remove closed or superseded entries. They explain why branches and commits exist and
 prevent repeated work.
