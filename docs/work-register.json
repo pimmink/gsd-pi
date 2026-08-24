@@ -518,6 +518,33 @@
 			"validation": "A rebase mistake was made and immediately caught with zero downstream impact: the first --onto attempt used W018's own prior SHA as the oldbase argument instead of W014's prior tip, which produced an empty replay range and silently fast-forwarded to the new base, dropping W018's own 2 commits from the branch tip. Caught instantly via the standard post-rebase check `git rev-list --left-right --count <newbase>...HEAD` returning `0 0` instead of the expected `0 2` (documented in repo memory as a new gotcha). Fixed via `git reset --hard` to the just-created recovery ref, then redone with the correct oldbase (W014's actual prior tip, 4339e623c048f0289b717a38f9b01fa916358f44). Nothing was lost (recovery ref) and nothing bad was pushed (caught before the push step). After the fix: git range-diff confirmed both W018 commits content-identical across the fourth rebase; git merge-base origin/feat/github-copilot-model-catalog-sync HEAD equals 9c84c780a13f0a1ac1036600601a8a3dbdd33002 (0 behind, 2 ahead); pnpm run typecheck:extensions passed cleanly. GSD-W014's own fourth-rebase full-gate is pending; W018's own exact-SHA full-gate is not yet dispatched, per the required W014->W018->W017 order.",
 			"nextAction": "PR opened: https://github.com/open-gsd/gsd-pi/pull/1979 (Draft, base main, depends on #1978). Monitor for maintainer review/feedback; retarget/rebase and promote out of Draft once #1978 merges.",
 			"localExtensionPatchRef": "copilot-catalog-patch"
+		},
+		{
+			"id": "GSD-W020",
+			"type": "docs",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Repo-wide markdownlint config: disable MD013/MD060, track remaining cleanup",
+			"status": "complete",
+			"issues": [
+				1992
+			],
+			"pullRequests": [
+				1991
+			],
+			"relatedRefs": [
+				"sha:f3fd49050cb644d5b825e9a8d9d847fed1d74a3b",
+				"base:upstream/main:e28218e4"
+			],
+			"branches": [
+				"docs/markdownlint-config"
+			],
+			"commits": [
+				"f3fd49050cb644d5b825e9a8d9d847fed1d74a3b"
+			],
+			"context": "A repo-wide markdownlint-cli2 scan (git ls-files '*.md' passed as an explicit file list, not a glob, to avoid ENAMETOOLONG from deeply nested pnpm node_modules symlinks) found 29,678 issues across 919 of 1145 tracked markdown files. MD013 (line-length, 17,309 violations) and MD060 (table-column-style, 5,916 violations) together account for 78% of the total and were never actually enforced as project conventions (verified: neither rule has any pre-existing inline markdownlint-disable comment anywhere in a clean upstream/main checkout, correcting an earlier assumption that CONTRIBUTING.md already disabled these -- that pattern only existed in this fork-local work-register.md, not upstream). Added a root .markdownlint-cli2.jsonc disabling both rules repo-wide; zero content changes. New worktree created off current upstream/main (e28218e4) after an initial git worktree add path mistake (relative destination resolved against -C fork instead of caller cwd) was caught and corrected.",
+			"validation": "Scan before: 29678 issues in 919 files. Scan after adding the config (same file list, config auto-discovered by markdownlint-cli2): 6472 issues in 649 files -- confirms the 78% reduction empirically, not just estimated. JSONC syntax independently verified via a comment-stripped JSON.parse in addition to markdownlint-cli2 itself successfully parsing and applying it. Full pnpm install for a local verify:fast attempt failed (ENOTDIR: a symlinked node_modules from a sibling worktree conflicted with pnpm's own install step) and was not worth resolving given the change is a single non-executable config file touching no src/packages/scripts paths that ci-classify-changes.sh's heavy-gate patterns key on.",
+			"nextAction": "Monitor PR #1991 (https://github.com/open-gsd/gsd-pi/pull/1991) for maintainer feedback. Issue #1992 (https://github.com/open-gsd/gsd-pi/issues/1992) tracks the remaining 6,472 issues as separate, incremental cleanup work (by-rule breakdown included in the issue), not a single mass-reformat PR."
 		}
 	],
 	"localExtensionPatches": [
