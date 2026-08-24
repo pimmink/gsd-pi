@@ -14,7 +14,7 @@ Use three intentionally separate layers:
    fetched `upstream/main`.
 2. **Governance anchor** — tracked fork-local control-plane on
    `docs/copilot-workspace-governance` at
-   `/Users/pimmink/Klanten/gsd-pi-workspace-governance`.
+   `/Users/pimmink/Klanten/gsd-pi-pimmink/worktrees/workspace-governance`.
 3. **VS Code Profile** — local runtime configuration named `GSD Pi Contributor`, shared by
    every GSD Pi feature worktree but not by unrelated projects.
 
@@ -89,7 +89,7 @@ feature worktree, never add or copy the register into the contribution branch.
 When branch, issue, PR, commit, status, checks, validation, or next action changes:
 
 ```bash
-cd /Users/pimmink/Klanten/gsd-pi-workspace-governance
+cd /Users/pimmink/Klanten/gsd-pi-pimmink/worktrees/workspace-governance
 # Edit docs/work-register.json first, then its Markdown projection.
 node scripts/validate-work-register.mjs
 ```
@@ -179,7 +179,7 @@ Treat slow or failing verification as an observability problem first, not a log-
 2. Use GitHub MCP or the GitHub PR extension to inspect check runs, per-job logs, and artifacts
    in context.
 3. Once a branch is stable enough to push, prefer the sharded clean-runner flow from
-   `/Users/pimmink/Klanten/gsd-pi-ci/docs/remote-verification-guide.md` via
+   `/Users/pimmink/Klanten/gsd-pi-pimmink/ci/docs/remote-verification-guide.md` via
    `scripts/remote-verify.sh dispatch --mode sharded --source-ref <branch> --expected-sha <sha>`.
 4. Fall back to `--mode stable` only when the sharded harness itself is under suspicion.
 5. Report the slowest gate or failing job explicitly (`build:web-host`, `validate-pack`,

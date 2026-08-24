@@ -115,7 +115,7 @@ rules, not a copy of the full `AGENTS.md`:
   `origin=pimmink/gsd-pi`; otherwise stop.
 - Treat current upstream policy and maintainer direction as authoritative.
 - Before planning/editing, read `AGENTS.md`, `docs/contributor-workflow.md`, and canonical
-  `docs/work-register.json` from `/Users/pimmink/Klanten/gsd-pi-workspace-governance`.
+  `docs/work-register.json` from `/Users/pimmink/Klanten/gsd-pi-pimmink/worktrees/workspace-governance`.
 - Keep feature worktrees based on fetched `upstream/main`; never copy fork-local governance
   into an upstream contribution branch.
 - Preserve unknown dirty work and keep private/customer context out of the public fork.

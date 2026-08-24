@@ -13,7 +13,7 @@ or perform GitHub writes.
 1. Verify the repository and remotes: `upstream` must be `open-gsd/gsd-pi` and `origin`
    must be `pimmink/gsd-pi`.
 2. Read current upstream `CONTRIBUTING.md`, `VISION.md`, and relevant repository guidance.
-3. Read fork-local governance from `/Users/pimmink/Klanten/gsd-pi-workspace-governance`:
+3. Read fork-local governance from `/Users/pimmink/Klanten/gsd-pi-pimmink/worktrees/workspace-governance`:
    `AGENTS.md`, `docs/contributor-workflow.md`, and canonical
    `docs/work-register.json`.
 4. Run bounded read-only checks: branch/status, worktree list, remotes, recent commits,

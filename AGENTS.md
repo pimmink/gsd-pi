@@ -46,7 +46,7 @@ Fork-local contribution governance is tracked only on
 `origin/docs/copilot-workspace-governance` and checked out at:
 
 ```text
-/Users/pimmink/Klanten/gsd-pi-workspace-governance
+/Users/pimmink/Klanten/gsd-pi-pimmink/worktrees/workspace-governance
 ```
 
 That checkout is the governance anchor. It owns this file,
@@ -107,7 +107,7 @@ Merge/review loop:
   CI observability tools first: `repo-actions-hub`, `pr-artifact-explorer`, GitHub MCP, and
   the GitHub PR extension when available.
 - Once a branch is stable enough to push, prefer the sharded clean-runner verification flow
-  documented in `/Users/pimmink/Klanten/gsd-pi-ci/docs/remote-verification-guide.md` before
+  documented in `/Users/pimmink/Klanten/gsd-pi-pimmink/ci/docs/remote-verification-guide.md` before
   manually digging through raw logs; fall back to the stable unsharded tier only when the
   sharded harness itself is suspect.
 
