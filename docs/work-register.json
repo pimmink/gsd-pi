@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-08-23",
+	"evidenceAsOf": "2026-08-24",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -413,6 +413,25 @@
 			"context": "Not an independent feature or workstream. This is the recovery/provenance record for the stranded Phase-I/J spike commit e8e46fe9, which was built on top of the retired historical fix/mai-cost-table-provider-section branch (base fork main c4f78553, pre-1.16) rather than the clean feat/github-copilot-model-catalog-sync branch. Content is conceptually part of the GSD-W014 roadmap: provider-aware Copilot runtime economics (Phase I) in model-cost-table.ts and Copilot economics/drift handling in the copilot-models handler, plus router profile-confidence safety (Phase J) in model-router.ts, with accompanying tests. Because it sits on the wrong historical base it is not directly mergeable. The commit is archived on branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9, pushed to origin at the same SHA.",
 			"validation": "As of 2026-08-18: git show --stat reports 7 files changed, 615 insertions and 48 deletions; git show --check is clean; a secret/PII scan over the commit diff found only false positives (a runtime token variable and dummy 'token-abc' test fixtures), no real credentials. Ancestry: origin/fix/mai-cost-table-provider-section (28a2c92c) and d700abcf are ancestors of e8e46fe9; e8e46fe9 is NOT an ancestor of feat/github-copilot-model-catalog-sync or upstream/main; merge-base with upstream/main is c4f78553. Per-file divergence vs the committed catalog-sync branch: model-cost-table.ts and its test, model-router.ts and its test are Phase I/J content absent from catalog-sync; the copilot-models handler and its test diverged (Phase H parts superseded on catalog-sync, Phase I economics/drift unique to the spike); catalog.ts is largely superseded on catalog-sync. Local branch ref and origin remote ref both point to e8e46fe9450f326641fccf7bbf3929f10be80f09.",
 			"nextAction": "Do not merge or cherry-pick wholesale. After the current GSD-W014 Phase-H working tree is committed and remotely verified, compare e8e46fe9 hunk-by-hunk against current upstream/main and reconstruct only the still-relevant, proven Phase-I/J pieces onto appropriate fresh upstream/main-based reviewable branches with their own scope, tests, and validation. The historical fix/mai-cost-table-provider-section branch and its dirty worktree were left untouched (ARCHIVE/EXTRACT_FIRST) because that worktree was not clean."
+		},
+		{
+			"id": "GSD-W019",
+			"type": "performance",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "verify-merge heavy-gate classifier and compile-once optimization",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"branches": [
+				"perf/verify-merge-efficiency"
+			],
+			"commits": [
+				"4062e0654c580aca85c4954c4d9a781702ad53b5"
+			],
+			"context": "scripts/verify-merge-needed.sh classifies a diff via ci-classify-changes.sh and reports whether it would trigger CI's heavy Linux build/test gate without running the full merge gate; scripts/verify-merge.sh runs the same classifier for context, installs once, builds the web host only when stale, compiles test artifacts once and reuses the compiled output for test:unit/test:packages, and gates native package tests behind the same portability classification CI uses, while preserving every pre-existing required step (validate-pack, workspace/extension coverage, the pi-ai vitest suite, integration, e2e). Also documents the new advisory script in CONTRIBUTING.md and two docs/dev guides, and adds scripts/__tests__/verify-merge.test.mjs covering the optimization invariants. Discovered 2026-08-24 during a worktree audit: one real, already-pushed commit (origin/perf/verify-merge-efficiency, matches local HEAD) with no upstream issue/PR and no prior register entry -- it was simply never followed up on. 91 commits behind current upstream/main as of 2026-08-24 (not rebased since 2026-08-19). A stray one-space whitespace edit to the test file was found uncommitted in the worktree and discarded (git checkout --) as clearly accidental, not meaningful work.",
+			"validation": "Not yet run through the standard exact-SHA remote verify:pr/verify:merge gate used for GSD-W014/W017/W018. No local test evidence recorded in this register prior to 2026-08-24.",
+			"nextAction": "Needs a decision: rebase onto current upstream/main, run local + exact-SHA remote gate evidence (same bar as GSD-W014/W017/W018), and open a PR -- or deliberately drop it. Not actioned further without explicit direction, since this is newly-discovered untracked work, not something already authorized."
 		},
 		{
 			"id": "GSD-W017",
