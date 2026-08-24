@@ -130,7 +130,10 @@
 					"knownIssue": { "type": "string", "minLength": 1 },
 					"branchHeadsAtLastSync": {
 						"type": "object",
-						"additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" }
+						"additionalProperties": {
+							"type": "string",
+							"pattern": "^[0-9a-f]{7,40}$"
+						}
 					},
 					"syncPolicy": { "type": "string", "minLength": 1 },
 					"retireWhen": { "type": "string", "minLength": 1 },
