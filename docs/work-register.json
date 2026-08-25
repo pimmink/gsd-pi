@@ -572,9 +572,9 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Repair evidence-backed lifecycle shadow authority before Milestone validation",
-			"status": "complete",
+			"status": "pr-open",
 			"issues": [],
-			"pullRequests": [],
+			"pullRequests": [2002],
 			"relatedRefs": [
 				"sha:bb75b2f964a4574cf5fb3ec936298b29f2b6af4c",
 				"base:upstream/main:e28218e41706b724e7bcc044d210210b04850009"
@@ -583,7 +583,7 @@
 			"commits": ["bb75b2f964a4574cf5fb3ec936298b29f2b6af4c"],
 			"context": "Adopted Milestones could contain legacy-complete Tasks or Slices with durable completion evidence but no workflow_item_lifecycles authority, causing strict closeout validation to fail with missing canonical lifecycle authority. The fix adds a narrow evidence-gated forward repair before validation, preserving strict Milestone completion guards.",
 			"validation": "Focused milestone validation domain suite: 20/20 passed, including positive partial-adoption repair and negative missing-evidence rejection. corepack pnpm exec tsc --noEmit --project tsconfig.extensions.json passed. corepack pnpm run build:core passed. corepack pnpm run verify:fast passed with pnpm install --frozen-lockfile; pnpm-lock.yaml unchanged. Repair processes Tasks before Slices, uses replay-safe lifecycle.shadow.repair Domain Operations, and validation records its receipt after descendant repair writes.",
-			"nextAction": "Open an upstream PR from fix/lifecycle-shadow-authority-repair; no GitHub write has been performed yet."
+			"nextAction": "Monitor PR #2002 (https://github.com/open-gsd/gsd-pi/pull/2002) for maintainer feedback and CI."
 		}
 	],
 	"localExtensionPatches": [
