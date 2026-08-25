@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-08-24",
+	"evidenceAsOf": "2026-08-25",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -565,6 +565,25 @@
 			"context": "A repo-wide markdownlint-cli2 scan (git ls-files '*.md' passed as an explicit file list, not a glob, to avoid ENAMETOOLONG from deeply nested pnpm node_modules symlinks) found 29,678 issues across 919 of 1145 tracked markdown files. MD013 (line-length, 17,309 violations) and MD060 (table-column-style, 5,916 violations) together account for 78% of the total and were never actually enforced as project conventions (verified: neither rule has any pre-existing inline markdownlint-disable comment anywhere in a clean upstream/main checkout, correcting an earlier assumption that CONTRIBUTING.md already disabled these -- that pattern only existed in this fork-local work-register.md, not upstream). Added a root .markdownlint-cli2.jsonc disabling both rules repo-wide; zero content changes. New worktree created off current upstream/main (e28218e4) after an initial git worktree add path mistake (relative destination resolved against -C fork instead of caller cwd) was caught and corrected.",
 			"validation": "Scan before: 29678 issues in 919 files. Scan after adding the config (same file list, config auto-discovered by markdownlint-cli2): 6472 issues in 649 files -- confirms the 78% reduction empirically, not just estimated. JSONC syntax independently verified via a comment-stripped JSON.parse in addition to markdownlint-cli2 itself successfully parsing and applying it. Full pnpm install for a local verify:fast attempt failed (ENOTDIR: a symlinked node_modules from a sibling worktree conflicted with pnpm's own install step) and was not worth resolving given the change is a single non-executable config file touching no src/packages/scripts paths that ci-classify-changes.sh's heavy-gate patterns key on.",
 			"nextAction": "Monitor PR #1991 (https://github.com/open-gsd/gsd-pi/pull/1991) for maintainer feedback. Issue #1992 (https://github.com/open-gsd/gsd-pi/issues/1992) tracks the remaining 6,472 issues as separate, incremental cleanup work (by-rule breakdown included in the issue), not a single mass-reformat PR."
+		},
+		{
+			"id": "GSD-W021",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Repair evidence-backed lifecycle shadow authority before Milestone validation",
+			"status": "complete",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [
+				"sha:bb75b2f964a4574cf5fb3ec936298b29f2b6af4c",
+				"base:upstream/main:e28218e41706b724e7bcc044d210210b04850009"
+			],
+			"branches": ["fix/lifecycle-shadow-authority-repair"],
+			"commits": ["bb75b2f964a4574cf5fb3ec936298b29f2b6af4c"],
+			"context": "Adopted Milestones could contain legacy-complete Tasks or Slices with durable completion evidence but no workflow_item_lifecycles authority, causing strict closeout validation to fail with missing canonical lifecycle authority. The fix adds a narrow evidence-gated forward repair before validation, preserving strict Milestone completion guards.",
+			"validation": "Focused milestone validation domain suite: 20/20 passed, including positive partial-adoption repair and negative missing-evidence rejection. corepack pnpm exec tsc --noEmit --project tsconfig.extensions.json passed. corepack pnpm run build:core passed. corepack pnpm run verify:fast passed with pnpm install --frozen-lockfile; pnpm-lock.yaml unchanged. Repair processes Tasks before Slices, uses replay-safe lifecycle.shadow.repair Domain Operations, and validation records its receipt after descendant repair writes.",
+			"nextAction": "Open an upstream PR from fix/lifecycle-shadow-authority-repair; no GitHub write has been performed yet."
 		}
 	],
 	"localExtensionPatches": [
