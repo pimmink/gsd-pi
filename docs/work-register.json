@@ -624,7 +624,7 @@
 			"scope": "fork-local",
 			"upstreamDisposition": "no-pr-planned",
 			"title": "Recovery runtime patch tracking (orphan guard, upstream PR #1946)",
-			"status": "idea",
+			"status": "complete",
 			"issues": [],
 			"pullRequests": [
 				1946
@@ -635,8 +635,8 @@
 			],
 			"commits": [],
 			"context": "The recovery orphan guard fix (resumeAuthorized) is active in installed/managed runtime locally, reported merged upstream as PR #1946. Needs confirmation of the actual release status before planning a normal upgrade vs. an interim local patch.",
-			"validation": "Not started.",
-			"nextAction": "Check whether PR #1946 shipped in an official release. If yes, plan a normal package upgrade. If no, document an interim patch plan with backups, hashes, and rollback only; no installed/managed runtime write without explicit Patch-local authorization."
+			"validation": "Upstream PR #1946 is merged and explicitly included in release v1.16.2, published 2026-08-25. The local global CLI is still v1.16.1; no runtime files were changed during this check.",
+			"nextAction": "Plan a normal upgrade from @opengsd/gsd-pi 1.16.1 to v1.16.2 or later. Execute the upgrade only with separate explicit Patch-local authorization, then fresh-process verify the orphan-guard behavior."
 		},
 		{
 			"id": "GSD-W024",
