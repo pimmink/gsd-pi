@@ -578,7 +578,7 @@
 				2002
 			],
 			"relatedRefs": [
-				"sha:4fff959838e44d5ea5da9bdccf5f74547edd1b51",
+				"sha:cf873bf9ff0da4768c1b3027efdd9443ecb2f9d7",
 				"base:upstream/main:e28218e41706b724e7bcc044d210210b04850009"
 			],
 			"branches": [
@@ -589,11 +589,12 @@
 				"e7cb339e",
 				"4061bc41",
 				"4fff9598",
-				"0713f16c"
+				"0713f16c",
+				"cf873bf9"
 			],
 			"context": "Adopted Milestones could contain legacy-complete Tasks or Slices with durable completion evidence but no workflow_item_lifecycles authority, causing strict closeout validation to fail with missing canonical lifecycle authority. The fix adds a narrow evidence-gated forward repair before validation, preserving strict Milestone completion guards. Post-review found two additional stop-ship gaps in the original bb75b2f9 patch: (1) taskCompletionFacts() accepted any non-empty verification_result instead of requiring an exact passed verdict; (2) repairMilestoneLifecycleShadowsForward() committed each repairable descendant as its own separate Domain Operation while iterating, so a later unresolved sibling did not roll back earlier already-committed repairs.",
-			"validation": "All review findings from PR #2002 addressed in commit 0713f16c: (1) Milestone state guard added to repairMilestoneLifecycleShadowsForward to refuse repair when canonical status is completed, pending, or cancelled; (2) deterministic per-category batch keys with content digest hashes added to executeMilestoneSingleStepRepairBatch to allow idempotency convergence across partial multi-batch retries; (3) Task repairs partitioned and committed before Slice repairs. All 32 focused tests in lifecycle-shadow-forward-repair.test.ts and milestone-validation-domain-operation.test.ts pass locally (100%). tsc --noEmit --project tsconfig.extensions.json clean. Commit 0713f16c pushed to origin/fix/lifecycle-shadow-authority-repair.",
-			"nextAction": "Pushed commit 0713f16c to PR #2002. All 9 GitHub status checks passed on previous commit 4fff9598; new commit 0713f16c triggered fresh CI checks. Awaiting maintainer review/merge."
+			"validation": "All review findings from PR #2002 addressed in commits 0713f16c and cf873bf9: (1) Milestone state guard added to repairMilestoneLifecycleShadowsForward to refuse repair when canonical status is completed, pending, or cancelled; (2) deterministic per-category batch keys with content digest hashes added to executeMilestoneSingleStepRepairBatch to allow idempotency convergence across partial multi-batch retries; (3) Task repairs partitioned and committed before Slice repairs; (4) schema test fixtures updated to match exact SQLite table columns (workflow_item_lifecycles). All 32 focused tests in lifecycle-shadow-forward-repair.test.ts and milestone-validation-domain-operation.test.ts pass locally (100%). tsc --noEmit --project tsconfig.extensions.json clean. Commit cf873bf9 pushed to origin/fix/lifecycle-shadow-authority-repair.",
+			"nextAction": "Pushed commit cf873bf9 to PR #2002. Fresh CI run 32976664676 dispatched on GitHub. Awaiting maintainer review/merge."
 		},
 		{
 			"id": "GSD-W022",
@@ -618,8 +619,8 @@
 				"5bfcc551"
 			],
 			"context": "A normally resolved tool result carrying isError: true is re-wrapped by the agent loop as isError: false, silently discarding a caller's error signal. The native MCP adapter already preserves the MCP error flag and the external Claude adapter already preserves externalResult.isError; the loss is in the shared pi-agent-core execution path. Because AgentToolResult currently documents throw-on-failure and does not declare isError, preserving the field in core would add a public error-signaling contract.",
-			"validation": "Upstream Draft PR #2016 contains the reproduction test (fd9946ca). Independent review completed: fix implemented on local branch fix/w022-local-patch (commit 5bfcc551): AgentToolResult gains optional isError?: boolean field, normalizeAgentToolResult preserves isError, and raceToolExecutionAgainstAbort preserves result.isError. All 29 tests in agent-loop.test.ts pass (100%). Installed local community extension patch w022-iserror-patch at ~/.gsd/agent/extensions/w022-iserror-patch using public tool_result hook to preserve isError for live local use in Edelman Studio without waiting for upstream PR merge.",
-			"nextAction": "RFC issue #2015 and Draft PR #2016 are open upstream awaiting maintainer decision on AgentToolResult.isError public contract. Local patch w022-iserror-patch is active in ~/.gsd/agent/extensions/ for local workflow execution in Edelman Studio.",
+			"validation": "Fix implemented and pushed to PR #2016 (commit 5bfcc551): AgentToolResult gains optional isError?: boolean field, normalizeAgentToolResult preserves isError, and raceToolExecutionAgainstAbort preserves result.isError. All 29 tests in agent-loop.test.ts pass (100%). Fresh CI run 32976709169 dispatched on GitHub. Installed local community extension patch w022-iserror-patch at ~/.gsd/agent/extensions/w022-iserror-patch using public tool_result hook to preserve isError for live local use in Edelman Studio without waiting for upstream PR merge.",
+			"nextAction": "RFC issue #2015 and Draft PR #2016 updated with commit 5bfcc551. Fresh CI running on GitHub. Local patch w022-iserror-patch is active in ~/.gsd/agent/extensions/ for local workflow execution in Edelman Studio.",
 			"localExtensionPatchRef": "w022-iserror-patch"
 		},
 		{
