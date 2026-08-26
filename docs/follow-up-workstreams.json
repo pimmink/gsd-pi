@@ -15,7 +15,11 @@
 		"workflow": "remote-full-gate.yml",
 		"runId": 32947426378,
 		"url": "https://github.com/pimmink/gsd-pi-ci/actions/runs/32947426378",
-		"statusAtCreation": "in_progress"
+		"statusAtCreation": "in_progress",
+		"statusAtLastCheck": "success",
+		"conclusion": "success",
+		"verifyPr": "success",
+		"verifyMerge": "success"
 	},
 	"workstreams": [
 		{
