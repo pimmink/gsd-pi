@@ -644,19 +644,23 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "UAT issue #1993 follow-up (schema-error run poisoning / stale abort)",
-			"status": "idea",
+			"status": "pr-open",
 			"issues": [
 				1993
 			],
-			"pullRequests": [],
+			"pullRequests": [
+				2017
+			],
 			"relatedRefs": [],
 			"branches": [
 				"fix/uat-1993-schema-error-poisoning"
 			],
-			"commits": [],
-			"context": "A schema error must not permanently poison a run, and a stale abort must be able to heal, while a genuine truncation guard remains. Local branch created from upstream/main (327343af); no code written yet.",
-			"validation": "Not started.",
-			"nextAction": "Build the callgraph/testmatrix for the affected UAT path, write behavioral regression tests for the poisoning and stale-abort scenarios, then implement."
+			"commits": [
+				"d351e4bc"
+			],
+			"context": "A schema-invalid gsd_uat_exec could poison a run by recording a durable harnessAbort, causing later gsd_uat_result_save calls to be rejected and sending the unit into a finalize-retry wedge. The fix separates model-fixable schema validation from genuine harness truncation and heals only stale same-run tool-error aborts after successful gsd_exec/gsd_uat_exec. Existing workflow tool-surface preflight and finalize rerun mechanisms remain unchanged.",
+			"validation": "Issue #1993 was reproduced in the owning register-hooks path. Commit d351e4bc adds the narrow predicate, locked runtime clear operation, and execution-based regressions. Focused W024 suites pass 110/110, covering schema-invalid gsd_uat_exec, stale tool-error healing, timeout preservation, loop-guard preservation, UAT save rejection, and workflow tool-surface readiness. git diff --check passed. Upstream Draft PR #2017 is open; issue #1993 is labeled needs-maintainer-review and large-scope."
+			,"nextAction": "Await maintainer review/approval on Draft PR #2017. Keep it Draft until the broader issue scope and the retained truncation/retry invariants are accepted; then run the required broader verification and mark ready."
 		},
 		{
 			"id": "GSD-W025",
@@ -720,7 +724,7 @@
 			"scope": "fork-local",
 			"upstreamDisposition": "no-pr-planned",
 			"title": "Stale local path cleanup in docs and settings",
-			"status": "idea",
+			"status": "complete",
 			"issues": [],
 			"pullRequests": [],
 			"relatedRefs": [],
@@ -729,8 +733,8 @@
 			],
 			"commits": [],
 			"context": "~/.gsd/agent/settings.json and related local docs still reference the retired /Users/pimmink/Klanten/gsd-pi-fork path; the durable fork now lives at /Users/pimmink/Klanten/gsd-pi-pimmink/fork. Fork-local only; must not leak user-specific absolute paths into upstream docs.",
-			"validation": "Not started.",
-			"nextAction": "Correct stale paths via dynamic discovery or a single local config value; keep user-specific absolute paths out of any upstream-facing documentation."
+			"validation": "Updated the active ~/.gsd/agent/settings.json package override from the retired /Users/pimmink/Klanten/gsd-pi-fork path to /Users/pimmink/Klanten/gsd-pi-pimmink/fork. JSON parsing passed, no stale path remains in active settings, and a fresh gsd --help process from the current fork exited successfully on v1.16.2. Historical session and subagent logs were intentionally left unchanged.",
+			"nextAction": "None; active local package discovery now uses the current fork path."
 		}
 	],
 	"localExtensionPatches": [
