@@ -600,17 +600,23 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Agent-core resolved tool result isError flag dropped in the agent loop",
-			"status": "blocked",
-			"issues": [],
-			"pullRequests": [],
+			"status": "pr-open",
+			"issues": [
+				2015
+			],
+			"pullRequests": [
+				2016
+			],
 			"relatedRefs": [],
 			"branches": [
 				"fix/agent-core-tool-result-iserror"
 			],
-			"commits": [],
+			"commits": [
+				"fd9946ca"
+			],
 			"context": "A normally resolved tool result carrying isError: true is re-wrapped by the agent loop as isError: false, silently discarding a caller's error signal. The native MCP adapter already preserves the MCP error flag and the external Claude adapter already preserves externalResult.isError; the loss is in the shared pi-agent-core execution path. Because AgentToolResult currently documents throw-on-failure and does not declare isError, preserving the field in core would add a public error-signaling contract.",
 			"validation": "Reproduction added locally in packages/pi-agent-core/test/agent-loop.test.ts on branch fix/agent-core-tool-result-iserror (based on upstream/main 327343af): a tool resolving with { content, details, isError: true } currently emits tool_execution_end.isError=false, so the focused test fails exactly at that assertion. The test dependency setup required pnpm install --frozen-lockfile and pnpm --filter @gsd/pi-ai run build; git diff --check is clean. No production code changed. Upstream CONTRIBUTING.md requires an RFC and maintainer approval before changes touching agent-core; no issue or approval is recorded yet.",
-			"nextAction": "Obtain maintainer approval for the proposed AgentToolResult.isError contract (or agree on an adapter-only alternative) via an upstream RFC/issue. After approval, implement the smallest shared-loop fix, extend the regression to tool_execution_end and ToolResultMessage, then run targeted tests and the required verification ladder. Do not publish or open a PR before approval."
+			"nextAction": "RFC issue #2015 and Draft PR #2016 are open. Await maintainer approval for the proposed AgentToolResult.isError contract (or agreement on an adapter-only alternative); then implement the smallest approved shared-loop fix, extend the regression to ToolResultMessage, and run the required verification ladder before marking the PR ready."
 		},
 		{
 			"id": "GSD-W023",
