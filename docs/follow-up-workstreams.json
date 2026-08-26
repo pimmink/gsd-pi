@@ -87,16 +87,6 @@
 			"status": "idea",
 			"requiresApprovalBeforeImplementation": false,
 			"firstStep": "Replace stale gsd-pi-fork path assumptions with dynamic discovery or one fork-local config value."
-		},
-		{
-			"id": "GSD-W029",
-			"priority": "P2",
-			"title": "M011 Milestone re-run plan (post lifecycle-shadow-repair)",
-			"branch": "docs/m011-resumption-plan",
-			"scope": "fork-local",
-			"status": "idea",
-			"requiresApprovalBeforeImplementation": true,
-			"firstStep": "Wait for GSD-W021 to merge or activate, then plan backup DB+WAL+SHM and one fresh validation."
 		}
 	]
 }

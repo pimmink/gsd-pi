@@ -725,24 +725,6 @@
 			"context": "~/.gsd/agent/settings.json and related local docs still reference the retired /Users/pimmink/Klanten/gsd-pi-fork path; the durable fork now lives at /Users/pimmink/Klanten/gsd-pi-pimmink/fork. Fork-local only; must not leak user-specific absolute paths into upstream docs.",
 			"validation": "Not started.",
 			"nextAction": "Correct stale paths via dynamic discovery or a single local config value; keep user-specific absolute paths out of any upstream-facing documentation."
-		},
-		{
-			"id": "GSD-W029",
-			"type": "chore",
-			"scope": "fork-local",
-			"upstreamDisposition": "no-pr-planned",
-			"title": "M011 Milestone re-run plan (post lifecycle-shadow-repair)",
-			"status": "idea",
-			"issues": [],
-			"pullRequests": [],
-			"relatedRefs": [],
-			"branches": [
-				"docs/m011-resumption-plan"
-			],
-			"commits": [],
-			"context": "M011 remains needs-attention pending real product evidence. Once GSD-W021 is merged/activated, a fresh session must re-run Milestone validation once, since the pre-existing pass receipt predates the repair. No manual SQL; DB/WAL/SHM must be backed up as one consistent set before any attempt.",
-			"validation": "Not started.",
-			"nextAction": "Wait for GSD-W021 to merge/activate, then plan the rerun: backup DB+WAL+SHM, verify source/installed/managed hashes, start a fresh session, run one new validation, and observe the resulting receipt/lifecycle state."
 		}
 	],
 	"localExtensionPatches": [
