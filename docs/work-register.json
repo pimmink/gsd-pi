@@ -635,8 +635,8 @@
 			],
 			"commits": [],
 			"context": "The recovery orphan guard fix (resumeAuthorized) is active in installed/managed runtime locally, reported merged upstream as PR #1946. Needs confirmation of the actual release status before planning a normal upgrade vs. an interim local patch.",
-			"validation": "Upstream PR #1946 is merged and explicitly included in release v1.16.2, published 2026-08-25. The local global CLI is still v1.16.1; no runtime files were changed during this check.",
-			"nextAction": "Plan a normal upgrade from @opengsd/gsd-pi 1.16.1 to v1.16.2 or later. Execute the upgrade only with separate explicit Patch-local authorization, then fresh-process verify the orphan-guard behavior."
+			"validation": "Upstream PR #1946 is merged and explicitly included in release v1.16.2, published 2026-08-25. The local global CLI was upgraded from 1.16.1 to 1.16.2 and verified with npm's global package listing and a fresh `gsd --version` process. No independent W023 runtime patch remains. The unrelated copilot-catalog-patch remains active because PRs #1978/#1979/#1980 are not all merged and released.",
+			"nextAction": "None for W023. Keep the independent copilot-catalog-patch until PRs #1978, #1979, and #1980 have all merged and shipped in a release; then reassess that patch separately."
 		},
 		{
 			"id": "GSD-W024",
