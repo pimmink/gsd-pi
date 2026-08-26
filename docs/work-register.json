@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-08-25",
+	"evidenceAsOf": "2026-08-26",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -574,16 +574,175 @@
 			"title": "Repair evidence-backed lifecycle shadow authority before Milestone validation",
 			"status": "pr-open",
 			"issues": [],
-			"pullRequests": [2002],
+			"pullRequests": [
+				2002
+			],
 			"relatedRefs": [
-				"sha:bb75b2f964a4574cf5fb3ec936298b29f2b6af4c",
+				"sha:4fff959838e44d5ea5da9bdccf5f74547edd1b51",
 				"base:upstream/main:e28218e41706b724e7bcc044d210210b04850009"
 			],
-			"branches": ["fix/lifecycle-shadow-authority-repair"],
-			"commits": ["bb75b2f964a4574cf5fb3ec936298b29f2b6af4c"],
-			"context": "Adopted Milestones could contain legacy-complete Tasks or Slices with durable completion evidence but no workflow_item_lifecycles authority, causing strict closeout validation to fail with missing canonical lifecycle authority. The fix adds a narrow evidence-gated forward repair before validation, preserving strict Milestone completion guards.",
-			"validation": "Focused milestone validation domain suite: 20/20 passed, including positive partial-adoption repair and negative missing-evidence rejection. corepack pnpm exec tsc --noEmit --project tsconfig.extensions.json passed. corepack pnpm run build:core passed. corepack pnpm run verify:fast passed with pnpm install --frozen-lockfile; pnpm-lock.yaml unchanged. Repair processes Tasks before Slices, uses replay-safe lifecycle.shadow.repair Domain Operations, and validation records its receipt after descendant repair writes.",
-			"nextAction": "Monitor PR #2002 (https://github.com/open-gsd/gsd-pi/pull/2002) for maintainer feedback and CI."
+			"branches": [
+				"fix/lifecycle-shadow-authority-repair"
+			],
+			"commits": [
+				"bb75b2f964a4574cf5fb3ec936298b29f2b6af4c",
+				"e7cb339e",
+				"4061bc41",
+				"4fff9598"
+			],
+			"context": "Adopted Milestones could contain legacy-complete Tasks or Slices with durable completion evidence but no workflow_item_lifecycles authority, causing strict closeout validation to fail with missing canonical lifecycle authority. The fix adds a narrow evidence-gated forward repair before validation, preserving strict Milestone completion guards. Post-review found two additional stop-ship gaps in the original bb75b2f9 patch: (1) taskCompletionFacts() accepted any non-empty verification_result instead of requiring an exact passed verdict; (2) repairMilestoneLifecycleShadowsForward() committed each repairable descendant as its own separate Domain Operation while iterating, so a later unresolved sibling did not roll back earlier already-committed repairs.",
+			"validation": "Both gaps fixed with test-first regression coverage: e7cb339e adds isPassingVerificationResult() (trim+lowercase equality) with normalized-passing and rejected-non-passing variant tests. 4061bc41 adds an execution-based reproduction of the partial-write atomicity gap. 4fff9598 makes the milestone repair all-or-nothing: a read-only planning pass classifies every descendant first; if any in-scope descendant is unresolved, nothing is written; otherwise single-step repairs commit together in one shared lifecycle.shadow.repair Domain Operation, and two-phase ready-Task advance+complete sequences (a pre-existing, unrelated schema invariant requiring two separately committed operations) run only after the planning pass has confirmed no sibling is unresolved. 71/71 focused tests pass across lifecycle-shadow-forward-repair.test.ts and milestone-validation-domain-operation.test.ts. tsc --noEmit --project tsconfig.extensions.json passed. pnpm run build:core passed. scripts/ci-fast-gates.sh passed (222/222 tests + strict test-gap/test-matrix audits). gate:lifecycle-shadow-no-cutover passed (7/7 structural, 11/11 behavioral). Local test:unit:compiled (the full ~1800-file monorepo suite) was too slow on this machine and was moved to remote CI instead.",
+			"nextAction": "Pushed 4fff9598 to origin (updates PR #2002). Remote full-gate CI dispatched: https://github.com/pimmink/gsd-pi-ci/actions/runs/32947426378 (verify:pr + verify:merge, literal). Still needed before merge-ready: independent strong review of bb75b2f9..4fff9598, and a completed OUTCOME report per the GSD-Pi-Auto-Mode execution prompt before requesting Pim's push/PR-update authorization confirmation."
+		},
+		{
+			"id": "GSD-W022",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Agent-core resolved tool result isError flag dropped in the agent loop",
+			"status": "idea",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": [
+				"fix/agent-core-tool-result-iserror"
+			],
+			"commits": [],
+			"context": "A normally resolved tool result carrying isError: true is re-wrapped by the agent loop as isError: false, silently discarding a caller's error signal. Local branch created from upstream/main (327343af); no code written yet.",
+			"validation": "Not started.",
+			"nextAction": "Reproduce the resolved isError:true -> false wrap with a focused regression test before any fix. Confirm whether an optional AgentToolResult.isError field needs upstream architecture approval before implementation (public contract change); do not implement until that is resolved."
+		},
+		{
+			"id": "GSD-W023",
+			"type": "chore",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Recovery runtime patch tracking (orphan guard, upstream PR #1946)",
+			"status": "idea",
+			"issues": [],
+			"pullRequests": [
+				1946
+			],
+			"relatedRefs": [],
+			"branches": [
+				"track/recovery-runtime-patch-1946"
+			],
+			"commits": [],
+			"context": "The recovery orphan guard fix (resumeAuthorized) is active in installed/managed runtime locally, reported merged upstream as PR #1946. Needs confirmation of the actual release status before planning a normal upgrade vs. an interim local patch.",
+			"validation": "Not started.",
+			"nextAction": "Check whether PR #1946 shipped in an official release. If yes, plan a normal package upgrade. If no, document an interim patch plan with backups, hashes, and rollback only; no installed/managed runtime write without explicit Patch-local authorization."
+		},
+		{
+			"id": "GSD-W024",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "UAT issue #1993 follow-up (schema-error run poisoning / stale abort)",
+			"status": "idea",
+			"issues": [
+				1993
+			],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": [
+				"fix/uat-1993-schema-error-poisoning"
+			],
+			"commits": [],
+			"context": "A schema error must not permanently poison a run, and a stale abort must be able to heal, while a genuine truncation guard remains. Local branch created from upstream/main (327343af); no code written yet.",
+			"validation": "Not started.",
+			"nextAction": "Build the callgraph/testmatrix for the affected UAT path, write behavioral regression tests for the poisoning and stale-abort scenarios, then implement."
+		},
+		{
+			"id": "GSD-W025",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Verify issue #1994 follow-up (multilingual verify-command fixture matrix)",
+			"status": "idea",
+			"issues": [
+				1994
+			],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": [
+				"fix/verify-1994-multilingual-fixtures"
+			],
+			"commits": [],
+			"context": "Verify-command extraction needs a fixture matrix covering Dutch, Italian, and non-Latin-script text; only positive, executed-command evidence should count. Local branch created from upstream/main (327343af); no code written yet.",
+			"validation": "Not started.",
+			"nextAction": "Build the multilingual fixture matrix, add execution-based (not source-grep) regression tests per language, then implement the fix."
+		},
+		{
+			"id": "GSD-W026",
+			"type": "feat",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "UAT contract: canonical nonAutomatable flag and pure preflight",
+			"status": "idea",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": [
+				"feat/uat-contract-non-automatable"
+			],
+			"commits": [],
+			"context": "Needs a canonical nonAutomatable?: boolean field, a pure preflight step validated against real prompt examples, and must never leak a raw schema error to the caller. Local branch created from upstream/main (327343af); no code written yet.",
+			"validation": "Not started.",
+			"nextAction": "Design the verdict matrix, add the canonical field, wire preflight through the real validator (not prose heuristics), add regression tests."
+		},
+		{
+			"id": "GSD-W027",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Mixed milestone validation/schema: class-pass under aggregate needs-attention",
+			"status": "idea",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": [
+				"fix/mixed-milestone-validation-schema"
+			],
+			"commits": [],
+			"context": "A passing class must be able to retain its evidence even when the aggregate verdict is needs-attention; needs the next free migration number, a shared preflight/trigger matrix, schema fingerprinting, and idempotent repair. Requires its own architecture approval, separate from GSD-W021's atomicity change. Local branch created from upstream/main (327343af); no code written yet.",
+			"validation": "Not started.",
+			"nextAction": "Seek architecture approval before any migration/trigger change; until then, only analysis, tests, and a local draft are in scope."
+		},
+		{
+			"id": "GSD-W028",
+			"type": "docs",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Stale local path cleanup in docs and settings",
+			"status": "idea",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": [
+				"docs/stale-local-paths-cleanup"
+			],
+			"commits": [],
+			"context": "~/.gsd/agent/settings.json and related local docs still reference the retired /Users/pimmink/Klanten/gsd-pi-fork path; the durable fork now lives at /Users/pimmink/Klanten/gsd-pi-pimmink/fork. Fork-local only; must not leak user-specific absolute paths into upstream docs.",
+			"validation": "Not started.",
+			"nextAction": "Correct stale paths via dynamic discovery or a single local config value; keep user-specific absolute paths out of any upstream-facing documentation."
+		},
+		{
+			"id": "GSD-W029",
+			"type": "chore",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "M011 Milestone re-run plan (post lifecycle-shadow-repair)",
+			"status": "idea",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": [
+				"docs/m011-resumption-plan"
+			],
+			"commits": [],
+			"context": "M011 remains needs-attention pending real product evidence. Once GSD-W021 is merged/activated, a fresh session must re-run Milestone validation once, since the pre-existing pass receipt predates the repair. No manual SQL; DB/WAL/SHM must be backed up as one consistent set before any attempt.",
+			"validation": "Not started.",
+			"nextAction": "Wait for GSD-W021 to merge/activate, then plan the rerun: backup DB+WAL+SHM, verify source/installed/managed hashes, start a fresh session, run one new validation, and observe the resulting receipt/lifecycle state."
 		}
 	],
 	"localExtensionPatches": [
