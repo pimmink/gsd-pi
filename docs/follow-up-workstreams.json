@@ -1,96 +1,99 @@
 {
-	"schemaVersion": 1,
-	"generatedAt": "2026-08-26",
-	"repository": {
-		"upstream": "open-gsd/gsd-pi",
-		"fork": "pimmink/gsd-pi",
-		"baseRef": "upstream/main",
-		"baseSha": "327343af2e2356d066c8a312cf1f37f370269b82"
-	},
-	"parentWorkItem": "GSD-W021",
-	"parentBranch": "fix/lifecycle-shadow-authority-repair",
-	"parentHead": "4fff959838e44d5ea5da9bdccf5f74547edd1b51",
-	"remoteFullGate": {
-		"repository": "pimmink/gsd-pi-ci",
-		"workflow": "remote-full-gate.yml",
-		"runId": 32947426378,
-		"url": "https://github.com/pimmink/gsd-pi-ci/actions/runs/32947426378",
-		"statusAtCreation": "in_progress",
-		"statusAtLastCheck": "success",
-		"conclusion": "success",
-		"verifyPr": "success",
-		"verifyMerge": "success"
-	},
-	"workstreams": [
-		{
-			"id": "GSD-W022",
-			"priority": "P0",
-			"title": "Agent-core resolved tool result isError flag dropped in the agent loop",
-			"branch": "fix/agent-core-tool-result-iserror",
-			"scope": "upstream",
-			"status": "idea",
-			"requiresApprovalBeforeImplementation": true,
-			"firstStep": "Reproduce resolved { isError: true } being wrapped as false with a focused regression test."
-		},
-		{
-			"id": "GSD-W023",
-			"priority": "P1",
-			"title": "Recovery runtime patch tracking (orphan guard, upstream PR #1946)",
-			"branch": "track/recovery-runtime-patch-1946",
-			"scope": "fork-local",
-			"status": "idea",
-			"requiresApprovalBeforeImplementation": true,
-			"firstStep": "Check whether PR #1946 shipped in an official release before any runtime patch plan."
-		},
-		{
-			"id": "GSD-W024",
-			"priority": "P1",
-			"title": "UAT issue #1993 follow-up (schema-error poisoning / stale abort)",
-			"branch": "fix/uat-1993-schema-error-poisoning",
-			"scope": "upstream",
-			"status": "idea",
-			"requiresApprovalBeforeImplementation": false,
-			"firstStep": "Map the affected UAT callgraph and write regression tests for schema-error poisoning and stale-abort healing."
-		},
-		{
-			"id": "GSD-W025",
-			"priority": "P1",
-			"title": "Verify issue #1994 follow-up (multilingual verify-command fixture matrix)",
-			"branch": "fix/verify-1994-multilingual-fixtures",
-			"scope": "upstream",
-			"status": "idea",
-			"requiresApprovalBeforeImplementation": false,
-			"firstStep": "Build Dutch, Italian, and non-Latin fixture cases proving only positive command evidence is executable."
-		},
-		{
-			"id": "GSD-W026",
-			"priority": "P2",
-			"title": "UAT contract: canonical nonAutomatable flag and pure preflight",
-			"branch": "feat/uat-contract-non-automatable",
-			"scope": "upstream",
-			"status": "idea",
-			"requiresApprovalBeforeImplementation": false,
-			"firstStep": "Design a verdict matrix and validate prompt examples through the real validator."
-		},
-		{
-			"id": "GSD-W027",
-			"priority": "P2",
-			"title": "Mixed milestone validation/schema: class-pass under aggregate needs-attention",
-			"branch": "fix/mixed-milestone-validation-schema",
-			"scope": "upstream",
-			"status": "idea",
-			"requiresApprovalBeforeImplementation": true,
-			"firstStep": "Prepare an architecture-approval draft before any migration or trigger changes."
-		},
-		{
-			"id": "GSD-W028",
-			"priority": "P2",
-			"title": "Stale local path cleanup in docs and settings",
-			"branch": "docs/stale-local-paths-cleanup",
-			"scope": "fork-local",
-			"status": "idea",
-			"requiresApprovalBeforeImplementation": false,
-			"firstStep": "Replace stale gsd-pi-fork path assumptions with dynamic discovery or one fork-local config value."
-		}
-	]
+    "schemaVersion": 1,
+    "generatedAt": "2026-08-26",
+    "repository": {
+        "upstream": "open-gsd/gsd-pi",
+        "fork": "pimmink/gsd-pi",
+        "baseRef": "upstream/main",
+        "baseSha": "327343af2e2356d066c8a312cf1f37f370269b82"
+    },
+    "parentWorkItem": "GSD-W021",
+    "parentBranch": "fix/lifecycle-shadow-authority-repair",
+    "parentHead": "4fff959838e44d5ea5da9bdccf5f74547edd1b51",
+    "remoteFullGate": {
+        "repository": "pimmink/gsd-pi-ci",
+        "workflow": "remote-full-gate.yml",
+        "runId": 32947426378,
+        "url": "https://github.com/pimmink/gsd-pi-ci/actions/runs/32947426378",
+        "statusAtCreation": "in_progress",
+        "statusAtLastCheck": "success",
+        "conclusion": "success",
+        "verifyPr": "success",
+        "verifyMerge": "success"
+    },
+    "workstreams": [
+        {
+            "id": "GSD-W022",
+            "priority": "P0",
+            "title": "Agent-core resolved tool result isError flag dropped in the agent loop",
+            "branch": "fix/agent-core-tool-result-iserror",
+            "scope": "upstream",
+            "status": "idea",
+            "requiresApprovalBeforeImplementation": true,
+            "firstStep": "Reproduce resolved { isError: true } being wrapped as false with a focused regression test."
+        },
+        {
+            "id": "GSD-W023",
+            "priority": "P1",
+            "title": "Recovery runtime patch tracking (orphan guard, upstream PR #1946)",
+            "branch": "track/recovery-runtime-patch-1946",
+            "scope": "fork-local",
+            "status": "idea",
+            "requiresApprovalBeforeImplementation": true,
+            "firstStep": "Check whether PR #1946 shipped in an official release before any runtime patch plan."
+        },
+        {
+            "id": "GSD-W024",
+            "priority": "P1",
+            "title": "UAT issue #1993 follow-up (schema-error poisoning / stale abort)",
+            "branch": "fix/uat-1993-schema-error-poisoning",
+            "scope": "upstream",
+            "status": "idea",
+            "requiresApprovalBeforeImplementation": false,
+            "firstStep": "Map the affected UAT callgraph and write regression tests for schema-error poisoning and stale-abort healing."
+        },
+        {
+            "id": "GSD-W025",
+            "priority": "P1",
+            "title": "Verify issue #1994 follow-up (multilingual verify-command fixture matrix)",
+            "branch": "fix/verify-1994-multilingual-fixtures",
+            "scope": "upstream",
+            "status": "dropped",
+            "requiresApprovalBeforeImplementation": false,
+            "firstStep": "Build Dutch, Italian, and non-Latin fixture cases proving only positive command evidence is executable.",
+            "notes": "Out of scope \u2014 external / speculative; not implementing"
+        },
+        {
+            "id": "GSD-W026",
+            "priority": "P2",
+            "title": "UAT contract: canonical nonAutomatable flag and pure preflight",
+            "branch": "feat/uat-contract-non-automatable",
+            "scope": "upstream",
+            "status": "dropped",
+            "requiresApprovalBeforeImplementation": false,
+            "firstStep": "Design a verdict matrix and validate prompt examples through the real validator.",
+            "notes": "Out of scope \u2014 external / speculative; not implementing"
+        },
+        {
+            "id": "GSD-W027",
+            "priority": "P2",
+            "title": "Mixed milestone validation/schema: class-pass under aggregate needs-attention",
+            "branch": "fix/mixed-milestone-validation-schema",
+            "scope": "upstream",
+            "status": "dropped",
+            "requiresApprovalBeforeImplementation": true,
+            "firstStep": "Prepare an architecture-approval draft before any migration or trigger changes.",
+            "notes": "Out of scope \u2014 external / speculative; not implementing"
+        },
+        {
+            "id": "GSD-W028",
+            "priority": "P2",
+            "title": "Stale local path cleanup in docs and settings",
+            "branch": "docs/stale-local-paths-cleanup",
+            "scope": "fork-local",
+            "status": "idea",
+            "requiresApprovalBeforeImplementation": false,
+            "firstStep": "Replace stale gsd-pi-fork path assumptions with dynamic discovery or one fork-local config value."
+        }
+    ]
 }
