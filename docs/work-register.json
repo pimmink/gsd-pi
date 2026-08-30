@@ -805,7 +805,7 @@
             "commits": [],
             "context": "Dependent post-merge correction for session-refresh classifications that do not consistently become account-scoped runtime registry and picker entries. Must preserve account isolation and sanitized last-known-good state without mutating static or user catalogs. Tracked by upstream issue #2088.",
             "validation": "Inspection on 2026-08-30 confirmed session refresh classifications and its bounded join are not consumed by the ModelRegistry or picker. The only registry extension seam replaces all provider models and requires concrete Model cost/capability fields, so it cannot safely represent account-scoped Class B records with unknown economics without fabricating data.",
-            "nextAction": "Obtain maintainer approval for a core account-scoped runtime catalog/origin contract, then implement registry-to-picker activation without static overlay or models.json mutation."
+            "nextAction": "Use docs/adr/w030-account-scoped-copilot-runtime-catalog-rfc-draft.md to open a focused RFC issue and obtain maintainer approval before implementing registry-to-picker activation without static overlay or models.json mutation."
         },
         {
             "id": "GSD-W031",
