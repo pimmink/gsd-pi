@@ -28,6 +28,11 @@ cause in their own files (a `bareModelId()` helper had been silently reintroduce
 auto-merge, plus several direct registry lookups across all three branches keyed on raw
 dotted IDs instead of `canonicalizeModelId`), fully re-verified, and force-pushed.
 
+**2026-08-30**: opened upstream issue [#2088](https://github.com/open-gsd/gsd-pi/issues/2088)
+for post-merge GitHub Copilot catalog regressions. GSD-W029 through GSD-W031 track the
+dependent normalization, account-scoped runtime activation, and safe-suggestion fixes;
+they preserve GSD-W014, GSD-W017, and GSD-W018 as merged historical work.
+
 ## Active work
 
 | ID | Work | Scope | Upstream | Issue | PR | Branch | Status | Next action |
@@ -38,6 +43,9 @@ dotted IDs instead of `canonicalizeModelId`), fully re-verified, and force-pushe
 | GSD-W022 | Agent-core resolved tool result `isError` dropped in the agent loop | Upstream | PR required | [#2015](https://github.com/open-gsd/gsd-pi/issues/2015) | [#2016](https://github.com/open-gsd/gsd-pi/pull/2016) | `fix/agent-core-tool-result-iserror` | **Draft PR open / Implementation pushed** — `5bfcc551` pushed to PR #2016. AgentToolResult gains optional `isError?: boolean` field, `normalizeAgentToolResult` and `raceToolExecutionAgainstAbort` preserve `isError`. All 29 tests pass (100%). Installed local community extension patch `w022-iserror-patch` at `~/.gsd/agent/extensions/` using `tool_result` hook so `/gsd auto` in Edelman Studio preserves `isError` immediately | Await GitHub CI and maintainer decision on RFC issue #2015 / Draft PR #2016; local patch active in `~/.gsd/agent/extensions/` for local execution |
 | GSD-W023 | Recovery runtime patch tracking (orphan guard, upstream PR #1946) | Fork-local | No PR planned | — | [#1946](https://github.com/open-gsd/gsd-pi/pull/1946) | `track/recovery-runtime-patch-1946` | **Complete** — PR #1946 is merged and included in release `v1.16.2` (published 2026-08-25); global CLI upgraded from `1.16.1` to `1.16.2` and verified in a fresh process; no independent W023 runtime patch remains. The unrelated Copilot catalog patch was retired upon v1.17.0 release | None for W023 |
 | GSD-W024 | UAT issue #1993 follow-up (schema-error poisoning / stale abort) | Upstream | PR required | [#1993](https://github.com/open-gsd/gsd-pi/issues/1993) | [#2017](https://github.com/open-gsd/gsd-pi/pull/2017) | `fix/uat-1993-schema-error-poisoning` | **Draft PR open** — `d351e4bc`; focused W024 suites 110/110 green. Schema-invalid `gsd_uat_exec` no longer poisons the run; stale `tool-error` aborts clear only after successful execution; real truncation guards remain. Issue #1993 is labeled `needs-maintainer-review`/`large-scope` | Await maintainer review on #2017; keep Draft until broader scope and invariants are accepted, then run broader verification and mark ready |
+| GSD-W029 | Truthful GitHub Copilot catalog normalization and bounded diagnostics | Upstream | PR required | [#2088](https://github.com/open-gsd/gsd-pi/issues/2088) | — | `fix/copilot-catalog-truthful-normalization` | Investigating — post-merge regression correction for provider facts, catalog role, picker visibility, manual selection, routing status, placeholder rejection, and bounded diagnostics | Reproduce on current upstream/main, then create the clean branch |
+| GSD-W030 | Account-scoped GitHub Copilot runtime catalog activation | Upstream | PR required | [#2088](https://github.com/open-gsd/gsd-pi/issues/2088) | — | `fix/copilot-runtime-catalog-activation` | Investigating — dependent correction for refresh classifications becoming account-scoped registry and picker models without static or user-catalog mutation | Begin after W029 establishes normalized catalog facts |
+| GSD-W031 | Safe account-scoped GitHub Copilot model suggestions | Upstream | PR required | [#2088](https://github.com/open-gsd/gsd-pi/issues/2088) | — | `fix/copilot-suggestion-safety` | Investigating — dependent correction for selection origin, deterministic capability dominance, and comparable account-scoped economics | Begin after W030 activates runtime models |
 
 ## Completed or historical work
 

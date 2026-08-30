@@ -6,7 +6,7 @@
         "fork": "pimmink/gsd-pi",
         "defaultBase": "upstream/main"
     },
-    "evidenceAsOf": "2026-08-28",
+    "evidenceAsOf": "2026-08-30",
     "statusVocabulary": [
         "idea",
         "investigating",
@@ -757,6 +757,76 @@
             "context": "~/.gsd/agent/settings.json and related local docs still reference the retired /Users/pimmink/Klanten/gsd-pi-fork path; the durable fork now lives at /Users/pimmink/Klanten/gsd-pi-pimmink/fork. Fork-local only; must not leak user-specific absolute paths into upstream docs.",
             "validation": "Updated the active ~/.gsd/agent/settings.json package override from the retired /Users/pimmink/Klanten/gsd-pi-fork path to /Users/pimmink/Klanten/gsd-pi-pimmink/fork. JSON parsing passed, no stale path remains in active settings, and a fresh gsd --help process from the current fork exited successfully on v1.16.2. Historical session and subagent logs were intentionally left unchanged.",
             "nextAction": "None; active local package discovery now uses the current fork path."
+        },
+        {
+            "id": "GSD-W029",
+            "type": "bugfix",
+            "scope": "upstream",
+            "upstreamDisposition": "pr-required",
+            "title": "Truthful GitHub Copilot catalog normalization and bounded diagnostics",
+            "status": "investigating",
+            "issues": [
+                2088
+            ],
+            "pullRequests": [],
+            "relatedRefs": [
+                "GSD-W014",
+                "GSD-W017",
+                "GSD-W018"
+            ],
+            "branches": [
+                "fix/copilot-catalog-truthful-normalization"
+            ],
+            "commits": [],
+            "context": "Post-merge regression correction for GitHub Copilot catalog normalization: keep provider facts, catalog role, picker visibility, manual selectability, and GSD routing status orthogonal; reject literal command placeholders; preserve unknown metadata; and bound diagnostics. Tracked by upstream issue #2088.",
+            "validation": "Issue #2088 opened on 2026-08-30 after no matching open upstream issue or PR was found. No implementation branch or code change has been created.",
+            "nextAction": "Inspect current upstream/main and reproduce the placeholder and catalog-classification paths before creating the clean branch from upstream/main."
+        },
+        {
+            "id": "GSD-W030",
+            "type": "bugfix",
+            "scope": "upstream",
+            "upstreamDisposition": "pr-required",
+            "title": "Account-scoped GitHub Copilot runtime catalog activation",
+            "status": "investigating",
+            "issues": [
+                2088
+            ],
+            "pullRequests": [],
+            "relatedRefs": [
+                "GSD-W029",
+                "GSD-W018"
+            ],
+            "branches": [
+                "fix/copilot-runtime-catalog-activation"
+            ],
+            "commits": [],
+            "context": "Dependent post-merge correction for session-refresh classifications that do not consistently become account-scoped runtime registry and picker entries. Must preserve account isolation and sanitized last-known-good state without mutating static or user catalogs. Tracked by upstream issue #2088.",
+            "validation": "Issue #2088 opened on 2026-08-30. No implementation branch or code change has been created.",
+            "nextAction": "Begin after GSD-W029 establishes truthful normalized catalog facts; trace the production refresh-to-picker path on current upstream/main."
+        },
+        {
+            "id": "GSD-W031",
+            "type": "bugfix",
+            "scope": "upstream",
+            "upstreamDisposition": "pr-required",
+            "title": "Safe account-scoped GitHub Copilot model suggestions",
+            "status": "investigating",
+            "issues": [
+                2088
+            ],
+            "pullRequests": [],
+            "relatedRefs": [
+                "GSD-W030",
+                "GSD-W017"
+            ],
+            "branches": [
+                "fix/copilot-suggestion-safety"
+            ],
+            "commits": [],
+            "context": "Dependent post-merge correction for cheaper-model suggestions: distinguish automatic and persisted manual selection, require deterministic capability dominance and comparable account-scoped economics, and never automatically switch models. Tracked by upstream issue #2088.",
+            "validation": "Issue #2088 opened on 2026-08-30. No implementation branch or code change has been created.",
+            "nextAction": "Begin after GSD-W030 provides account-scoped runtime activation; reproduce real selection-origin events and economics comparison behavior."
         }
     ],
     "localExtensionPatches": [
