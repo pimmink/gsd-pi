@@ -790,7 +790,7 @@
             "scope": "upstream",
             "upstreamDisposition": "pr-required",
             "title": "Account-scoped GitHub Copilot runtime catalog activation",
-            "status": "investigating",
+            "status": "blocked",
             "issues": [
                 2088
             ],
@@ -804,8 +804,8 @@
             ],
             "commits": [],
             "context": "Dependent post-merge correction for session-refresh classifications that do not consistently become account-scoped runtime registry and picker entries. Must preserve account isolation and sanitized last-known-good state without mutating static or user catalogs. Tracked by upstream issue #2088.",
-            "validation": "Issue #2088 opened on 2026-08-30. No implementation branch or code change has been created.",
-            "nextAction": "Begin after GSD-W029 establishes truthful normalized catalog facts; trace the production refresh-to-picker path on current upstream/main."
+            "validation": "Inspection on 2026-08-30 confirmed session refresh classifications and its bounded join are not consumed by the ModelRegistry or picker. The only registry extension seam replaces all provider models and requires concrete Model cost/capability fields, so it cannot safely represent account-scoped Class B records with unknown economics without fabricating data.",
+            "nextAction": "Obtain maintainer approval for a core account-scoped runtime catalog/origin contract, then implement registry-to-picker activation without static overlay or models.json mutation."
         },
         {
             "id": "GSD-W031",
@@ -813,7 +813,7 @@
             "scope": "upstream",
             "upstreamDisposition": "pr-required",
             "title": "Safe account-scoped GitHub Copilot model suggestions",
-            "status": "investigating",
+            "status": "complete",
             "issues": [
                 2088
             ],
@@ -825,10 +825,13 @@
             "branches": [
                 "fix/copilot-suggestion-safety"
             ],
-            "commits": [],
+            "commits": [
+                "a5dc72be33513bbdb3057c509065e0c91d65c14d",
+                "39afc0b369971d455fae0a38a0c4431384dd037d"
+            ],
             "context": "Dependent post-merge correction for cheaper-model suggestions: distinguish automatic and persisted manual selection, require deterministic capability dominance and comparable account-scoped economics, and never automatically switch models. Tracked by upstream issue #2088.",
-            "validation": "Issue #2088 opened on 2026-08-30. No implementation branch or code change has been created.",
-            "nextAction": "Begin after GSD-W030 provides account-scoped runtime activation; reproduce real selection-origin events and economics comparison behavior."
+            "validation": "Net branch diff from W029 is limited to deterministic capability comparison and regression tests. Lower or unknown required dimensions are incomparable and suppress notifications; equality is required for cheaper-equivalent. The direct Node test runner is blocked before execution by a malformed generated pi-ai source file in this worktree; changed files pass syntax checks and git diff --check.",
+            "nextAction": "Run focused suite after generated pi-ai source is restored; selection-origin and persisted-manual-selection work remains blocked behind W030's required core origin contract."
         }
     ],
     "localExtensionPatches": [
