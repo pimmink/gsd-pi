@@ -764,7 +764,7 @@
             "scope": "upstream",
             "upstreamDisposition": "pr-required",
             "title": "Truthful GitHub Copilot catalog normalization and bounded diagnostics",
-            "status": "investigating",
+            "status": "complete",
             "issues": [
                 2088
             ],
@@ -777,10 +777,12 @@
             "branches": [
                 "fix/copilot-catalog-truthful-normalization"
             ],
-            "commits": [],
+            "commits": [
+                "c2b0222fc82f26a612f0ac3bee62a71eefebfc1b"
+            ],
             "context": "Post-merge regression correction for GitHub Copilot catalog normalization: keep provider facts, catalog role, picker visibility, manual selectability, and GSD routing status orthogonal; reject literal command placeholders; preserve unknown metadata; and bound diagnostics. Tracked by upstream issue #2088.",
-            "validation": "Issue #2088 opened on 2026-08-30 after no matching open upstream issue or PR was found. No implementation branch or code change has been created.",
-            "nextAction": "Inspect current upstream/main and reproduce the placeholder and catalog-classification paths before creating the clean branch from upstream/main."
+            "validation": "Commit c2b0222f is pushed to origin/fix/copilot-catalog-truthful-normalization. Focused production behavior suites pass 92/92 (copilot-models handler, catalog normalizer, and overlay writer); typecheck:extensions and git diff --check pass. The branch was based on upstream/main b8621206.",
+            "nextAction": "Run the required fast and merge-needed verification before opening a PR."
         },
         {
             "id": "GSD-W030",
