@@ -33,6 +33,11 @@ for post-merge GitHub Copilot catalog regressions. GSD-W029 through GSD-W031 tra
 dependent normalization, account-scoped runtime activation, and safe-suggestion fixes;
 they preserve GSD-W014, GSD-W017, and GSD-W018 as merged historical work.
 
+**2026-08-30 merged-worktree cleanup**: removed clean local worktrees and local branch
+refs for merged GSD-W017, GSD-W018, GSD-W019, and GSD-W020 after checking their upstream
+ancestry. GSD-W014 remains because it has an uncommitted user change in
+`docs/zh-CN/user-docs/custom-models.md`; it was not altered.
+
 ## Active work
 
 | ID | Work | Scope | Upstream | Issue | PR | Branch | Status | Next action |
