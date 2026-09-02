@@ -292,9 +292,9 @@
 			"scope": "fork-local",
 			"upstreamDisposition": "no-pr-planned",
 			"title": "Fork-native VS Code and Copilot contributor workspace",
-			"status": "complete",
-			"issues": [],
-			"pullRequests": [],
+			"status": "pr-open",
+			"issues": [2132],
+			"pullRequests": [2133],
 			"branches": ["docs/copilot-workspace-governance"],
 			"commits": [
 				"1dc21a2026a80241961a5cc408e322088f48ba98",
@@ -685,8 +685,8 @@
 			"branches": ["fix/copilot-router-model-coverage"],
 			"commits": ["85dd3513f35eb418a57db8448949291b6bc7da76"],
 			"context": "Follow-up for the still-outdated model-router tables after the published Copilot catalog already includes these models. Adds router tier, cost, and capability-profile coverage for bundled GitHub Copilot IDs that were still unknown to dynamic routing: gemini-3.1-pro-preview, gemini-3.5-flash, gemini-3.6-flash, gemini-3.7-flash, gpt-5.4-nano, grok-4.6, kimi-k2.7-code, kimi-k3, and mai-code-1-flash-picker. Also adds a generated-catalog assertion that Copilot Kimi models use the existing GitHub Copilot OpenAI-compatible transport with Copilot headers, rather than requiring a separate Kimi provider path.",
-			"validation": "2026-09-02: branch created from current upstream/main and pushed to origin/fix/copilot-router-model-coverage at 85dd3513. Local router completeness scan found no bundled GitHub Copilot chat models missing tier/profile coverage after the patch. `pnpm --filter @gsd/pi-ai exec vitest run test/generated-models.test.ts test/openai-completions-tool-choice.test.ts test/tool-call-without-result.test.ts` passed 40/40 with 26 env-gated live tests skipped. `pnpm exec tsx --test src/resources/extensions/gsd/tests/model-router.test.ts` passed 130/130. `pnpm exec tsc --noEmit --project tsconfig.extensions.json` passed after building required workspace dist packages. `pnpm run verify:fast` passed 250/250 and strict audits. Initial sharded remote verification run 33656066924 for exact SHA 85dd3513 failed on `dist-test/src/tests/bootstrap-links.test.js` because the gsd-pi-ci sharded build artifact omitted root `dist/`; fixed in pimmink/gsd-pi-ci commit ede043a. Redispatched sharded run 33664264464 for the same exact SHA and it passed: build, shards 1-4, lifecycle gate, and aggregate all green; aggregate totals 14759 passed, 0 failed, 31 skipped.",
-			"nextAction": "Open an upstream PR with Kimi/Gemini/Grok/MAI/GPT-5.4 Nano in the title after the already-open #2092/#2093 CI gates are green; create/link the matching issue if upstream maintainers still require it for this bugfix."
+			"validation": "2026-09-02: branch created from current upstream/main and pushed to origin/fix/copilot-router-model-coverage at 85dd3513. Local router completeness scan found no bundled GitHub Copilot chat models missing tier/profile coverage after the patch. `pnpm --filter @gsd/pi-ai exec vitest run test/generated-models.test.ts test/openai-completions-tool-choice.test.ts test/tool-call-without-result.test.ts` passed 40/40 with 26 env-gated live tests skipped. `pnpm exec tsx --test src/resources/extensions/gsd/tests/model-router.test.ts` passed 130/130. `pnpm exec tsc --noEmit --project tsconfig.extensions.json` passed after building required workspace dist packages. `pnpm run verify:fast` passed 250/250 and strict audits. Initial sharded remote verification run 33656066924 for exact SHA 85dd3513 failed on `dist-test/src/tests/bootstrap-links.test.js` because the gsd-pi-ci sharded build artifact omitted root `dist/`; fixed in pimmink/gsd-pi-ci commit ede043a. Redispatched sharded run 33664264464 for the same exact SHA and it passed: build, shards 1-4, lifecycle gate, and aggregate all green; aggregate totals 14759 passed, 0 failed, 31 skipped. Issue #2132 and PR #2133 opened upstream after #2092 and #2093 were green; PR #2133 CI is running at evidence time.",
+			"nextAction": "Wait for upstream CI and maintainer review on PR #2133."
 		}
 	],
 	"localExtensionPatches": [
