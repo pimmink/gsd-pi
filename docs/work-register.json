@@ -782,10 +782,11 @@
             "commits": [
                 "c2b0222fc82f26a612f0ac3bee62a71eefebfc1b",
                 "d6aa1f9fd8c68e12b45b9fba1669c1977d98d82b",
-                "339d4320c7f568d560470a6f75778ef6aaaabd74"
+                "339d4320c7f568d560470a6f75778ef6aaaabd74",
+                "bafbdfb842f04e13a525ea69ad3f959722483fa2"
             ],
             "context": "Post-merge regression correction for GitHub Copilot catalog normalization: keep provider facts, catalog role, picker visibility, manual selectability, and GSD routing status orthogonal; reject literal command placeholders; preserve unknown metadata; bound diagnostics; preserve provider-live/static transport conflicts; and require authoritative input modality before overlay synthesis. Tracked by upstream issue #2088 and upstream PR #2092.",
-            "validation": "2026-09-02: branch rebased onto current upstream/main and force-with-lease pushed to origin/fix/copilot-catalog-truthful-normalization at 339d4320 (0 behind / 3 ahead before push). Focused catalog/handler suites passed 82/82 via `pnpm exec tsx --test src/resources/extensions/gsd/tests/copilot-model-catalog.test.ts src/resources/extensions/gsd/tests/copilot-models-handler.test.ts`; `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2092 were resolved. Upstream Socket checks were green; GitHub Actions fast-gates/workflow-lint were queued at evidence time.",
+            "validation": "2026-09-02: branch rebased onto current upstream/main and pushed to origin/fix/copilot-catalog-truthful-normalization at bafbdfb8 (0 behind / 4 ahead before push). Focused catalog/handler/overlay suites passed 95/95 via `pnpm exec tsx --test src/resources/extensions/gsd/tests/copilot-overlay-writer.test.ts src/resources/extensions/gsd/tests/copilot-model-catalog.test.ts src/resources/extensions/gsd/tests/copilot-models-handler.test.ts`; `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2092 were resolved. Previous upstream build failure was traced to overlay-writer fixtures missing explicit input modality after the stricter completeness gate; commit bafbdfb8 fixes those fixtures. Fresh upstream CI is running at evidence time.",
             "nextAction": "Wait for upstream CI on PR #2092 and maintainer review."
         },
         {
