@@ -632,8 +632,8 @@
 				"954fb042af7e18360ca81a1b2dfc9680f21fb312"
 			],
 			"context": "Post-merge regression correction for GitHub Copilot catalog normalization: keep provider facts, catalog role, picker visibility, manual selectability, and GSD routing status orthogonal; reject literal command placeholders; preserve unknown metadata; bound diagnostics; preserve provider-live/static transport conflicts; and require authoritative input modality before overlay synthesis. Tracked by upstream issue #2088 and upstream PR #2092.",
-			"validation": "2026-09-02: branch pushed to origin/fix/copilot-catalog-truthful-normalization at 954fb042. Focused catalog/handler/overlay suites passed 95/95 before the autocomplete follow-up. Focused completion/handler suite passed 65/65 after preserving real model-ID completion for `pricing` and `why` while keeping placeholder completions removed. `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2092 were resolved. Status comments were added to issues #2088, #2089, and #2091. Fresh upstream CI is running at evidence time.",
-			"nextAction": "Wait for upstream CI on PR #2092 and maintainer review."
+			"validation": "2026-09-02: branch pushed to origin/fix/copilot-catalog-truthful-normalization at 954fb042. Focused catalog/handler/overlay suites passed 95/95 before the autocomplete follow-up. Focused completion/handler suite passed 65/65 after preserving real model-ID completion for `pricing` and `why` while keeping placeholder completions removed. `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2092 were resolved. Status comments were added to issues #2088, #2089, and #2091. Upstream PR #2092 CI run 33659240128 is green.",
+			"nextAction": "Wait for maintainer review on PR #2092."
 		},
 		{
 			"id": "GSD-W030",
@@ -669,8 +669,8 @@
 				"00f9ee0fdad9d97d12bb88e42bc123c5f465fe11"
 			],
 			"context": "Dependent post-merge correction for cheaper-model suggestions: require deterministic capability dominance, comparable economics, inherited profile resolution through the router profile resolver, tri-state tool-call diagnostics, and no automatic model switching. Selection-origin/core runtime activation work remains out of scope after RFC #2091 was closed as wontfix. Tracked by upstream issue #2088 and upstream PR #2093.",
-			"validation": "2026-09-02: branch rebased onto current upstream/main and force-with-lease pushed to origin/fix/copilot-suggestion-safety at 00f9ee0f (0 behind / 5 ahead before push). Focused notification/handler/router suites passed 204/204 via `pnpm exec tsx --test src/resources/extensions/gsd/tests/copilot-catalog-notifications.test.ts src/resources/extensions/gsd/tests/copilot-models-handler.test.ts src/resources/extensions/gsd/tests/model-router.test.ts`; `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2093 were resolved. Upstream Socket checks were green; GitHub Actions fast-gates/workflow-lint were queued at evidence time.",
-			"nextAction": "Wait for upstream CI on PR #2093 and maintainer review."
+			"validation": "2026-09-02: branch rebased onto current upstream/main and force-with-lease pushed to origin/fix/copilot-suggestion-safety at 00f9ee0f (0 behind / 5 ahead before push). Focused notification/handler/router suites passed 204/204 via `pnpm exec tsx --test src/resources/extensions/gsd/tests/copilot-catalog-notifications.test.ts src/resources/extensions/gsd/tests/copilot-models-handler.test.ts src/resources/extensions/gsd/tests/model-router.test.ts`; `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2093 were resolved. Upstream PR #2093 CI run 33650154545 is green.",
+			"nextAction": "Wait for maintainer review on PR #2093."
 		},
 		{
 			"id": "GSD-W032",
@@ -678,15 +678,15 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Route bundled Copilot Kimi, Gemini 3.x, Grok 4.6, MAI Flash Picker, and GPT-5.4 Nano models",
-			"status": "complete",
-			"issues": [],
-			"pullRequests": [],
+			"status": "pr-open",
+			"issues": [2132],
+			"pullRequests": [2133],
 			"relatedRefs": ["GSD-W029", "GSD-W031"],
 			"branches": ["fix/copilot-router-model-coverage"],
 			"commits": ["85dd3513f35eb418a57db8448949291b6bc7da76"],
 			"context": "Follow-up for the still-outdated model-router tables after the published Copilot catalog already includes these models. Adds router tier, cost, and capability-profile coverage for bundled GitHub Copilot IDs that were still unknown to dynamic routing: gemini-3.1-pro-preview, gemini-3.5-flash, gemini-3.6-flash, gemini-3.7-flash, gpt-5.4-nano, grok-4.6, kimi-k2.7-code, kimi-k3, and mai-code-1-flash-picker. Also adds a generated-catalog assertion that Copilot Kimi models use the existing GitHub Copilot OpenAI-compatible transport with Copilot headers, rather than requiring a separate Kimi provider path.",
-			"validation": "2026-09-02: branch created from current upstream/main and pushed to origin/fix/copilot-router-model-coverage at 85dd3513. Local router completeness scan found no bundled GitHub Copilot chat models missing tier/profile coverage after the patch. `pnpm --filter @gsd/pi-ai exec vitest run test/generated-models.test.ts test/openai-completions-tool-choice.test.ts test/tool-call-without-result.test.ts` passed 40/40 with 26 env-gated live tests skipped. `pnpm exec tsx --test src/resources/extensions/gsd/tests/model-router.test.ts` passed 130/130. `pnpm exec tsc --noEmit --project tsconfig.extensions.json` passed after building required workspace dist packages. `pnpm run verify:fast` passed 250/250 and strict audits. Initial sharded remote verification run 33656066924 for exact SHA 85dd3513 failed on `dist-test/src/tests/bootstrap-links.test.js` because the gsd-pi-ci sharded build artifact omitted root `dist/`; fixed in pimmink/gsd-pi-ci commit ede043a. Redispatched sharded run 33664264464 for the same exact SHA and it passed: build, shards 1-4, lifecycle gate, and aggregate all green; aggregate totals 14759 passed, 0 failed, 31 skipped. Issue #2132 and PR #2133 opened upstream after #2092 and #2093 were green; PR #2133 CI is running at evidence time.",
-			"nextAction": "Wait for upstream CI and maintainer review on PR #2133."
+			"validation": "2026-09-02: branch created from current upstream/main and pushed to origin/fix/copilot-router-model-coverage at 85dd3513. Local router completeness scan found no bundled GitHub Copilot chat models missing tier/profile coverage after the patch. `pnpm --filter @gsd/pi-ai exec vitest run test/generated-models.test.ts test/openai-completions-tool-choice.test.ts test/tool-call-without-result.test.ts` passed 40/40 with 26 env-gated live tests skipped. `pnpm exec tsx --test src/resources/extensions/gsd/tests/model-router.test.ts` passed 130/130. `pnpm exec tsc --noEmit --project tsconfig.extensions.json` passed after building required workspace dist packages. `pnpm run verify:fast` passed 250/250 and strict audits. Initial sharded remote verification run 33656066924 for exact SHA 85dd3513 failed on `dist-test/src/tests/bootstrap-links.test.js` because the gsd-pi-ci sharded build artifact omitted root `dist/`; fixed in pimmink/gsd-pi-ci commit ede043a. Redispatched sharded run 33664264464 for the same exact SHA and it passed: build, shards 1-4, lifecycle gate, and aggregate all green; aggregate totals 14759 passed, 0 failed, 31 skipped. Issue #2132 and PR #2133 opened upstream after #2092 and #2093 were green. Upstream PR #2133 CI run 33666763144 is green.",
+			"nextAction": "Wait for maintainer review on PR #2133."
 		}
 	],
 	"localExtensionPatches": [
