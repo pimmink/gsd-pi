@@ -1,872 +1,713 @@
 {
-    "$schema": "./work-register.schema.json",
-    "schemaVersion": 1,
-    "repository": {
-        "upstream": "open-gsd/gsd-pi",
-        "fork": "pimmink/gsd-pi",
-        "defaultBase": "upstream/main"
-    },
-    "evidenceAsOf": "2026-08-30",
-    "statusVocabulary": [
-        "idea",
-        "investigating",
-        "in-progress",
-        "complete",
-        "pr-open",
-        "merged",
-        "closed-unmerged",
-        "superseded",
-        "blocked"
-    ],
-    "items": [
-        {
-            "id": "GSD-W001",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "historical",
-            "title": "Extension registry lockSync ESYNC failure",
-            "status": "merged",
-            "issues": [
-                1598
-            ],
-            "pullRequests": [],
-            "branches": [],
-            "commits": [],
-            "context": "gsd extensions used the synchronous proper-lockfile API with an unsupported retries option in v1.12.0.",
-            "validation": "Upstream issue is closed; no contributor PR is recorded in this fork register.",
-            "nextAction": "None unless the regression reappears."
-        },
-        {
-            "id": "GSD-W002",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Markdown renderer output must satisfy markdownlint",
-            "status": "merged",
-            "issues": [
-                1600
-            ],
-            "pullRequests": [
-                1610
-            ],
-            "branches": [
-                "fix/markdownlint-table-separators"
-            ],
-            "commits": [
-                "e7b6f291ac680f1b00fe1cb6ca246b8cbcac3aac"
-            ],
-            "context": "Generated markdown contained invalid heading, spacing, and table separator forms including MD055, MD056, and MD060 failures.",
-            "validation": "PR #1610 is state MERGED (2026-08-16T23:44:17Z) at merge commit e7b6f291ac680f1b00fe1cb6ca246b8cbcac3aac; the merge is contained in current upstream/main (09ae3c22).",
-            "nextAction": "None; contribution merged upstream."
-        },
-        {
-            "id": "GSD-W003",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "historical",
-            "title": "Milestone status exposes persisted dependencies",
-            "status": "merged",
-            "issues": [
-                1601
-            ],
-            "pullRequests": [],
-            "branches": [],
-            "commits": [],
-            "context": "gsd_milestone_status omitted persisted dependsOn data, preventing authoritative dependency verification through the database tool.",
-            "validation": "Upstream issue is closed and current gsd_milestone_status returns dependsOn.",
-            "nextAction": "Keep contract coverage when milestone status evolves."
-        },
-        {
-            "id": "GSD-W004",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "historical",
-            "title": "Legacy migration consistency for completed slices and structured decisions",
-            "status": "merged",
-            "issues": [
-                1606,
-                1607
-            ],
-            "pullRequests": [
-                1611
-            ],
-            "branches": [
-                "fix/migrate-slice-decision-consistency"
-            ],
-            "commits": [
-                "8d1d2067b1ec5b0b06e8772033b6f6f848b7613d"
-            ],
-            "context": "Legacy migration could produce completed slices with pending tasks and lose structured decision semantics through title-only extraction.",
-            "validation": "PR #1611 merged upstream.",
-            "nextAction": "Retain migration corpus regression coverage."
-        },
-        {
-            "id": "GSD-W005",
-            "type": "feature",
-            "scope": "upstream",
-            "upstreamDisposition": "historical",
-            "title": "Canonical requirement and decision read tools",
-            "status": "closed-unmerged",
-            "issues": [
-                1608
-            ],
-            "pullRequests": [
-                1613,
-                1682
-            ],
-            "branches": [
-                "feat/canonical-read-tools",
-                "pr-1613"
-            ],
-            "commits": [
-                "af34c4e4",
-                "8eeed156"
-            ],
-            "context": "Added canonical requirement and decision list/get tools and addressed adversarial review findings. The original and follow-up PRs were closed without merge; related behavior later appeared in the v1.15 line and generated three follow-up correctness issues.",
-            "validation": "PR #1613 and PR #1682 are closed without merge. Follow-up issues #1727-#1729 remain tracked separately.",
-            "nextAction": "Use the active canonical-read follow-up PRs as the current authority."
-        },
-        {
-            "id": "GSD-W006",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "historical",
-            "title": "Claude Sonnet 5 routing catalog and Copilot startup fallback",
-            "status": "merged",
-            "issues": [
-                1612
-            ],
-            "pullRequests": [
-                1609,
-                1703,
-                1705
-            ],
-            "branches": [
-                "fix/model-router-sonnet5-catalog",
-                "fix/copilot-sonnet5-startup-fallback"
-            ],
-            "commits": [
-                "409ea8543bc6807b17b49317c117e8c846b1d1bf",
-                "42cb8ec346e06cd41b51c69acccb9e91d3a9290f",
-                "795b4b3df76ca15f91834e6d11c749c179d8ce18"
-            ],
-            "context": "Registered claude-sonnet-5 in routing capability, cost, and profile tables and added graceful Copilot fallback when the preferred model is temporarily unavailable.",
-            "validation": "PRs #1609, #1703, and #1705 merged upstream.",
-            "nextAction": "Guard against duplicate registry rows and invalid provider aliases."
-        },
-        {
-            "id": "GSD-W007",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Package-manager-aware verification commands and bootstrap recovery",
-            "status": "merged",
-            "issues": [],
-            "pullRequests": [
-                1706
-            ],
-            "branches": [
-                "fix/verification-gate-package-manager"
-            ],
-            "commits": [
-                "a4c63862",
-                "65b77ec8",
-                "d9ddb5a0",
-                "8b986a9b2953ee56467194bb9b2fa62d2246542e",
-                "85b334d4c0d77fe8c88ec5e000966f4ca8ba7092"
-            ],
-            "context": "Centralizes npm, pnpm, yarn, and bun command construction. Follow-up commit 8b986a9b restores stale shim backups after interrupted bootstrap runs and writes new backups atomically.",
-            "validation": "PR #1706 is state MERGED (2026-08-16T23:38:38Z) at merge commit 85b334d4c0d77fe8c88ec5e000966f4ca8ba7092; the merge is contained in current upstream/main (09ae3c22).",
-            "nextAction": "None; contribution merged upstream."
-        },
-        {
-            "id": "GSD-W008",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Isolate canonical reads from the global workflow database handle",
-            "status": "merged",
-            "issues": [
-                1727
-            ],
-            "pullRequests": [
-                1731
-            ],
-            "branches": [
-                "fix/canonical-read-db-isolation"
-            ],
-            "commits": [
-                "31af02a7",
-                "e329a411",
-                "10aa03954444e51390160f00a1d97a59d4a8604f"
-            ],
-            "context": "Routes canonical native and MCP reads through isolated per-project adapters to prevent implicit database creation and global handle mutation.",
-            "validation": "PR #1731 is state MERGED (2026-08-14T13:01:34Z) at merge commit 10aa03954444e51390160f00a1d97a59d4a8604f; the merge is contained in current upstream/main (09ae3c22).",
-            "nextAction": "None; contribution merged upstream."
-        },
-        {
-            "id": "GSD-W009",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Apply canonical list predicates before SQL limit",
-            "status": "merged",
-            "issues": [
-                1728
-            ],
-            "pullRequests": [
-                1732
-            ],
-            "branches": [
-                "fix/canonical-sql-predicates"
-            ],
-            "commits": [
-                "27167552",
-                "da908349835815274d2b2d097da50880d3c44f33"
-            ],
-            "context": "Moves requirement class filtering and decision tombstone exclusion into SQL before LIMIT to prevent under-returning and deleted decision leakage.",
-            "validation": "PR #1732 is state MERGED (2026-08-16T23:38:38Z) at merge commit da908349835815274d2b2d097da50880d3c44f33; the merge is contained in current upstream/main (09ae3c22).",
-            "nextAction": "None; contribution merged upstream."
-        },
-        {
-            "id": "GSD-W010",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Canonical read error parity between native and MCP surfaces",
-            "status": "merged",
-            "issues": [
-                1729
-            ],
-            "pullRequests": [
-                1734
-            ],
-            "branches": [
-                "fix/canonical-read-error-parity"
-            ],
-            "commits": [
-                "c4e6aa75",
-                "c547bc73",
-                "e728a95714c7fa78cb2f41c91d978a93e6e56a5f"
-            ],
-            "context": "Centralizes db_unavailable, not_found, and query_error semantics and replaces simulated tests with behavioral native-versus-MCP fixtures.",
-            "validation": "PR #1734 is state MERGED (2026-08-16T23:31:55Z) at merge commit e728a95714c7fa78cb2f41c91d978a93e6e56a5f; the merge is contained in current upstream/main (09ae3c22).",
-            "nextAction": "None; contribution merged upstream."
-        },
-        {
-            "id": "GSD-W011",
-            "type": "feature",
-            "scope": "upstream",
-            "upstreamDisposition": "historical",
-            "title": "MAI Code 1.1 Flash support for GitHub Copilot routing",
-            "status": "merged",
-            "issues": [],
-            "pullRequests": [
-                1758
-            ],
-            "relatedRefs": [
-                "pimmink/gsd-pi#1",
-                "open-gsd/gsd-pi#1758"
-            ],
-            "branches": [
-                "main",
-                "feat/mai-code-1-1-flash-copilot",
-                "fix/mai-cost-table-provider-section"
-            ],
-            "commits": [
-                "ef6ec9cd",
-                "5a96d62d",
-                "47461c6065b116e1320bf7aeef912af8bc77a017",
-                "8362b8c9",
-                "babffb04251d04a70f03ab1cafbe2cb6cb3f8c75",
-                "c4f785534924f55eb644c451e8668969a875ab1c"
-            ],
-            "context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Fork PR pimmink/gsd-pi#1 was squash-merged into fork main; upstream PR #1758 was opened from fork main. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
-            "validation": "Upstream PR #1758 is state MERGED as of 2026-08-15 at head c4f78553 (fork main). All CI checks (fast-gates, build, node22-smoke, ci-gate, GitGuardian, Socket) report SUCCESS; windows-portability SKIPPED. The earlier build/ci-gate failure from the headless-auto provider-error pause E2E test was resolved before merge. As of 2026-08-18 the MAI Code 1.1 Flash cost table is present upstream and fork main was fast-forwarded to upstream/main (09ae3c22).",
-            "nextAction": "None; contribution merged upstream. The retired fix/mai-cost-table-provider-section branch is no longer an active MAI branch: its unique local Phase-I/J spike commit e8e46fe9 is now archived as branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9 (tracked under GSD-W016). Do not treat fix/mai-cost-table-provider-section as the MAI contribution branch; the merged MAI work lives on fork main / upstream PR #1758."
-        },
-        {
-            "id": "GSD-W012",
-            "type": "recovery",
-            "scope": "fork-local",
-            "upstreamDisposition": "no-pr-planned",
-            "title": "Pre-fork model routing recovery snapshot",
-            "status": "superseded",
-            "issues": [],
-            "pullRequests": [],
-            "branches": [
-                "recovery/pre-fork-model-routing-20260813"
-            ],
-            "commits": [
-                "788ef30621f06e951a9d866dc049c9eb2545b6d6"
-            ],
-            "context": "Preserves the unique auto-commit from the retired backup clone. Most Opus 5 and Sonnet 5 content is upstream; MAI catalog work moved to GSD-W011. The recovery snapshot retains additional MAI Copilot provider tests for comparison.",
-            "validation": "Commit object was fetched into the active fork before the 1.5 GB backup clone was deleted.",
-            "nextAction": "Do not merge wholesale. Extract only tests or code proven missing from GSD-W011, then delete the recovery branch after explicit confirmation."
-        },
-        {
-            "id": "GSD-W014",
-            "type": "feature",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "GitHub Copilot model-catalog sync (/gsd copilot-models)",
-            "status": "merged",
-            "issues": [],
-            "pullRequests": [
-                1978
-            ],
-            "relatedRefs": [
-                "superseded:sha:1439c2d05a6d0194a284f78d71e41bbbb27a24ca",
-                "depends-on-base:9c84c780a13f0a1ac1036600601a8a3dbdd33002",
-                "remote:run:32743896391 (for intermediate sha 16baf772249c44dce44f666666361497349235568, both jobs green)",
-                "superseded:sha:16baf77249c44dce44f666666361497349235568",
-                "superseded:sha:cf4d2c1360d57c5d2ea6327c9991cb1b99c402cb",
-                "superseded:remote:run:32741361389 (cancelled, superseded before completion)",
-                "superseded:sha:9c84c780a13f0a1ac1036600601a8a3dbdd33002",
-                "superseded:remote:run:32663412416",
-                "superseded:base:c84f72b79f0bad21002be8d0988a912056e204a6",
-                "superseded:recovery:recovery/w014-pre-rebase4-20260823",
-                "superseded:sha:4339e623c048f0289b717a38f9b01fa916358f44",
-                "superseded:remote:run:32655349780",
-                "superseded:base:60f6919967a4dd4e01d599eb15ee1fd39bc68b70",
-                "superseded:recovery:recovery/w014-pre-rebase3-20260823",
-                "superseded:sha:fa4672fc4dd2609a35b232d7d47b5f63f35e173d",
-                "superseded:remote:run:32648668119",
-                "superseded:remote:run:32646186707",
-                "superseded:base:b5ff8ced2a19d58c3892e954e503a5d5d8479114",
-                "superseded:older-generations:rebase1-and-rebase2-evidence-condensed-see-context",
-                "phase-h:complete",
-                "phase-i:complete",
-                "phase-j:complete",
-                "phase-k:complete",
-                "phase-l:complete",
-                "phase-m:complete",
-                "phase-n:complete",
-                "superseded:sha:c6e108ea7878d7ae25c11f54f28fc93d8035e332",
-                "superseded:blocked-by:upstream-merge:2035",
-                "sha:7053d35ae091c586f50a271422fdd1497c75d697"
-            ],
-            "branches": [
-                "feat/github-copilot-model-catalog-sync"
-            ],
-            "commits": [
-                "9c84c780a13f0a1ac1036600601a8a3dbdd33002",
-                "cf4d2c1360d57c5d2ea6327c9991cb1b99c402cb",
-                "16baf77249c44dce44f666666361497349235568",
-                "1439c2d05a6d0194a284f78d71e41bbbb27a24ca",
-                "c6e108ea7878d7ae25c11f54f28fc93d8035e332",
-                "7053d35ae091c586f50a271422fdd1497c75d697"
-            ],
-            "context": "W014 remains the same upstream feature. upstream/main advanced a FOURTH time (60f6919 -> c84f72b79f0bad21002be8d0988a912056e204a6, 4 commits, zero overlap with any Copilot-catalog file); the branch was rebased a fourth time. git range-diff confirmed all 18 feature commits content-identical across this rebase too, so scope and intent remain unchanged: live GitHub Copilot /models normalization, account-isolated last-known-good snapshots, safe remote-only registration/quarantine, provider-aware economics, fail-closed unknown-confidence routing behavior, and the expanded /gsd copilot-models sync/changes/pricing/promos/doctor/why surface. Fast-forwarded local and origin main to the new upstream/main tip first (live ancestry proof each time, four times total). Older rebase generations (1st: base 6a310619, head 7a81883a, green run 32476902861; 2nd: base b5ff8ced, head fa4672fc, green redispatch run 32648668119 after an unrelated transient flake on run 32646186707) remain historical evidence of the same content passing the same gate, condensed here for readability -- full detail for those generations exists in prior governance commits and local .plans/ drafts. No overlapping upstream issue or PR was found. 2026-08-24: GitHub's automated Copilot code reviewer left 12 posted inline comments plus 2 more findings visible only in its review-overview text on PR #1978, spanning copilot-model-catalog.ts, copilot-models.ts, copilot-overlay-writer.ts, and model-router.ts. All 14 were verified against the current code (none were stale/incorrect) and fixed in commit cf4d2c13, stacked on the same head 9c84c780; most notable: a real data-loss bug (a malformed existing models-catalog.json overlay was indistinguishable from a missing one, so registration could silently overwrite it and delete unrelated providers' entries) and a routing-safety gap (STEP 3's automatic single-eligible-model fallback bypassed the capability-confidence fail-closed gate that STEP 2 already enforces). 2026-08-24 follow-up: two more codex review rounds (--commit cf4d2c13, --commit 16baf772) caught 6 additional real issues across the fix itself; all corrected across 3 total fix commits (cf4d2c13, 16baf77249c44dce44f666666361497349235568, 1439c2d05a6d0194a284f78d71e41bbbb27a24ca) atop the original 9c84c780 head. PR description and a PR comment updated to disclose the full review/fix history for maintainer transparency. 2026-08-24 cosmetic cleanup: the user pasted the VS Code editor's markdownlint/biome diagnostics for docs/user-docs/custom-models.md and 6 source/4 test files (this repo has no committed biome.json, so these reflect the extension's implicit defaults, not a reproducible CLI config). Fixed MD031/MD032 in the doc; organize-imports ordering in copilot-models.ts, copilot-model-catalog.ts, model-router.ts, copilot-overlay-writer.ts, and all 4 affected test files; removed 2 genuinely-unused imports (getAllToolCompatibility, ToolCompatibility) from model-router.ts; replaced a non-null assertion in model-cost-table.ts's lookupModelCost with a ?? modelId fallback; removed 2 useless switch cases and 1 string-concatenation-to-template-literal in copilot-overlay-writer.ts; replaced `as any` test mocks with `as unknown as <RealType>` casts and removed non-null assertions that were redundant given this project's tsconfig (no noUncheckedIndexedAccess) or already narrowed by a preceding assert.ok, across copilot-models-handler.test.ts, copilot-overlay-writer.test.ts, and model-router.test.ts; removed one genuinely-unused `config` local left over from an earlier test edit in model-router.test.ts.",
-            "validation": "2026-08-23 fourth rebase to head 9c84c780a13f0a1ac1036600601a8a3dbdd33002. Rebase proof: git rebase upstream/main succeeded with zero conflicts; git range-diff showed all 18 W014 commits content-identical; git merge-base upstream/main HEAD equals c84f72b79f0bad21002be8d0988a912056e204a6; git rev-list --left-right --count upstream/main...HEAD returned 0 18. Exact-SHA remote full-gate run 32663412416 (for 9c84c780) came back fully GREEN. 2026-08-24 review-fix rounds: (1) commit cf4d2c1360d57c5d2ea6327c9991cb1b99c402cb fixed all 14 GitHub Copilot automated-review findings (12 posted + 2 overview-only); (2) an independent codex review --commit cf4d2c13 caught 4 real regressions in that fix (economics precedence conflating bundled/overlay data with user data, account-key collision for env-var/models.json auth, an implicit bundled-fallback that kept applying internally regardless of caller input, and a routing fix overriding an explicit tier_models pin) -- all corrected in commit 16baf77249c44dce44f666666361497349235568; (3) a second codex review --commit 16baf772 caught 2 more issues (a genuine models.json cost override still losing to live pricing, and a fallback account-key collision risk for two different non-authStorage credentials) -- both corrected in commit 1439c2d05a6d0194a284f78d71e41bbbb27a24ca, which also implements the models.json-cost-override read properly (mirrors ModelRegistry own comment-stripping) and updates docs/user-docs/custom-models.md economics precedence section to match. tsc --noEmit --project tsconfig.extensions.json clean at every step; final full affected-suite run: 9 test files, 283+ tests (up from 276 across the fix rounds), all green. Exact-SHA remote full-gate run 32743896391 came back fully GREEN for the intermediate commit 16baf772 (verify-pr 19m44s, verify-merge 32m46s) -- the final commit 1439c2d0 only added docs/tests/the models.json-read fix on top and was verified locally only, per explicit user direction to stop dispatching a fresh remote gate for every incremental correction and instead rely on GitHub own re-review plus the already-established local verification bar. 2026-08-24 cosmetic cleanup commit c6e108ea: tsc --noEmit --project tsconfig.extensions.json clean; full run of the 5 affected test files (copilot-models-handler, copilot-overlay-writer, copilot-model-catalog, model-router, model-cost-table) — 215/215 passing. No fresh remote full-gate dispatched for this cosmetic-only commit, per established user direction to rely on local verification plus GitHub/codex re-review for incremental changes; the prior exact-SHA remote run for the substantive commit chain (32743896391, for 16baf772) remains the last full-gate evidence on record.",
-            "nextAction": "Merged upstream in v1.17.0 (commit 4b26a642). Local worktree retained during the 2026-08-30 merged-worktree cleanup because docs/zh-CN/user-docs/custom-models.md has an uncommitted change; preserve it until its owner resolves it.",
-            "localExtensionPatchRef": "copilot-catalog-patch"
-        },
-        {
-            "id": "GSD-W013",
-            "type": "documentation",
-            "scope": "fork-local",
-            "upstreamDisposition": "no-pr-planned",
-            "title": "Fork-native VS Code and Copilot contributor workspace",
-            "status": "complete",
-            "issues": [],
-            "pullRequests": [],
-            "branches": [
-                "docs/copilot-workspace-governance"
-            ],
-            "commits": [
-                "1dc21a2026a80241961a5cc408e322088f48ba98",
-                "6a6356f7",
-                "b6f96643",
-                "c701c6db",
-                "7a9c574d69e7cc212664c4264c72933b2a94782d",
-                "6ea9ffe9d8ffb95074acf711365b7066a043763a"
-            ],
-            "context": "Provides the governance anchor with repository agent contract, contributor workflow, durable work register, profile/bootstrap rationale, anchor workspace, and minimal MCP reference. A dedicated local VS Code Profile named GSD Pi Contributor supplies isolated settings, Biome, EditorConfig, GitHub MCP, Context7, bootstrap instructions, and a read-only init prompt to every clean feature worktree.",
-            "validation": "Official VS Code documentation confirms per-profile settings, extensions, MCP configuration, user instructions, prompts, and the `--profile` CLI selector. The local empty profile was created and contains only the intended non-built-in extensions and MCP servers. Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret scans pass locally.",
-            "nextAction": "Maintain profile templates and the canonical register from the governance anchor; keep clean feature worktrees governance-file-free and open them with the GSD Pi Contributor profile."
-        },
-        {
-            "id": "GSD-W015",
-            "type": "infrastructure",
-            "scope": "fork-local",
-            "upstreamDisposition": "no-pr-planned",
-            "title": "Sharded remote pr-verification harness (test-efficiency workstream)",
-            "status": "complete",
-            "issues": [],
-            "pullRequests": [],
-            "relatedRefs": [],
-            "branches": [
-                "perf/unit-test-sharding"
-            ],
-            "commits": [
-                "a381d55",
-                "3667f8d",
-                "87648c0"
-            ],
-            "context": "Lives entirely in the separate, fully user-owned pimmink/gsd-pi-ci harness repository, not in pimmink/gsd-pi — no upstream/fork PR is applicable. Adds .github/workflows/remote-pr-verification-sharded.yml, an experimental workflow_dispatch-only workflow that splits pimmink/gsd-pi's test:unit:compiled across 4 parallel shards using Node's native --test-shard=<index>/<total>, after independently validating locally (synthetic multi-glob fixture, exact production flag combination) that the flag must be placed before the glob patterns and is deterministic/complete/non-overlapping. Left the stable remote-pr-verification.yml completely untouched.",
-            "validation": "Two real dispatches against pimmink/gsd-pi commit 28a2c92c3835e61f5fd19beffc6b8b4c6476bfc6 (fix/mai-cost-table-provider-section, historical GSD-W011/W014 spike commit, used only as a fixed measurement target). First dispatch (run 32015752880) failed fast and safely at an intentional file-count safety check (1274 actual vs an incorrectly hand-counted 1272 expected) before any shard ran. Corrective dispatch (run 32016308055) succeeded: all 4 shards + lifecycle-gate + aggregate green; aggregate totals across shards exactly matched the known unsharded baseline (14176 passed/0 failed/31 skipped), proving no test file was skipped or duplicated; total wall clock ~12m04s vs the 19m11s unsharded baseline (~37% reduction, run 31857969918). Merged to gsd-pi-ci:main (fast-forward, no PR needed for this private single-owner repo).",
-            "nextAction": "None required to consider this workstream done. Optional future follow-up: consider promoting the sharded workflow from experimental to the primary remote-pr-verification path once used a few more times, and revisit shard_count if the real suite's size/composition changes materially."
-        },
-        {
-            "id": "GSD-W016",
-            "type": "recovery",
-            "scope": "fork-local",
-            "upstreamDisposition": "no-pr-planned",
-            "title": "Recovery artifact for GSD-W014 Phase I/J economics and routing spike",
-            "status": "superseded",
-            "issues": [],
-            "pullRequests": [],
-            "relatedRefs": [],
-            "branches": [
-                "recovery/github-copilot-catalog-phase-i-j-e8e46fe9"
-            ],
-            "commits": [
-                "e8e46fe9450f326641fccf7bbf3929f10be80f09"
-            ],
-            "context": "Not an independent feature or workstream. This is the recovery/provenance record for the stranded Phase-I/J spike commit e8e46fe9, which was built on top of the retired historical fix/mai-cost-table-provider-section branch (base fork main c4f78553, pre-1.16) rather than the clean feat/github-copilot-model-catalog-sync branch. Content is conceptually part of the GSD-W014 roadmap: provider-aware Copilot runtime economics (Phase I) in model-cost-table.ts and Copilot economics/drift handling in the copilot-models handler, plus router profile-confidence safety (Phase J) in model-router.ts, with accompanying tests. Because it sits on the wrong historical base it is not directly mergeable. The commit is archived on branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9, pushed to origin at the same SHA.",
-            "validation": "As of 2026-08-18: git show --stat reports 7 files changed, 615 insertions and 48 deletions; git show --check is clean; a secret/PII scan over the commit diff found only false positives (a runtime token variable and dummy 'token-abc' test fixtures), no real credentials. Ancestry: origin/fix/mai-cost-table-provider-section (28a2c92c) and d700abcf are ancestors of e8e46fe9; e8e46fe9 is NOT an ancestor of feat/github-copilot-model-catalog-sync or upstream/main; merge-base with upstream/main is c4f78553. Per-file divergence vs the committed catalog-sync branch: model-cost-table.ts and its test, model-router.ts and its test are Phase I/J content absent from catalog-sync; the copilot-models handler and its test diverged (Phase H parts superseded on catalog-sync, Phase I economics/drift unique to the spike); catalog.ts is largely superseded on catalog-sync. Local branch ref and origin remote ref both point to e8e46fe9450f326641fccf7bbf3929f10be80f09.",
-            "nextAction": "Do not merge or cherry-pick wholesale. After the current GSD-W014 Phase-H working tree is committed and remotely verified, compare e8e46fe9 hunk-by-hunk against current upstream/main and reconstruct only the still-relevant, proven Phase-I/J pieces onto appropriate fresh upstream/main-based reviewable branches with their own scope, tests, and validation. The historical fix/mai-cost-table-provider-section branch and its dirty worktree were left untouched (ARCHIVE/EXTRACT_FIRST) because that worktree was not clean."
-        },
-        {
-            "id": "GSD-W019",
-            "type": "performance",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "verify-merge heavy-gate classifier and compile-once optimization",
-            "status": "merged",
-            "issues": [],
-            "pullRequests": [
-                1990
-            ],
-            "relatedRefs": [
-                "sha:a64a26db8ccd9a83639c97dfa0ba6b320fb180d9",
-                "base:e28218e41706b724e7bcc044d210210b04850009",
-                "recovery:recovery/w019-pre-rebase1-20260824",
-                "cross-ai-review:codex-cli-0.145.0",
-                "cross-ai-review:subagent-claude-opus-4.6",
-                "remote:run:32728995515",
-                "superseded:sha:4d2eecd692d97477566a67f19293c07658ef789d",
-                "superseded:remote:run:32727696891"
-            ],
-            "branches": [
-                "perf/verify-merge-efficiency"
-            ],
-            "commits": [
-                "a64a26db8ccd9a83639c97dfa0ba6b320fb180d9"
-            ],
-            "context": "scripts/verify-merge-needed.sh classifies a diff via ci-classify-changes.sh and reports whether it would trigger CI's heavy Linux build/test gate without running the full merge gate; scripts/verify-merge.sh runs the same classifier for context, installs once, builds the web host only when stale, compiles test artifacts once and reuses the compiled output for test:unit/test:packages, and gates native package tests behind the same portability classification CI uses, while preserving every pre-existing required step (validate-pack, workspace/extension coverage, the pi-ai vitest suite, integration, e2e). Also documents the new advisory script in CONTRIBUTING.md and two docs/dev guides, and adds scripts/__tests__/verify-merge.test.mjs. 2026-08-24: rebased onto upstream/main (base e28218e4, up from the original 91-commits-behind base 4bbfb31f) after fast-forwarding fork main; hit a REAL merge conflict with an unrelated upstream fix (#1582/#1883, building the native test-fault-injection addon on a fresh checkout, gated behind a rustc check) that landed on the same lines this branch touches. Resolved by combining both: classify step runs first, then the native-addon build/Rust-check, then install, preserving the addon-staging step (mkdir/cp/export GSD_NATIVE_PREFER_LOCAL) before test:unit:compiled. Verified via git range-diff and rev-list --left-right --count (0 1). Cross-AI reviewed with `codex review --commit` (codex-cli 0.145.0, using its own tool access to inspect build-web-if-stale.cjs and ci-classify-changes.sh) and an independent Claude Opus 4.6 subagent pass; both found real, non-overlapping issues, which were fixed and folded into the commit via amend: (1) verify-merge-needed.sh now guards --base/--head against a missing value instead of an unbound-variable crash, (2) verify-merge-needed.sh now warns (not fails) when the working tree has uncommitted/untracked changes, since its classification is diff-based and can't see them, (3) added 4 new behavioral tests for both fixes (10/10 pass locally). Two additional codex findings were verified accurate but deliberately NOT fixed here (out of scope, pre-existing bugs in files this branch doesn't own): build-web-if-stale.cjs's mtime-based staleness check doesn't cover packages/*, the lockfile, or scripts/stage-web-standalone.cjs, so it can under-rebuild; ci-classify-changes.sh silently falls back to `HEAD~1` if BASE/HEAD don't resolve, which can under-classify a multi-commit diff on a shallow/misconfigured checkout. Both are noted in a comment in verify-merge-needed.sh and should get their own dedicated fix later.",
-            "validation": "Local: bash -n syntax-checked all scripts; node --test scripts/__tests__/verify-merge.test.mjs passed 12/12 (10 from the review round plus 2 more for the exit-128 fail-safe fix). Remote: pimmink/gsd-pi-ci run 32727696891 (against 4d2eecd6, pre-fail-safe-fix) reproduced a REAL, live exit-128 crash in verify-merge (literal): the new classify step's ci-classify-changes.sh call failed because its own base-ref resolution AND its HEAD~1 fallback both failed on the harness's shallow/minimal checkout ('fatal: ambiguous argument HEAD~1: unknown revision'). Fixed by wrapping the classify call in both scripts so a non-zero exit or empty output defaults every gate to the safe/heavy path instead of crashing or silently skipping coverage. Redispatched against the fixed commit a64a26db: run 32728995515 came back fully GREEN -- verify-pr (literal) success in 19m41s, verify-merge (literal) success in 33m36s. This is the submission-grade exact-SHA evidence, and it caught a real bug the earlier local-only review passes (codex, Claude Opus 4.6 subagent) did not exercise.",
-            "nextAction": "Merged into open-gsd/gsd-pi:main on 2026-08-28. Work complete."
-        },
-        {
-            "id": "GSD-W017",
-            "type": "feature",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Cheaper same-tier Copilot suggestions in pricing/why",
-            "status": "merged",
-            "issues": [],
-            "pullRequests": [
-                1980
-            ],
-            "relatedRefs": [
-                "depends-on:GSD-W014",
-                "depends-on:GSD-W018",
-                "superseded:base:886c4b41c3db3cb244de4ea6215c9f0771230b1d",
-                "superseded:sha:da4f2b4422530d8cca69c7b4d4e33937810b3197",
-                "superseded:remote:run:32670073187",
-                "superseded:recovery:recovery/w017-pre-rebase4-20260823",
-                "superseded:base:995518351238ddaf1b3d9273b51481b41ea74029",
-                "superseded:sha:bcc3946a28d9debf574a90b86f15d7872aa19101",
-                "superseded:remote:run:32659104364",
-                "superseded:recovery:recovery/w017-pre-rebase3-20260823",
-                "superseded:base:d7acc03486b2a549b69d9bb35206b34988ff5ce0",
-                "superseded:sha:007e3c2c65a8f1390bb74f1a2099a9befa7f400e",
-                "superseded:remote:run:32652579050",
-                "superseded:older-generations:rebase1-and-rebase2-evidence-condensed-see-context",
-                "base:91787bcd07d439adb46a597953d82c403c4840b1",
-                "sha:2a936c0387d5c10abfcb32b259310fdc902f69ec",
-                "recovery:recovery/w017-pre-rebase5-20260824",
-                "superseded:base:3e7241fd6b4e4b6ec51b6479a95816ab3b20855f",
-                "superseded:sha:521ba06c56f1454aa789041b39c7d9d59b1e0341",
-                "recovery:recovery/w017-pre-rebase6-20260828",
-                "recovery:recovery/w017-pre-rebase7-20260828",
-                "base:9e60b9c9b58c8a88eca481b0c9f68e935547d927",
-                "sha:8d4a1e1d8bfa50a136165a7de9c16a2f25e0bb18"
-            ],
-            "branches": [
-                "feat/copilot-cheaper-model-suggestions"
-            ],
-            "commits": [
-                "da4f2b4422530d8cca69c7b4d4e33937810b3197",
-                "2a936c0387d5c10abfcb32b259310fdc902f69ec",
-                "8d4a1e1d8bfa50a136165a7de9c16a2f25e0bb18"
-            ],
-            "context": "Separate follow-up feature branch, rebuilt on top of the confirmed-green GSD-W018 tip (886c4b41c3db3cb244de4ea6215c9f0771230b1d, itself rebased for the fourth time after a fourth upstream drift). Adds explicit cheaper same-tier GitHub Copilot suggestions to /gsd copilot-models pricing and why output, plus the proactive notification feature in copilot-catalog-notifications.ts (fires a non-blocking, deduplicated notification on manual model selection/cycling or after a GSD-W018 session-start refresh, distinguishing cheaper-equivalent from better-and-cheaper messaging via a pure capability-score comparison, never fabricating data, never altering routing or switching the active model). upstream/main advanced a FOURTH time; W014 and W018 were both rebased a fourth time and this branch was rebased onto the new W018 tip via `git rebase --onto`; git range-diff confirmed the single commit content-identical. 2026-08-24 fifth rebase onto GSD-W018's updated tip 91787bcd. Unlike prior rebases, this one produced a real conflict in copilot-models.ts (8 hunks) because GSD-W014's codex-round fixes changed the same functions (localCopilotModels, findLocalModel, resolveEconomicsForModel, formatPricingRecord) that GSD-W017's own commit also touches — resolved by combining both sides: kept the Model<Api>/ExtensionCommandContext type-safety from GSD-W014 while preserving GSD-W017's new parameters/call sites (cheaperSameTierOption, snapshot). Rebase also silently broke 2 call sites inside findCheaperSameTierOption that called resolveEconomicsForModel with GSD-W014's *old* 3-argument signature (no ctx) without a git conflict marker (wholly-new hunk, nothing to conflict with) — caught by tsc, not by the merge itself. Fixing that then surfaced a genuine type mismatch: findCheaperSameTierOption only ever has ExtensionContext (it's invoked from the model_select hook, not a command handler), so it cannot pass ctx into a parameter typed ExtensionCommandContext — relaxed readGithubCopilotModelsJsonCost/buildUserOverrideEconomics/resolveEconomicsForModel's ctx parameter to ExtensionContext (they only touch ctx.modelRegistry, unchanged on the narrower type, so every existing caller stays valid). Full-suite verification after the rebase then surfaced two PRE-EXISTING test-fixture bugs, confirmed present even on the original pre-rebase commit da4f2b44 (checked out from recovery/w017-pre-rebase5-20260824 for comparison): (1) copilot-models-handler.test.ts's two cheaper-same-tier tests set Model<Api>.cost in $-per-1K units instead of the actual $-per-1M convention (tokenPricesFromCost divides by 1000), so they were silently relying on the bare-ID BUNDLED_COST_TABLE implicit fallback instead of the fixture's own intended cost, and broke once GSD-W014's disableImplicitFallback: true was inherited; (2) copilot-catalog-notifications.test.ts's createFakeCtx never supplied any cost data at all, so 5 of its 10 tests were failing (via early-return false, no exception) even before this rebase. Both fixed with correctly-scaled explicit cost fixtures.",
-            "validation": "git range-diff confirmed the single W017 commit content-identical across the fourth rebase (old-base 995518351238ddaf1b3d9273b51481b41ea74029..recovery-ref vs new-base 886c4b41c3db3cb244de4ea6215c9f0771230b1d..HEAD). git merge-base origin/feat/copilot-catalog-session-refresh HEAD equals 886c4b41c3db3cb244de4ea6215c9f0771230b1d (0 behind, 1 ahead). pnpm run typecheck:extensions passed cleanly. GSD-W014 and GSD-W018's own fourth-rebase full-gates both confirmed green (runs 32663412416 and 32666347203 respectively); the fresh exact-SHA remote full-gate for da4f2b4422530d8cca69c7b4d4e33937810b3197 (run 32670073187) came back fully GREEN: verify-pr (literal) success, verify-merge (literal) success. This is the submission-grade exact-SHA evidence for the current head. All three branches (GSD-W014, GSD-W018, GSD-W017) are now confirmed green on their final fourth-rebase SHAs. A live ancestry check afterward found upstream/main had advanced a FIFTH time (c84f72b7 -> fdc4c943a30569173bf5a51315b8bc372ee520e9, 5 commits, zero overlap with any Copilot-catalog file). Given explicit user direction to stop the rebase-chase cycle and finish, a fifth full rebase cascade was deliberately NOT performed -- a PR sitting a small number of commits behind main at open time is normal practice and gets reconciled at review/merge time, not before. 2026-08-24 rebase + fix commit 2a936c03: tsc --noEmit --project tsconfig.extensions.json clean. Full run of the 9 affected test files after all fixes: 269/269 passing (copilot-catalog-notifications, copilot-models-handler, model-cost-table, copilot-catalog-session-refresh, provider-equality-allowlist, oauth-api-model-routing, copilot-overlay-writer, model-router, copilot-model-catalog). Confirmed the 2 test-fixture bugs pre-dated this rebase by temporarily checking out the pre-rebase files from recovery/w017-pre-rebase5-20260824 and reproducing the same 6 failures. No fresh remote full-gate dispatched, per explicit user direction.",
-            "nextAction": "Merged upstream in v1.17.0 (commit 31fab790). Work complete.",
-            "localExtensionPatchRef": "copilot-catalog-patch"
-        },
-        {
-            "id": "GSD-W018",
-            "type": "feature",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Session-start GitHub Copilot catalog refresh and runtime model activation",
-            "status": "merged",
-            "issues": [],
-            "pullRequests": [
-                1979
-            ],
-            "relatedRefs": [
-                "depends-on:GSD-W014",
-                "superseded:base:9c84c780a13f0a1ac1036600601a8a3dbdd33002",
-                "superseded:sha:886c4b41c3db3cb244de4ea6215c9f0771230b1d",
-                "superseded:remote:run:32666347203",
-                "superseded:recovery:recovery/w018-pre-rebase4-20260823",
-                "superseded:base:4339e623c048f0289b717a38f9b01fa916358f44",
-                "superseded:sha:995518351238ddaf1b3d9273b51481b41ea74029",
-                "superseded:remote:run:32657264306",
-                "superseded:recovery:recovery/w018-pre-rebase3-20260823",
-                "superseded:base:fa4672fc4dd2609a35b232d7d47b5f63f35e173d",
-                "superseded:sha:d7acc03486b2a549b69d9bb35206b34988ff5ce0",
-                "superseded:remote:run:32650707615",
-                "superseded:older-generations:rebase1-and-rebase2-evidence-condensed-see-context",
-                "base:c6e108ea7878d7ae25c11f54f28fc93d8035e332",
-                "sha:91787bcd07d439adb46a597953d82c403c4840b1",
-                "recovery:recovery/w018-pre-rebase5-20260824",
-                "superseded:base:7053d35ae091c586f50a271422fdd1497c75d697",
-                "superseded:sha:3e7241fd6b4e4b6ec51b6479a95816ab3b20855f",
-                "recovery:recovery/w018-pre-rebase6-20260828",
-                "sha:9e60b9c9b58c8a88eca481b0c9f68e935547d927"
-            ],
-            "branches": [
-                "feat/copilot-catalog-session-refresh"
-            ],
-            "commits": [
-                "886c4b41c3db3cb244de4ea6215c9f0771230b1d",
-                "91787bcd07d439adb46a597953d82c403c4840b1",
-                "9e60b9c9b58c8a88eca481b0c9f68e935547d927"
-            ],
-            "context": "Separate follow-up feature branch stacked on the W014 tip (W014 is not yet merged upstream). Adds an opt-in automatic refresh of the GitHub Copilot live model catalog at GSD session start, gated by a new copilot_catalog preference block (refresh_on_session_start: off|if_stale|always, default off; notify_on_changes default true; stale_after_ms default 6h). The coordinator reuses W014's existing fetch/last-known-good pipeline rather than duplicating it, is fire-and-forget only (never blocks ordinary startup), deduplicates concurrent triggers per basePath, applies a bounded timeout, and never triggers or waits on an OAuth/login flow. Also implements 3-tier runtime model classification (trusted / manual-only / quarantined) directly from the live CopilotModelRecord's availability/execution/billing/conflicts fields, without fabricating capability or pricing data. Wired into the session_start extension hook only. upstream/main advanced a FOURTH time (60f6919 -> c84f72b79f0bad21002be8d0988a912056e204a6), so W014 was rebased a fourth time and this branch was rebased onto the new W014 tip via `git rebase --onto`; git range-diff confirmed both feature commits content-identical again. 2026-08-24 fifth rebase onto GSD-W014's updated tip c6e108ea (cosmetic lint-cleanup commit, no functional changes) — clean rebase, zero conflicts. While rebased, fixed copilot-catalog-session-refresh.ts's own instance of the cross-provider price-bleed bug already fixed for copilot-models.ts on PR #1978 (independent codex review, round 1): classifyRemoteCopilotModel's resolveModelEconomics call passed an explicit fallbackEconomics object with no tokenPrices, so resolveModelEconomics still merged in its own bare-model-ID implicit bundled-fallback lookup for the missing field, meaning a same-named model priced by a different provider could silently be reported as this Copilot model's known price. Added disableImplicitFallback: true (the same opt-in flag added to model-cost-table.ts during GSD-W014's codex round 1) to close it.",
-            "validation": "A rebase mistake was made and immediately caught with zero downstream impact: the first --onto attempt used W018's own prior SHA as the oldbase argument instead of W014's prior tip, which produced an empty replay range and silently fast-forwarded to the new base, dropping W018's own 2 commits from the branch tip. Caught instantly via the standard post-rebase check `git rev-list --left-right --count <newbase>...HEAD` returning `0 0` instead of the expected `0 2` (documented in repo memory as a new gotcha). Fixed via `git reset --hard` to the just-created recovery ref, then redone with the correct oldbase (W014's actual prior tip, 4339e623c048f0289b717a38f9b01fa916358f44). Nothing was lost (recovery ref) and nothing bad was pushed (caught before the push step). After the fix: git range-diff confirmed both W018 commits content-identical across the fourth rebase; git merge-base origin/feat/github-copilot-model-catalog-sync HEAD equals 9c84c780a13f0a1ac1036600601a8a3dbdd33002 (0 behind, 2 ahead); pnpm run typecheck:extensions passed cleanly. GSD-W014's own fourth-rebase full-gate is pending; W018's own exact-SHA full-gate is not yet dispatched, per the required W014->W018->W017 order. 2026-08-24 rebase + fix commit 91787bcd: tsc --noEmit clean; full run of copilot-catalog-session-refresh.test.ts (25/25 passing, including the pre-existing 'pricing is unknown and tier/profile are unknown too' coverage). No new regression test added and no fresh remote full-gate dispatched, per explicit user direction that this fix mirrors an already-tested, already-verified pattern from PR #1978 and does not need the same verification depth.",
-            "nextAction": "Merged upstream in v1.17.0 (commit 40553f41). Work complete.",
-            "localExtensionPatchRef": "copilot-catalog-patch"
-        },
-        {
-            "id": "GSD-W020",
-            "type": "docs",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Repo-wide markdownlint config: disable MD013/MD060, track remaining cleanup",
-            "status": "merged",
-            "issues": [
-                1992
-            ],
-            "pullRequests": [
-                1991
-            ],
-            "relatedRefs": [
-                "sha:f3fd49050cb644d5b825e9a8d9d847fed1d74a3b",
-                "base:upstream/main:e28218e4"
-            ],
-            "branches": [
-                "docs/markdownlint-config"
-            ],
-            "commits": [
-                "f3fd49050cb644d5b825e9a8d9d847fed1d74a3b"
-            ],
-            "context": "A repo-wide markdownlint-cli2 scan (git ls-files '*.md' passed as an explicit file list, not a glob, to avoid ENAMETOOLONG from deeply nested pnpm node_modules symlinks) found 29,678 issues across 919 of 1145 tracked markdown files. MD013 (line-length, 17,309 violations) and MD060 (table-column-style, 5,916 violations) together account for 78% of the total and were never actually enforced as project conventions (verified: neither rule has any pre-existing inline markdownlint-disable comment anywhere in a clean upstream/main checkout, correcting an earlier assumption that CONTRIBUTING.md already disabled these -- that pattern only existed in this fork-local work-register.md, not upstream). Added a root .markdownlint-cli2.jsonc disabling both rules repo-wide; zero content changes. New worktree created off current upstream/main (e28218e4) after an initial git worktree add path mistake (relative destination resolved against -C fork instead of caller cwd) was caught and corrected.",
-            "validation": "Scan before: 29678 issues in 919 files. Scan after adding the config (same file list, config auto-discovered by markdownlint-cli2): 6472 issues in 649 files -- confirms the 78% reduction empirically, not just estimated. JSONC syntax independently verified via a comment-stripped JSON.parse in addition to markdownlint-cli2 itself successfully parsing and applying it. Full pnpm install for a local verify:fast attempt failed (ENOTDIR: a symlinked node_modules from a sibling worktree conflicted with pnpm's own install step) and was not worth resolving given the change is a single non-executable config file touching no src/packages/scripts paths that ci-classify-changes.sh's heavy-gate patterns key on.",
-            "nextAction": "Merged into open-gsd/gsd-pi:main on 2026-08-28. Work complete."
-        },
-        {
-            "id": "GSD-W021",
-            "type": "fix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Repair evidence-backed lifecycle shadow authority before Milestone validation",
-            "status": "pr-open",
-            "issues": [
-                2055
-            ],
-            "pullRequests": [
-                2002
-            ],
-            "relatedRefs": [
-                "sha:cf873bf9ff0da4768c1b3027efdd9443ecb2f9d7",
-                "base:upstream/main:e28218e41706b724e7bcc044d210210b04850009"
-            ],
-            "branches": [
-                "fix/lifecycle-shadow-authority-repair"
-            ],
-            "commits": [
-                "bb75b2f964a4574cf5fb3ec936298b29f2b6af4c",
-                "e7cb339e",
-                "4061bc41",
-                "4fff9598",
-                "0713f16c",
-                "cf873bf9"
-            ],
-            "context": "Adopted Milestones could contain legacy-complete Tasks or Slices with durable completion evidence but no workflow_item_lifecycles authority, causing strict closeout validation to fail with missing canonical lifecycle authority. The fix adds a narrow evidence-gated forward repair before validation, preserving strict Milestone completion guards. Post-review found two additional stop-ship gaps in the original bb75b2f9 patch: (1) taskCompletionFacts() accepted any non-empty verification_result instead of requiring an exact passed verdict; (2) repairMilestoneLifecycleShadowsForward() committed each repairable descendant as its own separate Domain Operation while iterating, so a later unresolved sibling did not roll back earlier already-committed repairs.",
-            "validation": "All review findings from PR #2002 addressed in commits 0713f16c and cf873bf9: (1) Milestone state guard added to repairMilestoneLifecycleShadowsForward to refuse repair when canonical status is completed, pending, or cancelled; (2) deterministic per-category batch keys with content digest hashes added to executeMilestoneSingleStepRepairBatch to allow idempotency convergence across partial multi-batch retries; (3) Task repairs partitioned and committed before Slice repairs; (4) schema test fixtures updated to match exact SQLite table columns (workflow_item_lifecycles). All 32 focused tests in lifecycle-shadow-forward-repair.test.ts and milestone-validation-domain-operation.test.ts pass locally (100%). tsc --noEmit --project tsconfig.extensions.json clean. Commit cf873bf9 pushed to origin/fix/lifecycle-shadow-authority-repair.",
-            "nextAction": "Review finding addressed (exact passed token + unified single-step batch). Pushed commit 647c4a07. Linked issue #2055. Awaiting maintainer review."
-        },
-        {
-            "id": "GSD-W022",
-            "type": "fix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Agent-core resolved tool result isError flag dropped in the agent loop",
-            "status": "pr-open",
-            "issues": [
-                2015
-            ],
-            "pullRequests": [
-                2016
-            ],
-            "relatedRefs": [],
-            "branches": [
-                "fix/agent-core-tool-result-iserror",
-                "fix/w022-local-patch"
-            ],
-            "commits": [
-                "fd9946ca",
-                "5bfcc551"
-            ],
-            "context": "A normally resolved tool result carrying isError: true is re-wrapped by the agent loop as isError: false, silently discarding a caller's error signal. The native MCP adapter already preserves the MCP error flag and the external Claude adapter already preserves externalResult.isError; the loss is in the shared pi-agent-core execution path. Because AgentToolResult currently documents throw-on-failure and does not declare isError, preserving the field in core would add a public error-signaling contract.",
-            "validation": "Fix implemented and pushed to PR #2016 (commit 5bfcc551): AgentToolResult gains optional isError?: boolean field, normalizeAgentToolResult preserves isError, and raceToolExecutionAgainstAbort preserves result.isError. All 29 tests in agent-loop.test.ts pass (100%). Fresh CI run 32976709169 dispatched on GitHub. Installed local community extension patch w022-iserror-patch at ~/.gsd/agent/extensions/w022-iserror-patch using public tool_result hook to preserve isError for live local use in Edelman Studio without waiting for upstream PR merge.",
-            "nextAction": "RFC issue #2015 and Draft PR #2016 updated with commit 5bfcc551. Fresh CI running on GitHub. Local patch w022-iserror-patch is active in ~/.gsd/agent/extensions/ for local workflow execution in Edelman Studio.",
-            "localExtensionPatchRef": "w022-iserror-patch"
-        },
-        {
-            "id": "GSD-W023",
-            "type": "chore",
-            "scope": "fork-local",
-            "upstreamDisposition": "no-pr-planned",
-            "title": "Recovery runtime patch tracking (orphan guard, upstream PR #1946)",
-            "status": "complete",
-            "issues": [],
-            "pullRequests": [
-                1946
-            ],
-            "relatedRefs": [],
-            "branches": [
-                "track/recovery-runtime-patch-1946"
-            ],
-            "commits": [],
-            "context": "The recovery orphan guard fix (resumeAuthorized) is active in installed/managed runtime locally, reported merged upstream as PR #1946. Needs confirmation of the actual release status before planning a normal upgrade vs. an interim local patch.",
-            "validation": "Upstream PR #1946 is merged and explicitly included in release v1.16.2, published 2026-08-25. The local global CLI was upgraded from 1.16.1 to 1.16.2 and verified with npm's global package listing and a fresh `gsd --version` process. No independent W023 runtime patch remains. The unrelated copilot-catalog-patch remains active because PRs #1978/#1979/#1980 are not all merged and released.",
-            "nextAction": "None for W023. Keep the independent copilot-catalog-patch until PRs #1978, #1979, and #1980 have all merged and shipped in a release; then reassess that patch separately."
-        },
-        {
-            "id": "GSD-W024",
-            "type": "fix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "UAT issue #1993 follow-up (schema-error run poisoning / stale abort)",
-            "status": "pr-open",
-            "issues": [
-                1993
-            ],
-            "pullRequests": [
-                2017
-            ],
-            "relatedRefs": [],
-            "branches": [
-                "fix/uat-1993-schema-error-poisoning"
-            ],
-            "commits": [
-                "d351e4bc"
-            ],
-            "context": "A schema-invalid gsd_uat_exec could poison a run by recording a durable harnessAbort, causing later gsd_uat_result_save calls to be rejected and sending the unit into a finalize-retry wedge. The fix separates model-fixable schema validation from genuine harness truncation and heals only stale same-run tool-error aborts after successful gsd_exec/gsd_uat_exec. Existing workflow tool-surface preflight and finalize rerun mechanisms remain unchanged.",
-            "validation": "Issue #1993 was reproduced in the owning register-hooks path. Commit d351e4bc adds the narrow predicate, locked runtime clear operation, and execution-based regressions. Focused W024 suites pass 110/110, covering schema-invalid gsd_uat_exec, stale tool-error healing, timeout preservation, loop-guard preservation, UAT save rejection, and workflow tool-surface readiness. git diff --check passed. Upstream Draft PR #2017 is open; issue #1993 is labeled needs-maintainer-review and large-scope.",
-            "nextAction": "Await maintainer review/approval on Draft PR #2017. Keep it Draft until the broader issue scope and the retained truncation/retry invariants are accepted; then run the required broader verification and mark ready."
-        },
-        {
-            "id": "GSD-W025",
-            "type": "fix",
-            "scope": "upstream",
-            "upstreamDisposition": "historical",
-            "title": "Verify issue #1994 follow-up (multilingual verify-command fixture matrix)",
-            "status": "closed-unmerged",
-            "issues": [
-                1994
-            ],
-            "pullRequests": [],
-            "relatedRefs": [],
-            "branches": [
-                "fix/verify-1994-multilingual-fixtures"
-            ],
-            "commits": [],
-            "context": "Verify-command extraction needs a fixture matrix covering Dutch, Italian, and non-Latin-script text; only positive, executed-command evidence should count. Local branch created from upstream/main (327343af); no code written yet.",
-            "validation": "Not started.",
-            "nextAction": "Out of scope for this fork — external issue #1994; won't implement."
-        },
-        {
-            "id": "GSD-W026",
-            "type": "feat",
-            "scope": "upstream",
-            "upstreamDisposition": "historical",
-            "title": "UAT contract: canonical nonAutomatable flag and pure preflight",
-            "status": "closed-unmerged",
-            "issues": [],
-            "pullRequests": [],
-            "relatedRefs": [],
-            "branches": [
-                "feat/uat-contract-non-automatable"
-            ],
-            "commits": [],
-            "context": "Needs a canonical nonAutomatable?: boolean field, a pure preflight step validated against real prompt examples, and must never leak a raw schema error to the caller. Local branch created from upstream/main (327343af); no code written yet.",
-            "validation": "Not started.",
-            "nextAction": "Out of scope — speculative idea; won't implement."
-        },
-        {
-            "id": "GSD-W027",
-            "type": "fix",
-            "scope": "upstream",
-            "upstreamDisposition": "historical",
-            "title": "Mixed milestone validation/schema: class-pass under aggregate needs-attention",
-            "status": "closed-unmerged",
-            "issues": [],
-            "pullRequests": [],
-            "relatedRefs": [],
-            "branches": [
-                "fix/mixed-milestone-validation-schema"
-            ],
-            "commits": [],
-            "context": "A passing class must be able to retain its evidence even when the aggregate verdict is needs-attention; needs the next free migration number, a shared preflight/trigger matrix, schema fingerprinting, and idempotent repair. Requires its own architecture approval, separate from GSD-W021's atomicity change. Local branch created from upstream/main (327343af); no code written yet.",
-            "validation": "Not started.",
-            "nextAction": "Out of scope — speculative idea; won't implement."
-        },
-        {
-            "id": "GSD-W028",
-            "type": "docs",
-            "scope": "fork-local",
-            "upstreamDisposition": "no-pr-planned",
-            "title": "Stale local path cleanup in docs and settings",
-            "status": "complete",
-            "issues": [],
-            "pullRequests": [],
-            "relatedRefs": [],
-            "branches": [
-                "docs/stale-local-paths-cleanup"
-            ],
-            "commits": [],
-            "context": "~/.gsd/agent/settings.json and related local docs still reference the retired /Users/pimmink/Klanten/gsd-pi-fork path; the durable fork now lives at /Users/pimmink/Klanten/gsd-pi-pimmink/fork. Fork-local only; must not leak user-specific absolute paths into upstream docs.",
-            "validation": "Updated the active ~/.gsd/agent/settings.json package override from the retired /Users/pimmink/Klanten/gsd-pi-fork path to /Users/pimmink/Klanten/gsd-pi-pimmink/fork. JSON parsing passed, no stale path remains in active settings, and a fresh gsd --help process from the current fork exited successfully on v1.16.2. Historical session and subagent logs were intentionally left unchanged.",
-            "nextAction": "None; active local package discovery now uses the current fork path."
-        },
-        {
-            "id": "GSD-W029",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Truthful GitHub Copilot catalog normalization and bounded diagnostics",
-            "status": "complete",
-            "issues": [
-                2088
-            ],
-            "pullRequests": [
-                2092
-            ],
-            "relatedRefs": [
-                "GSD-W014",
-                "GSD-W017",
-                "GSD-W018"
-            ],
-            "branches": [
-                "fix/copilot-catalog-truthful-normalization"
-            ],
-            "commits": [
-                "c2b0222fc82f26a612f0ac3bee62a71eefebfc1b",
-                "d6aa1f9fd8c68e12b45b9fba1669c1977d98d82b",
-                "339d4320c7f568d560470a6f75778ef6aaaabd74",
-                "bafbdfb842f04e13a525ea69ad3f959722483fa2"
-            ],
-            "context": "Post-merge regression correction for GitHub Copilot catalog normalization: keep provider facts, catalog role, picker visibility, manual selectability, and GSD routing status orthogonal; reject literal command placeholders; preserve unknown metadata; bound diagnostics; preserve provider-live/static transport conflicts; and require authoritative input modality before overlay synthesis. Tracked by upstream issue #2088 and upstream PR #2092.",
-            "validation": "2026-09-02: branch rebased onto current upstream/main and pushed to origin/fix/copilot-catalog-truthful-normalization at bafbdfb8 (0 behind / 4 ahead before push). Focused catalog/handler/overlay suites passed 95/95 via `pnpm exec tsx --test src/resources/extensions/gsd/tests/copilot-overlay-writer.test.ts src/resources/extensions/gsd/tests/copilot-model-catalog.test.ts src/resources/extensions/gsd/tests/copilot-models-handler.test.ts`; `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2092 were resolved. Previous upstream build failure was traced to overlay-writer fixtures missing explicit input modality after the stricter completeness gate; commit bafbdfb8 fixes those fixtures. Fresh upstream CI is running at evidence time.",
-            "nextAction": "Wait for upstream CI on PR #2092 and maintainer review."
-        },
-        {
-            "id": "GSD-W030",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Account-scoped GitHub Copilot runtime catalog activation",
-            "status": "blocked",
-            "issues": [
-                2088
-            ],
-            "pullRequests": [],
-            "relatedRefs": [
-                "GSD-W029",
-                "GSD-W018"
-            ],
-            "branches": [
-                "fix/copilot-runtime-catalog-activation"
-            ],
-            "commits": [],
-            "context": "Dependent post-merge correction for session-refresh classifications that do not consistently become account-scoped runtime registry and picker entries. Must preserve account isolation and sanitized last-known-good state without mutating static or user catalogs. Tracked by upstream issue #2088.",
-            "validation": "Inspection on 2026-08-30 confirmed session refresh classifications and its bounded join are not consumed by the ModelRegistry or picker. The only registry extension seam replaces all provider models and requires concrete Model cost/capability fields, so it cannot safely represent account-scoped Class B records with unknown economics without fabricating data.",
-            "nextAction": "Use docs/adr/w030-account-scoped-copilot-runtime-catalog-rfc-draft.md to open a focused RFC issue and obtain maintainer approval before implementing registry-to-picker activation without static overlay or models.json mutation."
-        },
-        {
-            "id": "GSD-W031",
-            "type": "bugfix",
-            "scope": "upstream",
-            "upstreamDisposition": "pr-required",
-            "title": "Safe account-scoped GitHub Copilot model suggestions",
-            "status": "complete",
-            "issues": [
-                2088
-            ],
-            "pullRequests": [
-                2093
-            ],
-            "relatedRefs": [
-                "GSD-W030",
-                "GSD-W017"
-            ],
-            "branches": [
-                "fix/copilot-suggestion-safety"
-            ],
-            "commits": [
-                "a5dc72be33513bbdb3057c509065e0c91d65c14d",
-                "39afc0b369971d455fae0a38a0c4431384dd037d",
-                "5e5cdadb04123e53ce28d99b3da5ff8fa7ce40f6",
-                "00f9ee0fdad9d97d12bb88e42bc123c5f465fe11"
-            ],
-            "context": "Dependent post-merge correction for cheaper-model suggestions: require deterministic capability dominance, comparable economics, inherited profile resolution through the router profile resolver, tri-state tool-call diagnostics, and no automatic model switching. Selection-origin/core runtime activation work remains out of scope after RFC #2091 was closed as wontfix. Tracked by upstream issue #2088 and upstream PR #2093.",
-            "validation": "2026-09-02: branch rebased onto current upstream/main and force-with-lease pushed to origin/fix/copilot-suggestion-safety at 00f9ee0f (0 behind / 5 ahead before push). Focused notification/handler/router suites passed 204/204 via `pnpm exec tsx --test src/resources/extensions/gsd/tests/copilot-catalog-notifications.test.ts src/resources/extensions/gsd/tests/copilot-models-handler.test.ts src/resources/extensions/gsd/tests/model-router.test.ts`; `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2093 were resolved. Upstream Socket checks were green; GitHub Actions fast-gates/workflow-lint were queued at evidence time.",
-            "nextAction": "Wait for upstream CI on PR #2093 and maintainer review."
-        }
-    ],
-    "localExtensionPatches": [
-        {
-            "extensionId": "copilot-catalog-patch",
-            "path": "~/.gsd/agent/extensions/copilot-catalog-patch",
-            "scope": "global",
-            "installedAt": "2026-08-24",
-            "relatedWorkItems": [
-                "GSD-W014",
-                "GSD-W017",
-                "GSD-W018"
-            ],
-            "reimplementation": true,
-            "reimplementationNote": "Independent, scoped-down reimplementation for personal use, not a copy of the PR diffs. Community extensions cannot modify gsd's own core files that these PRs touch (model-router.ts, preferences-types.ts, bootstrap/register-hooks.ts), so this only adds new commands/hooks via the public ExtensionAPI. Provides read-only catalog viewing (/copilot-catalog [all|pricing|why]) plus a best-effort, at-most-hourly session-start new/removed-model notification. Deliberately omits automatic model registration into gsd's provider config and automatic cheaper-model-switch notifications tied to gsd's internal before_model_select task-classification/routing system -- both were judged too risky to reimplement without the real PRs' tested logic. Verified working end-to-end 2026-08-24 from the Edelman_Studio project: session_start hook fetched the live Copilot catalog (56 models) and wrote it to ~/.gsd/agent/extensions/copilot-catalog-patch/.catalog-cache.json. 2026-08-24 re-sync check: reviewed every commit added to the 3 branches since the previous recorded heads (9c84c780/886c4b41/da4f2b44), including the GitHub-Copilot-automated-review fixes, 2 codex review rounds, the account-isolation fix, the cross-provider price-bleed fix (disableImplicitFallback), and the lint-cleanup commit. None apply to this extension: index.ts always fetches the live /models catalog fresh on every command invocation (no cached last-known-good snapshot, no per-account session state, no BUNDLED_COST_TABLE bare-ID lookup, no models.json cost-override resolution) -- the entire bug class this session fixed (stale/cross-provider/wrong-account data reuse) does not exist in this simpler, always-live-fetch design. No index.ts change made. 2026-08-24 re-sync check #2: reviewed the 7 new GitHub-Copilot-review-driven fixes in commit 7595ba0a (missing Copilot client-identity headers on /models, input_cost_per_token/output_cost_per_token pricing parsing, account-key stable-source fingerprinting, deferred snapshot commit, transition-keyed notification dedup, routing-eligibility/caveats split, cross-provider cost threading, rejection-reason comparator mirroring). None apply: index.ts already sends the same Copilot client-identity headers (COPILOT_HEADERS, unchanged since this extension was written), never computes cost-table pricing at all (pricing mode just sorts by the raw API multiplier field), has no per-account session state or account-key fingerprinting (loadCatalog() always fetches fresh), and its session_start cache-diff (comparing only against the single most recent .catalog-cache.json, not a permanent ever-growing set) is structurally immune to the notification-dedup bug since a re-added model naturally re-diffs as added again. No index.ts change needed. 2026-08-24 re-sync check #3: reviewed commit 4b5be82f (fixes 2 regressions a follow-up codex review found in 7595ba0a's own account-key and notification-dedup fixes: unstored-credential account keys now also fold in modelRegistry.modelsJsonPath to distinguish projects sharing a process, and notification dedup now compares against only the immediately-preceding shown content instead of a permanent transition-hash set). Neither applies: index.ts has no account-key concept at all (loadCatalog() always fetches fresh, no per-account fingerprinting to collide across projects), and its session_start cache-diff already only compares against the single most recent .catalog-cache.json, never a permanent set, so the transition-hash-collision/register-suppression bug class doesn't exist here either. No index.ts change needed. 2026-08-24 bug found+fixed (unrelated to upstream PR sync, in this extension's own code): getArgumentCompletions returned raw strings (['all','pricing','why']) instead of {value,label} objects; gsd-pi's SelectList.getDisplayValue() does item.label || item.value, which is undefined on a bare string, and the resulting undefined gets passed to visibleWidth() during the very first render of the suggestion popup -- crashed the TUI (dropped to a raw shell with leaked escape-sequence garbage) every time a user typed \"/copilot-catalog \" (trailing space) to see subcommand suggestions. Reproduced live in Edelman_Studio 2026-08-24. Fixed by returning properly-shaped {value, label, description} objects filtered by the typed prefix, matching the real PR's filterOptions()/getGsdArgumentCompletions() convention (src/resources/extensions/gsd/commands/catalog.ts). Bumped extension-manifest.json version 0.2.0 -> 0.2.1. Verified: `node --experimental-strip-types --check index.ts` passes; awaiting live re-test in Edelman_Studio. 2026-08-28 re-sync check #4: reviewed all commits added across the 3 branches since the previous recorded heads (4b5be82f/3f8a3583/0d416566), which rebased GSD-W014/W018/W017 onto upstream PR #2035 (dotted-aware canonicalModelId normalization in model-router.ts) and fixed several MODEL_CAPABILITY_TIER/MODEL_CAPABILITY_PROFILES lookups across model-router.ts, copilot-models.ts, copilot-catalog-notifications.ts, and copilot-catalog-session-refresh.ts that were still keyed on raw dotted bare IDs. None apply to this extension: index.ts never imports model-router.ts or any capability-tier/cost registry at all -- it only fetches the live /models catalog and lists/sorts by the raw API id and billing.multiplier field, so the entire dotted-ID canonicalization bug class does not exist here. No index.ts change needed. Re-verified `node --experimental-strip-types --check index.ts` passes.",
-            "knownIssue": "On gsd-pi <=1.16.0, this directory-based global extension was silently destroyed on EVERY gsd session start: pruneRemovedBundledExtensions() in src/resource-loader.ts runs a 'sweep' step that rmSync()s (recursive, force) any subdirectory under ~/.gsd/agent/extensions/ whose name isn't part of gsd's own currently-bundled extension set, with no exclusion for community-tier manifests. Reproduced 2026-08-24 with a trivial, harmless test extension (no filesystem code of its own) -- gsd itself deleted the whole directory after one `gsd --print` session, silently (all wrapped in try/catch, no stderr). `gsd --version` alone did not trigger it (exits before initResources()); any full session-starting invocation did. Temporarily worked around via project-local .gsd/extensions/<name>.js (ecosystem/loader.ts has no prune/sweep logic), installed only in Edelman_Studio. CONFIRMED FIXED in 1.16.1 (upgraded global install from 1.16.0 -> 1.16.1 on 2026-08-24 via `npm install -g @opengsd/gsd-pi@latest`; re-tested the exact same reproduction with a fresh dummy extension and it survived a full gsd --print session). Reverted to the documented global location as the sole install afterward and removed the project-local workaround. requires.platform is now set to >=1.16.1 so this manifest self-documents the minimum safe version. Still plausibly worth an upstream bug report so gsd-pi's own manifest-spec.md / building-extensions.md Quick Start docs (or the sweep logic itself, for anyone still on <=1.16.0) reflect this -- NOT filed, needs explicit authorization first per contributor governance.",
-            "branchHeadsAtLastSync": {
-                "feat/github-copilot-model-catalog-sync": "7053d35a",
-                "feat/copilot-catalog-session-refresh": "9e60b9c9",
-                "feat/copilot-cheaper-model-suggestions": "8d4a1e1d"
-            },
-            "syncPolicy": "Whenever feat/github-copilot-model-catalog-sync, feat/copilot-catalog-session-refresh, or feat/copilot-cheaper-model-suggestions receive new commits (rebase, review fixes, anything), diff the new HEAD against the recorded value here and decide whether ~/.gsd/agent/extensions/copilot-catalog-patch/index.ts needs a matching behavior update. Update the recorded SHA here after each review, even when no code change was needed, so this never silently goes stale.",
-            "retireWhen": "Uninstall (rm -rf ~/.gsd/agent/extensions/copilot-catalog-patch) once PR #1978, #1979, and #1980 have all merged and shipped in a released @opengsd/gsd-pi version.",
-            "status": "active",
-            "retiredAt": "2026-08-29",
-            "retiredReason": "Retired and deleted upon release of @opengsd/gsd-pi@1.17.0; all three underlying PRs (#1978, #1979, #1980) are merged upstream and natively included in GSD core."
-        }
-    ]
+	"$schema": "./work-register.schema.json",
+	"schemaVersion": 1,
+	"repository": {
+		"upstream": "open-gsd/gsd-pi",
+		"fork": "pimmink/gsd-pi",
+		"defaultBase": "upstream/main"
+	},
+	"evidenceAsOf": "2026-08-30",
+	"statusVocabulary": [
+		"idea",
+		"investigating",
+		"in-progress",
+		"complete",
+		"pr-open",
+		"merged",
+		"closed-unmerged",
+		"superseded",
+		"blocked"
+	],
+	"items": [
+		{
+			"id": "GSD-W001",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "Extension registry lockSync ESYNC failure",
+			"status": "merged",
+			"issues": [1598],
+			"pullRequests": [],
+			"branches": [],
+			"commits": [],
+			"context": "gsd extensions used the synchronous proper-lockfile API with an unsupported retries option in v1.12.0.",
+			"validation": "Upstream issue is closed; no contributor PR is recorded in this fork register.",
+			"nextAction": "None unless the regression reappears."
+		},
+		{
+			"id": "GSD-W002",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Markdown renderer output must satisfy markdownlint",
+			"status": "merged",
+			"issues": [1600],
+			"pullRequests": [1610],
+			"branches": ["fix/markdownlint-table-separators"],
+			"commits": ["e7b6f291ac680f1b00fe1cb6ca246b8cbcac3aac"],
+			"context": "Generated markdown contained invalid heading, spacing, and table separator forms including MD055, MD056, and MD060 failures.",
+			"validation": "PR #1610 is state MERGED (2026-08-16T23:44:17Z) at merge commit e7b6f291ac680f1b00fe1cb6ca246b8cbcac3aac; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
+		},
+		{
+			"id": "GSD-W003",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "Milestone status exposes persisted dependencies",
+			"status": "merged",
+			"issues": [1601],
+			"pullRequests": [],
+			"branches": [],
+			"commits": [],
+			"context": "gsd_milestone_status omitted persisted dependsOn data, preventing authoritative dependency verification through the database tool.",
+			"validation": "Upstream issue is closed and current gsd_milestone_status returns dependsOn.",
+			"nextAction": "Keep contract coverage when milestone status evolves."
+		},
+		{
+			"id": "GSD-W004",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "Legacy migration consistency for completed slices and structured decisions",
+			"status": "merged",
+			"issues": [1606, 1607],
+			"pullRequests": [1611],
+			"branches": ["fix/migrate-slice-decision-consistency"],
+			"commits": ["8d1d2067b1ec5b0b06e8772033b6f6f848b7613d"],
+			"context": "Legacy migration could produce completed slices with pending tasks and lose structured decision semantics through title-only extraction.",
+			"validation": "PR #1611 merged upstream.",
+			"nextAction": "Retain migration corpus regression coverage."
+		},
+		{
+			"id": "GSD-W005",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "Canonical requirement and decision read tools",
+			"status": "closed-unmerged",
+			"issues": [1608],
+			"pullRequests": [1613, 1682],
+			"branches": ["feat/canonical-read-tools", "pr-1613"],
+			"commits": ["af34c4e4", "8eeed156"],
+			"context": "Added canonical requirement and decision list/get tools and addressed adversarial review findings. The original and follow-up PRs were closed without merge; related behavior later appeared in the v1.15 line and generated three follow-up correctness issues.",
+			"validation": "PR #1613 and PR #1682 are closed without merge. Follow-up issues #1727-#1729 remain tracked separately.",
+			"nextAction": "Use the active canonical-read follow-up PRs as the current authority."
+		},
+		{
+			"id": "GSD-W006",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "Claude Sonnet 5 routing catalog and Copilot startup fallback",
+			"status": "merged",
+			"issues": [1612],
+			"pullRequests": [1609, 1703, 1705],
+			"branches": [
+				"fix/model-router-sonnet5-catalog",
+				"fix/copilot-sonnet5-startup-fallback"
+			],
+			"commits": [
+				"409ea8543bc6807b17b49317c117e8c846b1d1bf",
+				"42cb8ec346e06cd41b51c69acccb9e91d3a9290f",
+				"795b4b3df76ca15f91834e6d11c749c179d8ce18"
+			],
+			"context": "Registered claude-sonnet-5 in routing capability, cost, and profile tables and added graceful Copilot fallback when the preferred model is temporarily unavailable.",
+			"validation": "PRs #1609, #1703, and #1705 merged upstream.",
+			"nextAction": "Guard against duplicate registry rows and invalid provider aliases."
+		},
+		{
+			"id": "GSD-W007",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Package-manager-aware verification commands and bootstrap recovery",
+			"status": "merged",
+			"issues": [],
+			"pullRequests": [1706],
+			"branches": ["fix/verification-gate-package-manager"],
+			"commits": [
+				"a4c63862",
+				"65b77ec8",
+				"d9ddb5a0",
+				"8b986a9b2953ee56467194bb9b2fa62d2246542e",
+				"85b334d4c0d77fe8c88ec5e000966f4ca8ba7092"
+			],
+			"context": "Centralizes npm, pnpm, yarn, and bun command construction. Follow-up commit 8b986a9b restores stale shim backups after interrupted bootstrap runs and writes new backups atomically.",
+			"validation": "PR #1706 is state MERGED (2026-08-16T23:38:38Z) at merge commit 85b334d4c0d77fe8c88ec5e000966f4ca8ba7092; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
+		},
+		{
+			"id": "GSD-W008",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Isolate canonical reads from the global workflow database handle",
+			"status": "merged",
+			"issues": [1727],
+			"pullRequests": [1731],
+			"branches": ["fix/canonical-read-db-isolation"],
+			"commits": [
+				"31af02a7",
+				"e329a411",
+				"10aa03954444e51390160f00a1d97a59d4a8604f"
+			],
+			"context": "Routes canonical native and MCP reads through isolated per-project adapters to prevent implicit database creation and global handle mutation.",
+			"validation": "PR #1731 is state MERGED (2026-08-14T13:01:34Z) at merge commit 10aa03954444e51390160f00a1d97a59d4a8604f; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
+		},
+		{
+			"id": "GSD-W009",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Apply canonical list predicates before SQL limit",
+			"status": "merged",
+			"issues": [1728],
+			"pullRequests": [1732],
+			"branches": ["fix/canonical-sql-predicates"],
+			"commits": ["27167552", "da908349835815274d2b2d097da50880d3c44f33"],
+			"context": "Moves requirement class filtering and decision tombstone exclusion into SQL before LIMIT to prevent under-returning and deleted decision leakage.",
+			"validation": "PR #1732 is state MERGED (2026-08-16T23:38:38Z) at merge commit da908349835815274d2b2d097da50880d3c44f33; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
+		},
+		{
+			"id": "GSD-W010",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Canonical read error parity between native and MCP surfaces",
+			"status": "merged",
+			"issues": [1729],
+			"pullRequests": [1734],
+			"branches": ["fix/canonical-read-error-parity"],
+			"commits": [
+				"c4e6aa75",
+				"c547bc73",
+				"e728a95714c7fa78cb2f41c91d978a93e6e56a5f"
+			],
+			"context": "Centralizes db_unavailable, not_found, and query_error semantics and replaces simulated tests with behavioral native-versus-MCP fixtures.",
+			"validation": "PR #1734 is state MERGED (2026-08-16T23:31:55Z) at merge commit e728a95714c7fa78cb2f41c91d978a93e6e56a5f; the merge is contained in current upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream."
+		},
+		{
+			"id": "GSD-W011",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "MAI Code 1.1 Flash support for GitHub Copilot routing",
+			"status": "merged",
+			"issues": [],
+			"pullRequests": [1758],
+			"relatedRefs": ["pimmink/gsd-pi#1", "open-gsd/gsd-pi#1758"],
+			"branches": [
+				"main",
+				"feat/mai-code-1-1-flash-copilot",
+				"fix/mai-cost-table-provider-section"
+			],
+			"commits": [
+				"ef6ec9cd",
+				"5a96d62d",
+				"47461c6065b116e1320bf7aeef912af8bc77a017",
+				"8362b8c9",
+				"babffb04251d04a70f03ab1cafbe2cb6cb3f8c75",
+				"c4f785534924f55eb644c451e8668969a875ab1c"
+			],
+			"context": "Adds MAI Code 1.1 Flash catalog generation, generated model entries, routing cost/profile coverage, and review fixes. Fork PR pimmink/gsd-pi#1 was squash-merged into fork main; upstream PR #1758 was opened from fork main. Recovery branch recovery/pre-fork-model-routing-20260813 preserves earlier provider behavior tests from commit 788ef306 for assessment.",
+			"validation": "Upstream PR #1758 is state MERGED as of 2026-08-15 at head c4f78553 (fork main). All CI checks (fast-gates, build, node22-smoke, ci-gate, GitGuardian, Socket) report SUCCESS; windows-portability SKIPPED. The earlier build/ci-gate failure from the headless-auto provider-error pause E2E test was resolved before merge. As of 2026-08-18 the MAI Code 1.1 Flash cost table is present upstream and fork main was fast-forwarded to upstream/main (09ae3c22).",
+			"nextAction": "None; contribution merged upstream. The retired fix/mai-cost-table-provider-section branch is no longer an active MAI branch: its unique local Phase-I/J spike commit e8e46fe9 is now archived as branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9 (tracked under GSD-W016). Do not treat fix/mai-cost-table-provider-section as the MAI contribution branch; the merged MAI work lives on fork main / upstream PR #1758."
+		},
+		{
+			"id": "GSD-W012",
+			"type": "recovery",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Pre-fork model routing recovery snapshot",
+			"status": "superseded",
+			"issues": [],
+			"pullRequests": [],
+			"branches": ["recovery/pre-fork-model-routing-20260813"],
+			"commits": ["788ef30621f06e951a9d866dc049c9eb2545b6d6"],
+			"context": "Preserves the unique auto-commit from the retired backup clone. Most Opus 5 and Sonnet 5 content is upstream; MAI catalog work moved to GSD-W011. The recovery snapshot retains additional MAI Copilot provider tests for comparison.",
+			"validation": "Commit object was fetched into the active fork before the 1.5 GB backup clone was deleted.",
+			"nextAction": "Do not merge wholesale. Extract only tests or code proven missing from GSD-W011, then delete the recovery branch after explicit confirmation."
+		},
+		{
+			"id": "GSD-W014",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "GitHub Copilot model-catalog sync (/gsd copilot-models)",
+			"status": "merged",
+			"issues": [],
+			"pullRequests": [1978],
+			"relatedRefs": [
+				"superseded:sha:1439c2d05a6d0194a284f78d71e41bbbb27a24ca",
+				"depends-on-base:9c84c780a13f0a1ac1036600601a8a3dbdd33002",
+				"remote:run:32743896391 (for intermediate sha 16baf772249c44dce44f666666361497349235568, both jobs green)",
+				"superseded:sha:16baf77249c44dce44f666666361497349235568",
+				"superseded:sha:cf4d2c1360d57c5d2ea6327c9991cb1b99c402cb",
+				"superseded:remote:run:32741361389 (cancelled, superseded before completion)",
+				"superseded:sha:9c84c780a13f0a1ac1036600601a8a3dbdd33002",
+				"superseded:remote:run:32663412416",
+				"superseded:base:c84f72b79f0bad21002be8d0988a912056e204a6",
+				"superseded:recovery:recovery/w014-pre-rebase4-20260823",
+				"superseded:sha:4339e623c048f0289b717a38f9b01fa916358f44",
+				"superseded:remote:run:32655349780",
+				"superseded:base:60f6919967a4dd4e01d599eb15ee1fd39bc68b70",
+				"superseded:recovery:recovery/w014-pre-rebase3-20260823",
+				"superseded:sha:fa4672fc4dd2609a35b232d7d47b5f63f35e173d",
+				"superseded:remote:run:32648668119",
+				"superseded:remote:run:32646186707",
+				"superseded:base:b5ff8ced2a19d58c3892e954e503a5d5d8479114",
+				"superseded:older-generations:rebase1-and-rebase2-evidence-condensed-see-context",
+				"phase-h:complete",
+				"phase-i:complete",
+				"phase-j:complete",
+				"phase-k:complete",
+				"phase-l:complete",
+				"phase-m:complete",
+				"phase-n:complete",
+				"superseded:sha:c6e108ea7878d7ae25c11f54f28fc93d8035e332",
+				"superseded:blocked-by:upstream-merge:2035",
+				"sha:7053d35ae091c586f50a271422fdd1497c75d697"
+			],
+			"branches": ["feat/github-copilot-model-catalog-sync"],
+			"commits": [
+				"9c84c780a13f0a1ac1036600601a8a3dbdd33002",
+				"cf4d2c1360d57c5d2ea6327c9991cb1b99c402cb",
+				"16baf77249c44dce44f666666361497349235568",
+				"1439c2d05a6d0194a284f78d71e41bbbb27a24ca",
+				"c6e108ea7878d7ae25c11f54f28fc93d8035e332",
+				"7053d35ae091c586f50a271422fdd1497c75d697"
+			],
+			"context": "W014 remains the same upstream feature. upstream/main advanced a FOURTH time (60f6919 -> c84f72b79f0bad21002be8d0988a912056e204a6, 4 commits, zero overlap with any Copilot-catalog file); the branch was rebased a fourth time. git range-diff confirmed all 18 feature commits content-identical across this rebase too, so scope and intent remain unchanged: live GitHub Copilot /models normalization, account-isolated last-known-good snapshots, safe remote-only registration/quarantine, provider-aware economics, fail-closed unknown-confidence routing behavior, and the expanded /gsd copilot-models sync/changes/pricing/promos/doctor/why surface. Fast-forwarded local and origin main to the new upstream/main tip first (live ancestry proof each time, four times total). Older rebase generations (1st: base 6a310619, head 7a81883a, green run 32476902861; 2nd: base b5ff8ced, head fa4672fc, green redispatch run 32648668119 after an unrelated transient flake on run 32646186707) remain historical evidence of the same content passing the same gate, condensed here for readability -- full detail for those generations exists in prior governance commits and local .plans/ drafts. No overlapping upstream issue or PR was found. 2026-08-24: GitHub's automated Copilot code reviewer left 12 posted inline comments plus 2 more findings visible only in its review-overview text on PR #1978, spanning copilot-model-catalog.ts, copilot-models.ts, copilot-overlay-writer.ts, and model-router.ts. All 14 were verified against the current code (none were stale/incorrect) and fixed in commit cf4d2c13, stacked on the same head 9c84c780; most notable: a real data-loss bug (a malformed existing models-catalog.json overlay was indistinguishable from a missing one, so registration could silently overwrite it and delete unrelated providers' entries) and a routing-safety gap (STEP 3's automatic single-eligible-model fallback bypassed the capability-confidence fail-closed gate that STEP 2 already enforces). 2026-08-24 follow-up: two more codex review rounds (--commit cf4d2c13, --commit 16baf772) caught 6 additional real issues across the fix itself; all corrected across 3 total fix commits (cf4d2c13, 16baf77249c44dce44f666666361497349235568, 1439c2d05a6d0194a284f78d71e41bbbb27a24ca) atop the original 9c84c780 head. PR description and a PR comment updated to disclose the full review/fix history for maintainer transparency. 2026-08-24 cosmetic cleanup: the user pasted the VS Code editor's markdownlint/biome diagnostics for docs/user-docs/custom-models.md and 6 source/4 test files (this repo has no committed biome.json, so these reflect the extension's implicit defaults, not a reproducible CLI config). Fixed MD031/MD032 in the doc; organize-imports ordering in copilot-models.ts, copilot-model-catalog.ts, model-router.ts, copilot-overlay-writer.ts, and all 4 affected test files; removed 2 genuinely-unused imports (getAllToolCompatibility, ToolCompatibility) from model-router.ts; replaced a non-null assertion in model-cost-table.ts's lookupModelCost with a ?? modelId fallback; removed 2 useless switch cases and 1 string-concatenation-to-template-literal in copilot-overlay-writer.ts; replaced `as any` test mocks with `as unknown as <RealType>` casts and removed non-null assertions that were redundant given this project's tsconfig (no noUncheckedIndexedAccess) or already narrowed by a preceding assert.ok, across copilot-models-handler.test.ts, copilot-overlay-writer.test.ts, and model-router.test.ts; removed one genuinely-unused `config` local left over from an earlier test edit in model-router.test.ts.",
+			"validation": "2026-08-23 fourth rebase to head 9c84c780a13f0a1ac1036600601a8a3dbdd33002. Rebase proof: git rebase upstream/main succeeded with zero conflicts; git range-diff showed all 18 W014 commits content-identical; git merge-base upstream/main HEAD equals c84f72b79f0bad21002be8d0988a912056e204a6; git rev-list --left-right --count upstream/main...HEAD returned 0 18. Exact-SHA remote full-gate run 32663412416 (for 9c84c780) came back fully GREEN. 2026-08-24 review-fix rounds: (1) commit cf4d2c1360d57c5d2ea6327c9991cb1b99c402cb fixed all 14 GitHub Copilot automated-review findings (12 posted + 2 overview-only); (2) an independent codex review --commit cf4d2c13 caught 4 real regressions in that fix (economics precedence conflating bundled/overlay data with user data, account-key collision for env-var/models.json auth, an implicit bundled-fallback that kept applying internally regardless of caller input, and a routing fix overriding an explicit tier_models pin) -- all corrected in commit 16baf77249c44dce44f666666361497349235568; (3) a second codex review --commit 16baf772 caught 2 more issues (a genuine models.json cost override still losing to live pricing, and a fallback account-key collision risk for two different non-authStorage credentials) -- both corrected in commit 1439c2d05a6d0194a284f78d71e41bbbb27a24ca, which also implements the models.json-cost-override read properly (mirrors ModelRegistry own comment-stripping) and updates docs/user-docs/custom-models.md economics precedence section to match. tsc --noEmit --project tsconfig.extensions.json clean at every step; final full affected-suite run: 9 test files, 283+ tests (up from 276 across the fix rounds), all green. Exact-SHA remote full-gate run 32743896391 came back fully GREEN for the intermediate commit 16baf772 (verify-pr 19m44s, verify-merge 32m46s) -- the final commit 1439c2d0 only added docs/tests/the models.json-read fix on top and was verified locally only, per explicit user direction to stop dispatching a fresh remote gate for every incremental correction and instead rely on GitHub own re-review plus the already-established local verification bar. 2026-08-24 cosmetic cleanup commit c6e108ea: tsc --noEmit --project tsconfig.extensions.json clean; full run of the 5 affected test files (copilot-models-handler, copilot-overlay-writer, copilot-model-catalog, model-router, model-cost-table) — 215/215 passing. No fresh remote full-gate dispatched for this cosmetic-only commit, per established user direction to rely on local verification plus GitHub/codex re-review for incremental changes; the prior exact-SHA remote run for the substantive commit chain (32743896391, for 16baf772) remains the last full-gate evidence on record.",
+			"nextAction": "Merged upstream in v1.17.0 (commit 4b26a642). Local worktree retained during the 2026-08-30 merged-worktree cleanup because docs/zh-CN/user-docs/custom-models.md has an uncommitted change; preserve it until its owner resolves it.",
+			"localExtensionPatchRef": "copilot-catalog-patch"
+		},
+		{
+			"id": "GSD-W013",
+			"type": "documentation",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Fork-native VS Code and Copilot contributor workspace",
+			"status": "complete",
+			"issues": [],
+			"pullRequests": [],
+			"branches": ["docs/copilot-workspace-governance"],
+			"commits": [
+				"1dc21a2026a80241961a5cc408e322088f48ba98",
+				"6a6356f7",
+				"b6f96643",
+				"c701c6db",
+				"7a9c574d69e7cc212664c4264c72933b2a94782d",
+				"6ea9ffe9d8ffb95074acf711365b7066a043763a"
+			],
+			"context": "Provides the governance anchor with repository agent contract, contributor workflow, durable work register, profile/bootstrap rationale, anchor workspace, and minimal MCP reference. A dedicated local VS Code Profile named GSD Pi Contributor supplies isolated settings, Biome, EditorConfig, GitHub MCP, Context7, bootstrap instructions, and a read-only init prompt to every clean feature worktree.",
+			"validation": "Official VS Code documentation confirms per-profile settings, extensions, MCP configuration, user instructions, prompts, and the `--profile` CLI selector. The local empty profile was created and contains only the intended non-built-in extensions and MCP servers. Register validation, JSON parsing, markdownlint, Biome, git diff checks, and secret scans pass locally.",
+			"nextAction": "Maintain profile templates and the canonical register from the governance anchor; keep clean feature worktrees governance-file-free and open them with the GSD Pi Contributor profile."
+		},
+		{
+			"id": "GSD-W015",
+			"type": "infrastructure",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Sharded remote pr-verification harness (test-efficiency workstream)",
+			"status": "complete",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": ["perf/unit-test-sharding"],
+			"commits": ["a381d55", "3667f8d", "87648c0"],
+			"context": "Lives entirely in the separate, fully user-owned pimmink/gsd-pi-ci harness repository, not in pimmink/gsd-pi — no upstream/fork PR is applicable. Adds .github/workflows/remote-pr-verification-sharded.yml, an experimental workflow_dispatch-only workflow that splits pimmink/gsd-pi's test:unit:compiled across 4 parallel shards using Node's native --test-shard=<index>/<total>, after independently validating locally (synthetic multi-glob fixture, exact production flag combination) that the flag must be placed before the glob patterns and is deterministic/complete/non-overlapping. Left the stable remote-pr-verification.yml completely untouched.",
+			"validation": "Two real dispatches against pimmink/gsd-pi commit 28a2c92c3835e61f5fd19beffc6b8b4c6476bfc6 (fix/mai-cost-table-provider-section, historical GSD-W011/W014 spike commit, used only as a fixed measurement target). First dispatch (run 32015752880) failed fast and safely at an intentional file-count safety check (1274 actual vs an incorrectly hand-counted 1272 expected) before any shard ran. Corrective dispatch (run 32016308055) succeeded: all 4 shards + lifecycle-gate + aggregate green; aggregate totals across shards exactly matched the known unsharded baseline (14176 passed/0 failed/31 skipped), proving no test file was skipped or duplicated; total wall clock ~12m04s vs the 19m11s unsharded baseline (~37% reduction, run 31857969918). Merged to gsd-pi-ci:main (fast-forward, no PR needed for this private single-owner repo).",
+			"nextAction": "None required to consider this workstream done. Optional future follow-up: consider promoting the sharded workflow from experimental to the primary remote-pr-verification path once used a few more times, and revisit shard_count if the real suite's size/composition changes materially."
+		},
+		{
+			"id": "GSD-W016",
+			"type": "recovery",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Recovery artifact for GSD-W014 Phase I/J economics and routing spike",
+			"status": "superseded",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": ["recovery/github-copilot-catalog-phase-i-j-e8e46fe9"],
+			"commits": ["e8e46fe9450f326641fccf7bbf3929f10be80f09"],
+			"context": "Not an independent feature or workstream. This is the recovery/provenance record for the stranded Phase-I/J spike commit e8e46fe9, which was built on top of the retired historical fix/mai-cost-table-provider-section branch (base fork main c4f78553, pre-1.16) rather than the clean feat/github-copilot-model-catalog-sync branch. Content is conceptually part of the GSD-W014 roadmap: provider-aware Copilot runtime economics (Phase I) in model-cost-table.ts and Copilot economics/drift handling in the copilot-models handler, plus router profile-confidence safety (Phase J) in model-router.ts, with accompanying tests. Because it sits on the wrong historical base it is not directly mergeable. The commit is archived on branch recovery/github-copilot-catalog-phase-i-j-e8e46fe9, pushed to origin at the same SHA.",
+			"validation": "As of 2026-08-18: git show --stat reports 7 files changed, 615 insertions and 48 deletions; git show --check is clean; a secret/PII scan over the commit diff found only false positives (a runtime token variable and dummy 'token-abc' test fixtures), no real credentials. Ancestry: origin/fix/mai-cost-table-provider-section (28a2c92c) and d700abcf are ancestors of e8e46fe9; e8e46fe9 is NOT an ancestor of feat/github-copilot-model-catalog-sync or upstream/main; merge-base with upstream/main is c4f78553. Per-file divergence vs the committed catalog-sync branch: model-cost-table.ts and its test, model-router.ts and its test are Phase I/J content absent from catalog-sync; the copilot-models handler and its test diverged (Phase H parts superseded on catalog-sync, Phase I economics/drift unique to the spike); catalog.ts is largely superseded on catalog-sync. Local branch ref and origin remote ref both point to e8e46fe9450f326641fccf7bbf3929f10be80f09.",
+			"nextAction": "Do not merge or cherry-pick wholesale. After the current GSD-W014 Phase-H working tree is committed and remotely verified, compare e8e46fe9 hunk-by-hunk against current upstream/main and reconstruct only the still-relevant, proven Phase-I/J pieces onto appropriate fresh upstream/main-based reviewable branches with their own scope, tests, and validation. The historical fix/mai-cost-table-provider-section branch and its dirty worktree were left untouched (ARCHIVE/EXTRACT_FIRST) because that worktree was not clean."
+		},
+		{
+			"id": "GSD-W019",
+			"type": "performance",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "verify-merge heavy-gate classifier and compile-once optimization",
+			"status": "merged",
+			"issues": [],
+			"pullRequests": [1990],
+			"relatedRefs": [
+				"sha:a64a26db8ccd9a83639c97dfa0ba6b320fb180d9",
+				"base:e28218e41706b724e7bcc044d210210b04850009",
+				"recovery:recovery/w019-pre-rebase1-20260824",
+				"cross-ai-review:codex-cli-0.145.0",
+				"cross-ai-review:subagent-claude-opus-4.6",
+				"remote:run:32728995515",
+				"superseded:sha:4d2eecd692d97477566a67f19293c07658ef789d",
+				"superseded:remote:run:32727696891"
+			],
+			"branches": ["perf/verify-merge-efficiency"],
+			"commits": ["a64a26db8ccd9a83639c97dfa0ba6b320fb180d9"],
+			"context": "scripts/verify-merge-needed.sh classifies a diff via ci-classify-changes.sh and reports whether it would trigger CI's heavy Linux build/test gate without running the full merge gate; scripts/verify-merge.sh runs the same classifier for context, installs once, builds the web host only when stale, compiles test artifacts once and reuses the compiled output for test:unit/test:packages, and gates native package tests behind the same portability classification CI uses, while preserving every pre-existing required step (validate-pack, workspace/extension coverage, the pi-ai vitest suite, integration, e2e). Also documents the new advisory script in CONTRIBUTING.md and two docs/dev guides, and adds scripts/__tests__/verify-merge.test.mjs. 2026-08-24: rebased onto upstream/main (base e28218e4, up from the original 91-commits-behind base 4bbfb31f) after fast-forwarding fork main; hit a REAL merge conflict with an unrelated upstream fix (#1582/#1883, building the native test-fault-injection addon on a fresh checkout, gated behind a rustc check) that landed on the same lines this branch touches. Resolved by combining both: classify step runs first, then the native-addon build/Rust-check, then install, preserving the addon-staging step (mkdir/cp/export GSD_NATIVE_PREFER_LOCAL) before test:unit:compiled. Verified via git range-diff and rev-list --left-right --count (0 1). Cross-AI reviewed with `codex review --commit` (codex-cli 0.145.0, using its own tool access to inspect build-web-if-stale.cjs and ci-classify-changes.sh) and an independent Claude Opus 4.6 subagent pass; both found real, non-overlapping issues, which were fixed and folded into the commit via amend: (1) verify-merge-needed.sh now guards --base/--head against a missing value instead of an unbound-variable crash, (2) verify-merge-needed.sh now warns (not fails) when the working tree has uncommitted/untracked changes, since its classification is diff-based and can't see them, (3) added 4 new behavioral tests for both fixes (10/10 pass locally). Two additional codex findings were verified accurate but deliberately NOT fixed here (out of scope, pre-existing bugs in files this branch doesn't own): build-web-if-stale.cjs's mtime-based staleness check doesn't cover packages/*, the lockfile, or scripts/stage-web-standalone.cjs, so it can under-rebuild; ci-classify-changes.sh silently falls back to `HEAD~1` if BASE/HEAD don't resolve, which can under-classify a multi-commit diff on a shallow/misconfigured checkout. Both are noted in a comment in verify-merge-needed.sh and should get their own dedicated fix later.",
+			"validation": "Local: bash -n syntax-checked all scripts; node --test scripts/__tests__/verify-merge.test.mjs passed 12/12 (10 from the review round plus 2 more for the exit-128 fail-safe fix). Remote: pimmink/gsd-pi-ci run 32727696891 (against 4d2eecd6, pre-fail-safe-fix) reproduced a REAL, live exit-128 crash in verify-merge (literal): the new classify step's ci-classify-changes.sh call failed because its own base-ref resolution AND its HEAD~1 fallback both failed on the harness's shallow/minimal checkout ('fatal: ambiguous argument HEAD~1: unknown revision'). Fixed by wrapping the classify call in both scripts so a non-zero exit or empty output defaults every gate to the safe/heavy path instead of crashing or silently skipping coverage. Redispatched against the fixed commit a64a26db: run 32728995515 came back fully GREEN -- verify-pr (literal) success in 19m41s, verify-merge (literal) success in 33m36s. This is the submission-grade exact-SHA evidence, and it caught a real bug the earlier local-only review passes (codex, Claude Opus 4.6 subagent) did not exercise.",
+			"nextAction": "Merged into open-gsd/gsd-pi:main on 2026-08-28. Work complete."
+		},
+		{
+			"id": "GSD-W017",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Cheaper same-tier Copilot suggestions in pricing/why",
+			"status": "merged",
+			"issues": [],
+			"pullRequests": [1980],
+			"relatedRefs": [
+				"depends-on:GSD-W014",
+				"depends-on:GSD-W018",
+				"superseded:base:886c4b41c3db3cb244de4ea6215c9f0771230b1d",
+				"superseded:sha:da4f2b4422530d8cca69c7b4d4e33937810b3197",
+				"superseded:remote:run:32670073187",
+				"superseded:recovery:recovery/w017-pre-rebase4-20260823",
+				"superseded:base:995518351238ddaf1b3d9273b51481b41ea74029",
+				"superseded:sha:bcc3946a28d9debf574a90b86f15d7872aa19101",
+				"superseded:remote:run:32659104364",
+				"superseded:recovery:recovery/w017-pre-rebase3-20260823",
+				"superseded:base:d7acc03486b2a549b69d9bb35206b34988ff5ce0",
+				"superseded:sha:007e3c2c65a8f1390bb74f1a2099a9befa7f400e",
+				"superseded:remote:run:32652579050",
+				"superseded:older-generations:rebase1-and-rebase2-evidence-condensed-see-context",
+				"base:91787bcd07d439adb46a597953d82c403c4840b1",
+				"sha:2a936c0387d5c10abfcb32b259310fdc902f69ec",
+				"recovery:recovery/w017-pre-rebase5-20260824",
+				"superseded:base:3e7241fd6b4e4b6ec51b6479a95816ab3b20855f",
+				"superseded:sha:521ba06c56f1454aa789041b39c7d9d59b1e0341",
+				"recovery:recovery/w017-pre-rebase6-20260828",
+				"recovery:recovery/w017-pre-rebase7-20260828",
+				"base:9e60b9c9b58c8a88eca481b0c9f68e935547d927",
+				"sha:8d4a1e1d8bfa50a136165a7de9c16a2f25e0bb18"
+			],
+			"branches": ["feat/copilot-cheaper-model-suggestions"],
+			"commits": [
+				"da4f2b4422530d8cca69c7b4d4e33937810b3197",
+				"2a936c0387d5c10abfcb32b259310fdc902f69ec",
+				"8d4a1e1d8bfa50a136165a7de9c16a2f25e0bb18"
+			],
+			"context": "Separate follow-up feature branch, rebuilt on top of the confirmed-green GSD-W018 tip (886c4b41c3db3cb244de4ea6215c9f0771230b1d, itself rebased for the fourth time after a fourth upstream drift). Adds explicit cheaper same-tier GitHub Copilot suggestions to /gsd copilot-models pricing and why output, plus the proactive notification feature in copilot-catalog-notifications.ts (fires a non-blocking, deduplicated notification on manual model selection/cycling or after a GSD-W018 session-start refresh, distinguishing cheaper-equivalent from better-and-cheaper messaging via a pure capability-score comparison, never fabricating data, never altering routing or switching the active model). upstream/main advanced a FOURTH time; W014 and W018 were both rebased a fourth time and this branch was rebased onto the new W018 tip via `git rebase --onto`; git range-diff confirmed the single commit content-identical. 2026-08-24 fifth rebase onto GSD-W018's updated tip 91787bcd. Unlike prior rebases, this one produced a real conflict in copilot-models.ts (8 hunks) because GSD-W014's codex-round fixes changed the same functions (localCopilotModels, findLocalModel, resolveEconomicsForModel, formatPricingRecord) that GSD-W017's own commit also touches — resolved by combining both sides: kept the Model<Api>/ExtensionCommandContext type-safety from GSD-W014 while preserving GSD-W017's new parameters/call sites (cheaperSameTierOption, snapshot). Rebase also silently broke 2 call sites inside findCheaperSameTierOption that called resolveEconomicsForModel with GSD-W014's *old* 3-argument signature (no ctx) without a git conflict marker (wholly-new hunk, nothing to conflict with) — caught by tsc, not by the merge itself. Fixing that then surfaced a genuine type mismatch: findCheaperSameTierOption only ever has ExtensionContext (it's invoked from the model_select hook, not a command handler), so it cannot pass ctx into a parameter typed ExtensionCommandContext — relaxed readGithubCopilotModelsJsonCost/buildUserOverrideEconomics/resolveEconomicsForModel's ctx parameter to ExtensionContext (they only touch ctx.modelRegistry, unchanged on the narrower type, so every existing caller stays valid). Full-suite verification after the rebase then surfaced two PRE-EXISTING test-fixture bugs, confirmed present even on the original pre-rebase commit da4f2b44 (checked out from recovery/w017-pre-rebase5-20260824 for comparison): (1) copilot-models-handler.test.ts's two cheaper-same-tier tests set Model<Api>.cost in $-per-1K units instead of the actual $-per-1M convention (tokenPricesFromCost divides by 1000), so they were silently relying on the bare-ID BUNDLED_COST_TABLE implicit fallback instead of the fixture's own intended cost, and broke once GSD-W014's disableImplicitFallback: true was inherited; (2) copilot-catalog-notifications.test.ts's createFakeCtx never supplied any cost data at all, so 5 of its 10 tests were failing (via early-return false, no exception) even before this rebase. Both fixed with correctly-scaled explicit cost fixtures.",
+			"validation": "git range-diff confirmed the single W017 commit content-identical across the fourth rebase (old-base 995518351238ddaf1b3d9273b51481b41ea74029..recovery-ref vs new-base 886c4b41c3db3cb244de4ea6215c9f0771230b1d..HEAD). git merge-base origin/feat/copilot-catalog-session-refresh HEAD equals 886c4b41c3db3cb244de4ea6215c9f0771230b1d (0 behind, 1 ahead). pnpm run typecheck:extensions passed cleanly. GSD-W014 and GSD-W018's own fourth-rebase full-gates both confirmed green (runs 32663412416 and 32666347203 respectively); the fresh exact-SHA remote full-gate for da4f2b4422530d8cca69c7b4d4e33937810b3197 (run 32670073187) came back fully GREEN: verify-pr (literal) success, verify-merge (literal) success. This is the submission-grade exact-SHA evidence for the current head. All three branches (GSD-W014, GSD-W018, GSD-W017) are now confirmed green on their final fourth-rebase SHAs. A live ancestry check afterward found upstream/main had advanced a FIFTH time (c84f72b7 -> fdc4c943a30569173bf5a51315b8bc372ee520e9, 5 commits, zero overlap with any Copilot-catalog file). Given explicit user direction to stop the rebase-chase cycle and finish, a fifth full rebase cascade was deliberately NOT performed -- a PR sitting a small number of commits behind main at open time is normal practice and gets reconciled at review/merge time, not before. 2026-08-24 rebase + fix commit 2a936c03: tsc --noEmit --project tsconfig.extensions.json clean. Full run of the 9 affected test files after all fixes: 269/269 passing (copilot-catalog-notifications, copilot-models-handler, model-cost-table, copilot-catalog-session-refresh, provider-equality-allowlist, oauth-api-model-routing, copilot-overlay-writer, model-router, copilot-model-catalog). Confirmed the 2 test-fixture bugs pre-dated this rebase by temporarily checking out the pre-rebase files from recovery/w017-pre-rebase5-20260824 and reproducing the same 6 failures. No fresh remote full-gate dispatched, per explicit user direction.",
+			"nextAction": "Merged upstream in v1.17.0 (commit 31fab790). Work complete.",
+			"localExtensionPatchRef": "copilot-catalog-patch"
+		},
+		{
+			"id": "GSD-W018",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Session-start GitHub Copilot catalog refresh and runtime model activation",
+			"status": "merged",
+			"issues": [],
+			"pullRequests": [1979],
+			"relatedRefs": [
+				"depends-on:GSD-W014",
+				"superseded:base:9c84c780a13f0a1ac1036600601a8a3dbdd33002",
+				"superseded:sha:886c4b41c3db3cb244de4ea6215c9f0771230b1d",
+				"superseded:remote:run:32666347203",
+				"superseded:recovery:recovery/w018-pre-rebase4-20260823",
+				"superseded:base:4339e623c048f0289b717a38f9b01fa916358f44",
+				"superseded:sha:995518351238ddaf1b3d9273b51481b41ea74029",
+				"superseded:remote:run:32657264306",
+				"superseded:recovery:recovery/w018-pre-rebase3-20260823",
+				"superseded:base:fa4672fc4dd2609a35b232d7d47b5f63f35e173d",
+				"superseded:sha:d7acc03486b2a549b69d9bb35206b34988ff5ce0",
+				"superseded:remote:run:32650707615",
+				"superseded:older-generations:rebase1-and-rebase2-evidence-condensed-see-context",
+				"base:c6e108ea7878d7ae25c11f54f28fc93d8035e332",
+				"sha:91787bcd07d439adb46a597953d82c403c4840b1",
+				"recovery:recovery/w018-pre-rebase5-20260824",
+				"superseded:base:7053d35ae091c586f50a271422fdd1497c75d697",
+				"superseded:sha:3e7241fd6b4e4b6ec51b6479a95816ab3b20855f",
+				"recovery:recovery/w018-pre-rebase6-20260828",
+				"sha:9e60b9c9b58c8a88eca481b0c9f68e935547d927"
+			],
+			"branches": ["feat/copilot-catalog-session-refresh"],
+			"commits": [
+				"886c4b41c3db3cb244de4ea6215c9f0771230b1d",
+				"91787bcd07d439adb46a597953d82c403c4840b1",
+				"9e60b9c9b58c8a88eca481b0c9f68e935547d927"
+			],
+			"context": "Separate follow-up feature branch stacked on the W014 tip (W014 is not yet merged upstream). Adds an opt-in automatic refresh of the GitHub Copilot live model catalog at GSD session start, gated by a new copilot_catalog preference block (refresh_on_session_start: off|if_stale|always, default off; notify_on_changes default true; stale_after_ms default 6h). The coordinator reuses W014's existing fetch/last-known-good pipeline rather than duplicating it, is fire-and-forget only (never blocks ordinary startup), deduplicates concurrent triggers per basePath, applies a bounded timeout, and never triggers or waits on an OAuth/login flow. Also implements 3-tier runtime model classification (trusted / manual-only / quarantined) directly from the live CopilotModelRecord's availability/execution/billing/conflicts fields, without fabricating capability or pricing data. Wired into the session_start extension hook only. upstream/main advanced a FOURTH time (60f6919 -> c84f72b79f0bad21002be8d0988a912056e204a6), so W014 was rebased a fourth time and this branch was rebased onto the new W014 tip via `git rebase --onto`; git range-diff confirmed both feature commits content-identical again. 2026-08-24 fifth rebase onto GSD-W014's updated tip c6e108ea (cosmetic lint-cleanup commit, no functional changes) — clean rebase, zero conflicts. While rebased, fixed copilot-catalog-session-refresh.ts's own instance of the cross-provider price-bleed bug already fixed for copilot-models.ts on PR #1978 (independent codex review, round 1): classifyRemoteCopilotModel's resolveModelEconomics call passed an explicit fallbackEconomics object with no tokenPrices, so resolveModelEconomics still merged in its own bare-model-ID implicit bundled-fallback lookup for the missing field, meaning a same-named model priced by a different provider could silently be reported as this Copilot model's known price. Added disableImplicitFallback: true (the same opt-in flag added to model-cost-table.ts during GSD-W014's codex round 1) to close it.",
+			"validation": "A rebase mistake was made and immediately caught with zero downstream impact: the first --onto attempt used W018's own prior SHA as the oldbase argument instead of W014's prior tip, which produced an empty replay range and silently fast-forwarded to the new base, dropping W018's own 2 commits from the branch tip. Caught instantly via the standard post-rebase check `git rev-list --left-right --count <newbase>...HEAD` returning `0 0` instead of the expected `0 2` (documented in repo memory as a new gotcha). Fixed via `git reset --hard` to the just-created recovery ref, then redone with the correct oldbase (W014's actual prior tip, 4339e623c048f0289b717a38f9b01fa916358f44). Nothing was lost (recovery ref) and nothing bad was pushed (caught before the push step). After the fix: git range-diff confirmed both W018 commits content-identical across the fourth rebase; git merge-base origin/feat/github-copilot-model-catalog-sync HEAD equals 9c84c780a13f0a1ac1036600601a8a3dbdd33002 (0 behind, 2 ahead); pnpm run typecheck:extensions passed cleanly. GSD-W014's own fourth-rebase full-gate is pending; W018's own exact-SHA full-gate is not yet dispatched, per the required W014->W018->W017 order. 2026-08-24 rebase + fix commit 91787bcd: tsc --noEmit clean; full run of copilot-catalog-session-refresh.test.ts (25/25 passing, including the pre-existing 'pricing is unknown and tier/profile are unknown too' coverage). No new regression test added and no fresh remote full-gate dispatched, per explicit user direction that this fix mirrors an already-tested, already-verified pattern from PR #1978 and does not need the same verification depth.",
+			"nextAction": "Merged upstream in v1.17.0 (commit 40553f41). Work complete.",
+			"localExtensionPatchRef": "copilot-catalog-patch"
+		},
+		{
+			"id": "GSD-W020",
+			"type": "docs",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Repo-wide markdownlint config: disable MD013/MD060, track remaining cleanup",
+			"status": "merged",
+			"issues": [1992],
+			"pullRequests": [1991],
+			"relatedRefs": [
+				"sha:f3fd49050cb644d5b825e9a8d9d847fed1d74a3b",
+				"base:upstream/main:e28218e4"
+			],
+			"branches": ["docs/markdownlint-config"],
+			"commits": ["f3fd49050cb644d5b825e9a8d9d847fed1d74a3b"],
+			"context": "A repo-wide markdownlint-cli2 scan (git ls-files '*.md' passed as an explicit file list, not a glob, to avoid ENAMETOOLONG from deeply nested pnpm node_modules symlinks) found 29,678 issues across 919 of 1145 tracked markdown files. MD013 (line-length, 17,309 violations) and MD060 (table-column-style, 5,916 violations) together account for 78% of the total and were never actually enforced as project conventions (verified: neither rule has any pre-existing inline markdownlint-disable comment anywhere in a clean upstream/main checkout, correcting an earlier assumption that CONTRIBUTING.md already disabled these -- that pattern only existed in this fork-local work-register.md, not upstream). Added a root .markdownlint-cli2.jsonc disabling both rules repo-wide; zero content changes. New worktree created off current upstream/main (e28218e4) after an initial git worktree add path mistake (relative destination resolved against -C fork instead of caller cwd) was caught and corrected.",
+			"validation": "Scan before: 29678 issues in 919 files. Scan after adding the config (same file list, config auto-discovered by markdownlint-cli2): 6472 issues in 649 files -- confirms the 78% reduction empirically, not just estimated. JSONC syntax independently verified via a comment-stripped JSON.parse in addition to markdownlint-cli2 itself successfully parsing and applying it. Full pnpm install for a local verify:fast attempt failed (ENOTDIR: a symlinked node_modules from a sibling worktree conflicted with pnpm's own install step) and was not worth resolving given the change is a single non-executable config file touching no src/packages/scripts paths that ci-classify-changes.sh's heavy-gate patterns key on.",
+			"nextAction": "Merged into open-gsd/gsd-pi:main on 2026-08-28. Work complete."
+		},
+		{
+			"id": "GSD-W021",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Repair evidence-backed lifecycle shadow authority before Milestone validation",
+			"status": "pr-open",
+			"issues": [2055],
+			"pullRequests": [2002],
+			"relatedRefs": [
+				"sha:cf873bf9ff0da4768c1b3027efdd9443ecb2f9d7",
+				"base:upstream/main:e28218e41706b724e7bcc044d210210b04850009"
+			],
+			"branches": ["fix/lifecycle-shadow-authority-repair"],
+			"commits": [
+				"bb75b2f964a4574cf5fb3ec936298b29f2b6af4c",
+				"e7cb339e",
+				"4061bc41",
+				"4fff9598",
+				"0713f16c",
+				"cf873bf9"
+			],
+			"context": "Adopted Milestones could contain legacy-complete Tasks or Slices with durable completion evidence but no workflow_item_lifecycles authority, causing strict closeout validation to fail with missing canonical lifecycle authority. The fix adds a narrow evidence-gated forward repair before validation, preserving strict Milestone completion guards. Post-review found two additional stop-ship gaps in the original bb75b2f9 patch: (1) taskCompletionFacts() accepted any non-empty verification_result instead of requiring an exact passed verdict; (2) repairMilestoneLifecycleShadowsForward() committed each repairable descendant as its own separate Domain Operation while iterating, so a later unresolved sibling did not roll back earlier already-committed repairs.",
+			"validation": "All review findings from PR #2002 addressed in commits 0713f16c and cf873bf9: (1) Milestone state guard added to repairMilestoneLifecycleShadowsForward to refuse repair when canonical status is completed, pending, or cancelled; (2) deterministic per-category batch keys with content digest hashes added to executeMilestoneSingleStepRepairBatch to allow idempotency convergence across partial multi-batch retries; (3) Task repairs partitioned and committed before Slice repairs; (4) schema test fixtures updated to match exact SQLite table columns (workflow_item_lifecycles). All 32 focused tests in lifecycle-shadow-forward-repair.test.ts and milestone-validation-domain-operation.test.ts pass locally (100%). tsc --noEmit --project tsconfig.extensions.json clean. Commit cf873bf9 pushed to origin/fix/lifecycle-shadow-authority-repair.",
+			"nextAction": "Review finding addressed (exact passed token + unified single-step batch). Pushed commit 647c4a07. Linked issue #2055. Awaiting maintainer review."
+		},
+		{
+			"id": "GSD-W022",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Agent-core resolved tool result isError flag dropped in the agent loop",
+			"status": "pr-open",
+			"issues": [2015],
+			"pullRequests": [2016],
+			"relatedRefs": [],
+			"branches": [
+				"fix/agent-core-tool-result-iserror",
+				"fix/w022-local-patch"
+			],
+			"commits": ["fd9946ca", "5bfcc551"],
+			"context": "A normally resolved tool result carrying isError: true is re-wrapped by the agent loop as isError: false, silently discarding a caller's error signal. The native MCP adapter already preserves the MCP error flag and the external Claude adapter already preserves externalResult.isError; the loss is in the shared pi-agent-core execution path. Because AgentToolResult currently documents throw-on-failure and does not declare isError, preserving the field in core would add a public error-signaling contract.",
+			"validation": "Fix implemented and pushed to PR #2016 (commit 5bfcc551): AgentToolResult gains optional isError?: boolean field, normalizeAgentToolResult preserves isError, and raceToolExecutionAgainstAbort preserves result.isError. All 29 tests in agent-loop.test.ts pass (100%). Fresh CI run 32976709169 dispatched on GitHub. Installed local community extension patch w022-iserror-patch at ~/.gsd/agent/extensions/w022-iserror-patch using public tool_result hook to preserve isError for live local use in Edelman Studio without waiting for upstream PR merge.",
+			"nextAction": "RFC issue #2015 and Draft PR #2016 updated with commit 5bfcc551. Fresh CI running on GitHub. Local patch w022-iserror-patch is active in ~/.gsd/agent/extensions/ for local workflow execution in Edelman Studio.",
+			"localExtensionPatchRef": "w022-iserror-patch"
+		},
+		{
+			"id": "GSD-W023",
+			"type": "chore",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Recovery runtime patch tracking (orphan guard, upstream PR #1946)",
+			"status": "complete",
+			"issues": [],
+			"pullRequests": [1946],
+			"relatedRefs": [],
+			"branches": ["track/recovery-runtime-patch-1946"],
+			"commits": [],
+			"context": "The recovery orphan guard fix (resumeAuthorized) is active in installed/managed runtime locally, reported merged upstream as PR #1946. Needs confirmation of the actual release status before planning a normal upgrade vs. an interim local patch.",
+			"validation": "Upstream PR #1946 is merged and explicitly included in release v1.16.2, published 2026-08-25. The local global CLI was upgraded from 1.16.1 to 1.16.2 and verified with npm's global package listing and a fresh `gsd --version` process. No independent W023 runtime patch remains. The unrelated copilot-catalog-patch remains active because PRs #1978/#1979/#1980 are not all merged and released.",
+			"nextAction": "None for W023. Keep the independent copilot-catalog-patch until PRs #1978, #1979, and #1980 have all merged and shipped in a release; then reassess that patch separately."
+		},
+		{
+			"id": "GSD-W024",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "UAT issue #1993 follow-up (schema-error run poisoning / stale abort)",
+			"status": "pr-open",
+			"issues": [1993],
+			"pullRequests": [2017],
+			"relatedRefs": [],
+			"branches": ["fix/uat-1993-schema-error-poisoning"],
+			"commits": ["d351e4bc"],
+			"context": "A schema-invalid gsd_uat_exec could poison a run by recording a durable harnessAbort, causing later gsd_uat_result_save calls to be rejected and sending the unit into a finalize-retry wedge. The fix separates model-fixable schema validation from genuine harness truncation and heals only stale same-run tool-error aborts after successful gsd_exec/gsd_uat_exec. Existing workflow tool-surface preflight and finalize rerun mechanisms remain unchanged.",
+			"validation": "Issue #1993 was reproduced in the owning register-hooks path. Commit d351e4bc adds the narrow predicate, locked runtime clear operation, and execution-based regressions. Focused W024 suites pass 110/110, covering schema-invalid gsd_uat_exec, stale tool-error healing, timeout preservation, loop-guard preservation, UAT save rejection, and workflow tool-surface readiness. git diff --check passed. Upstream Draft PR #2017 is open; issue #1993 is labeled needs-maintainer-review and large-scope.",
+			"nextAction": "Await maintainer review/approval on Draft PR #2017. Keep it Draft until the broader issue scope and the retained truncation/retry invariants are accepted; then run the required broader verification and mark ready."
+		},
+		{
+			"id": "GSD-W025",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "Verify issue #1994 follow-up (multilingual verify-command fixture matrix)",
+			"status": "closed-unmerged",
+			"issues": [1994],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": ["fix/verify-1994-multilingual-fixtures"],
+			"commits": [],
+			"context": "Verify-command extraction needs a fixture matrix covering Dutch, Italian, and non-Latin-script text; only positive, executed-command evidence should count. Local branch created from upstream/main (327343af); no code written yet.",
+			"validation": "Not started.",
+			"nextAction": "Out of scope for this fork — external issue #1994; won't implement."
+		},
+		{
+			"id": "GSD-W026",
+			"type": "feat",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "UAT contract: canonical nonAutomatable flag and pure preflight",
+			"status": "closed-unmerged",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": ["feat/uat-contract-non-automatable"],
+			"commits": [],
+			"context": "Needs a canonical nonAutomatable?: boolean field, a pure preflight step validated against real prompt examples, and must never leak a raw schema error to the caller. Local branch created from upstream/main (327343af); no code written yet.",
+			"validation": "Not started.",
+			"nextAction": "Out of scope — speculative idea; won't implement."
+		},
+		{
+			"id": "GSD-W027",
+			"type": "fix",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "Mixed milestone validation/schema: class-pass under aggregate needs-attention",
+			"status": "closed-unmerged",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": ["fix/mixed-milestone-validation-schema"],
+			"commits": [],
+			"context": "A passing class must be able to retain its evidence even when the aggregate verdict is needs-attention; needs the next free migration number, a shared preflight/trigger matrix, schema fingerprinting, and idempotent repair. Requires its own architecture approval, separate from GSD-W021's atomicity change. Local branch created from upstream/main (327343af); no code written yet.",
+			"validation": "Not started.",
+			"nextAction": "Out of scope — speculative idea; won't implement."
+		},
+		{
+			"id": "GSD-W028",
+			"type": "docs",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Stale local path cleanup in docs and settings",
+			"status": "complete",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [],
+			"branches": ["docs/stale-local-paths-cleanup"],
+			"commits": [],
+			"context": "~/.gsd/agent/settings.json and related local docs still reference the retired /Users/pimmink/Klanten/gsd-pi-fork path; the durable fork now lives at /Users/pimmink/Klanten/gsd-pi-pimmink/fork. Fork-local only; must not leak user-specific absolute paths into upstream docs.",
+			"validation": "Updated the active ~/.gsd/agent/settings.json package override from the retired /Users/pimmink/Klanten/gsd-pi-fork path to /Users/pimmink/Klanten/gsd-pi-pimmink/fork. JSON parsing passed, no stale path remains in active settings, and a fresh gsd --help process from the current fork exited successfully on v1.16.2. Historical session and subagent logs were intentionally left unchanged.",
+			"nextAction": "None; active local package discovery now uses the current fork path."
+		},
+		{
+			"id": "GSD-W029",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Truthful GitHub Copilot catalog normalization and bounded diagnostics",
+			"status": "complete",
+			"issues": [2088],
+			"pullRequests": [2092],
+			"relatedRefs": ["GSD-W014", "GSD-W017", "GSD-W018"],
+			"branches": ["fix/copilot-catalog-truthful-normalization"],
+			"commits": [
+				"c2b0222fc82f26a612f0ac3bee62a71eefebfc1b",
+				"d6aa1f9fd8c68e12b45b9fba1669c1977d98d82b",
+				"339d4320c7f568d560470a6f75778ef6aaaabd74",
+				"bafbdfb842f04e13a525ea69ad3f959722483fa2"
+			],
+			"context": "Post-merge regression correction for GitHub Copilot catalog normalization: keep provider facts, catalog role, picker visibility, manual selectability, and GSD routing status orthogonal; reject literal command placeholders; preserve unknown metadata; bound diagnostics; preserve provider-live/static transport conflicts; and require authoritative input modality before overlay synthesis. Tracked by upstream issue #2088 and upstream PR #2092.",
+			"validation": "2026-09-02: branch rebased onto current upstream/main and pushed to origin/fix/copilot-catalog-truthful-normalization at bafbdfb8 (0 behind / 4 ahead before push). Focused catalog/handler/overlay suites passed 95/95 via `pnpm exec tsx --test src/resources/extensions/gsd/tests/copilot-overlay-writer.test.ts src/resources/extensions/gsd/tests/copilot-model-catalog.test.ts src/resources/extensions/gsd/tests/copilot-models-handler.test.ts`; `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2092 were resolved. Previous upstream build failure was traced to overlay-writer fixtures missing explicit input modality after the stricter completeness gate; commit bafbdfb8 fixes those fixtures. Fresh upstream CI is running at evidence time.",
+			"nextAction": "Wait for upstream CI on PR #2092 and maintainer review."
+		},
+		{
+			"id": "GSD-W030",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Account-scoped GitHub Copilot runtime catalog activation",
+			"status": "blocked",
+			"issues": [2088],
+			"pullRequests": [],
+			"relatedRefs": ["GSD-W029", "GSD-W018"],
+			"branches": ["fix/copilot-runtime-catalog-activation"],
+			"commits": [],
+			"context": "Dependent post-merge correction for session-refresh classifications that do not consistently become account-scoped runtime registry and picker entries. Must preserve account isolation and sanitized last-known-good state without mutating static or user catalogs. Tracked by upstream issue #2088.",
+			"validation": "Inspection on 2026-08-30 confirmed session refresh classifications and its bounded join are not consumed by the ModelRegistry or picker. The only registry extension seam replaces all provider models and requires concrete Model cost/capability fields, so it cannot safely represent account-scoped Class B records with unknown economics without fabricating data.",
+			"nextAction": "Use docs/adr/w030-account-scoped-copilot-runtime-catalog-rfc-draft.md to open a focused RFC issue and obtain maintainer approval before implementing registry-to-picker activation without static overlay or models.json mutation."
+		},
+		{
+			"id": "GSD-W031",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Safe account-scoped GitHub Copilot model suggestions",
+			"status": "complete",
+			"issues": [2088],
+			"pullRequests": [2093],
+			"relatedRefs": ["GSD-W030", "GSD-W017"],
+			"branches": ["fix/copilot-suggestion-safety"],
+			"commits": [
+				"a5dc72be33513bbdb3057c509065e0c91d65c14d",
+				"39afc0b369971d455fae0a38a0c4431384dd037d",
+				"5e5cdadb04123e53ce28d99b3da5ff8fa7ce40f6",
+				"00f9ee0fdad9d97d12bb88e42bc123c5f465fe11"
+			],
+			"context": "Dependent post-merge correction for cheaper-model suggestions: require deterministic capability dominance, comparable economics, inherited profile resolution through the router profile resolver, tri-state tool-call diagnostics, and no automatic model switching. Selection-origin/core runtime activation work remains out of scope after RFC #2091 was closed as wontfix. Tracked by upstream issue #2088 and upstream PR #2093.",
+			"validation": "2026-09-02: branch rebased onto current upstream/main and force-with-lease pushed to origin/fix/copilot-suggestion-safety at 00f9ee0f (0 behind / 5 ahead before push). Focused notification/handler/router suites passed 204/204 via `pnpm exec tsx --test src/resources/extensions/gsd/tests/copilot-catalog-notifications.test.ts src/resources/extensions/gsd/tests/copilot-models-handler.test.ts src/resources/extensions/gsd/tests/model-router.test.ts`; `pnpm exec tsc --noEmit --project tsconfig.extensions.json` and `git diff --check` passed. Copilot review threads on PR #2093 were resolved. Upstream Socket checks were green; GitHub Actions fast-gates/workflow-lint were queued at evidence time.",
+			"nextAction": "Wait for upstream CI on PR #2093 and maintainer review."
+		},
+		{
+			"id": "GSD-W032",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Route bundled Copilot Kimi, Gemini 3.x, Grok 4.6, MAI Flash Picker, and GPT-5.4 Nano models",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": ["GSD-W029", "GSD-W031"],
+			"branches": ["fix/copilot-router-model-coverage"],
+			"commits": ["85dd3513f35eb418a57db8448949291b6bc7da76"],
+			"context": "Follow-up for the still-outdated model-router tables after the published Copilot catalog already includes these models. Adds router tier, cost, and capability-profile coverage for bundled GitHub Copilot IDs that were still unknown to dynamic routing: gemini-3.1-pro-preview, gemini-3.5-flash, gemini-3.6-flash, gemini-3.7-flash, gpt-5.4-nano, grok-4.6, kimi-k2.7-code, kimi-k3, and mai-code-1-flash-picker. Also adds a generated-catalog assertion that Copilot Kimi models use the existing GitHub Copilot OpenAI-compatible transport with Copilot headers, rather than requiring a separate Kimi provider path.",
+			"validation": "2026-09-02: branch created from current upstream/main and pushed to origin/fix/copilot-router-model-coverage at 85dd3513. Local router completeness scan found no bundled GitHub Copilot chat models missing tier/profile coverage after the patch. `pnpm --filter @gsd/pi-ai exec vitest run test/generated-models.test.ts test/openai-completions-tool-choice.test.ts test/tool-call-without-result.test.ts` passed 40/40 with 26 env-gated live tests skipped. `pnpm exec tsx --test src/resources/extensions/gsd/tests/model-router.test.ts` passed 130/130. `pnpm exec tsc --noEmit --project tsconfig.extensions.json` passed after building required workspace dist packages. `pnpm run verify:fast` passed 250/250 and strict audits. Sharded remote verification dispatched in pimmink/gsd-pi-ci as run 33656066924 for exact SHA 85dd3513f35eb418a57db8448949291b6bc7da76; run was in build job at evidence time.",
+			"nextAction": "Wait for remote sharded CI run 33656066924. If green, open an upstream PR with Kimi/Gemini/Grok/MAI/GPT-5.4 Nano in the title, then create/link the matching issue if upstream maintainers still require it for this bugfix."
+		}
+	],
+	"localExtensionPatches": [
+		{
+			"extensionId": "copilot-catalog-patch",
+			"path": "~/.gsd/agent/extensions/copilot-catalog-patch",
+			"scope": "global",
+			"installedAt": "2026-08-24",
+			"relatedWorkItems": ["GSD-W014", "GSD-W017", "GSD-W018"],
+			"reimplementation": true,
+			"reimplementationNote": "Independent, scoped-down reimplementation for personal use, not a copy of the PR diffs. Community extensions cannot modify gsd's own core files that these PRs touch (model-router.ts, preferences-types.ts, bootstrap/register-hooks.ts), so this only adds new commands/hooks via the public ExtensionAPI. Provides read-only catalog viewing (/copilot-catalog [all|pricing|why]) plus a best-effort, at-most-hourly session-start new/removed-model notification. Deliberately omits automatic model registration into gsd's provider config and automatic cheaper-model-switch notifications tied to gsd's internal before_model_select task-classification/routing system -- both were judged too risky to reimplement without the real PRs' tested logic. Verified working end-to-end 2026-08-24 from the Edelman_Studio project: session_start hook fetched the live Copilot catalog (56 models) and wrote it to ~/.gsd/agent/extensions/copilot-catalog-patch/.catalog-cache.json. 2026-08-24 re-sync check: reviewed every commit added to the 3 branches since the previous recorded heads (9c84c780/886c4b41/da4f2b44), including the GitHub-Copilot-automated-review fixes, 2 codex review rounds, the account-isolation fix, the cross-provider price-bleed fix (disableImplicitFallback), and the lint-cleanup commit. None apply to this extension: index.ts always fetches the live /models catalog fresh on every command invocation (no cached last-known-good snapshot, no per-account session state, no BUNDLED_COST_TABLE bare-ID lookup, no models.json cost-override resolution) -- the entire bug class this session fixed (stale/cross-provider/wrong-account data reuse) does not exist in this simpler, always-live-fetch design. No index.ts change made. 2026-08-24 re-sync check #2: reviewed the 7 new GitHub-Copilot-review-driven fixes in commit 7595ba0a (missing Copilot client-identity headers on /models, input_cost_per_token/output_cost_per_token pricing parsing, account-key stable-source fingerprinting, deferred snapshot commit, transition-keyed notification dedup, routing-eligibility/caveats split, cross-provider cost threading, rejection-reason comparator mirroring). None apply: index.ts already sends the same Copilot client-identity headers (COPILOT_HEADERS, unchanged since this extension was written), never computes cost-table pricing at all (pricing mode just sorts by the raw API multiplier field), has no per-account session state or account-key fingerprinting (loadCatalog() always fetches fresh), and its session_start cache-diff (comparing only against the single most recent .catalog-cache.json, not a permanent ever-growing set) is structurally immune to the notification-dedup bug since a re-added model naturally re-diffs as added again. No index.ts change needed. 2026-08-24 re-sync check #3: reviewed commit 4b5be82f (fixes 2 regressions a follow-up codex review found in 7595ba0a's own account-key and notification-dedup fixes: unstored-credential account keys now also fold in modelRegistry.modelsJsonPath to distinguish projects sharing a process, and notification dedup now compares against only the immediately-preceding shown content instead of a permanent transition-hash set). Neither applies: index.ts has no account-key concept at all (loadCatalog() always fetches fresh, no per-account fingerprinting to collide across projects), and its session_start cache-diff already only compares against the single most recent .catalog-cache.json, never a permanent set, so the transition-hash-collision/register-suppression bug class doesn't exist here either. No index.ts change needed. 2026-08-24 bug found+fixed (unrelated to upstream PR sync, in this extension's own code): getArgumentCompletions returned raw strings (['all','pricing','why']) instead of {value,label} objects; gsd-pi's SelectList.getDisplayValue() does item.label || item.value, which is undefined on a bare string, and the resulting undefined gets passed to visibleWidth() during the very first render of the suggestion popup -- crashed the TUI (dropped to a raw shell with leaked escape-sequence garbage) every time a user typed \"/copilot-catalog \" (trailing space) to see subcommand suggestions. Reproduced live in Edelman_Studio 2026-08-24. Fixed by returning properly-shaped {value, label, description} objects filtered by the typed prefix, matching the real PR's filterOptions()/getGsdArgumentCompletions() convention (src/resources/extensions/gsd/commands/catalog.ts). Bumped extension-manifest.json version 0.2.0 -> 0.2.1. Verified: `node --experimental-strip-types --check index.ts` passes; awaiting live re-test in Edelman_Studio. 2026-08-28 re-sync check #4: reviewed all commits added across the 3 branches since the previous recorded heads (4b5be82f/3f8a3583/0d416566), which rebased GSD-W014/W018/W017 onto upstream PR #2035 (dotted-aware canonicalModelId normalization in model-router.ts) and fixed several MODEL_CAPABILITY_TIER/MODEL_CAPABILITY_PROFILES lookups across model-router.ts, copilot-models.ts, copilot-catalog-notifications.ts, and copilot-catalog-session-refresh.ts that were still keyed on raw dotted bare IDs. None apply to this extension: index.ts never imports model-router.ts or any capability-tier/cost registry at all -- it only fetches the live /models catalog and lists/sorts by the raw API id and billing.multiplier field, so the entire dotted-ID canonicalization bug class does not exist here. No index.ts change needed. Re-verified `node --experimental-strip-types --check index.ts` passes.",
+			"knownIssue": "On gsd-pi <=1.16.0, this directory-based global extension was silently destroyed on EVERY gsd session start: pruneRemovedBundledExtensions() in src/resource-loader.ts runs a 'sweep' step that rmSync()s (recursive, force) any subdirectory under ~/.gsd/agent/extensions/ whose name isn't part of gsd's own currently-bundled extension set, with no exclusion for community-tier manifests. Reproduced 2026-08-24 with a trivial, harmless test extension (no filesystem code of its own) -- gsd itself deleted the whole directory after one `gsd --print` session, silently (all wrapped in try/catch, no stderr). `gsd --version` alone did not trigger it (exits before initResources()); any full session-starting invocation did. Temporarily worked around via project-local .gsd/extensions/<name>.js (ecosystem/loader.ts has no prune/sweep logic), installed only in Edelman_Studio. CONFIRMED FIXED in 1.16.1 (upgraded global install from 1.16.0 -> 1.16.1 on 2026-08-24 via `npm install -g @opengsd/gsd-pi@latest`; re-tested the exact same reproduction with a fresh dummy extension and it survived a full gsd --print session). Reverted to the documented global location as the sole install afterward and removed the project-local workaround. requires.platform is now set to >=1.16.1 so this manifest self-documents the minimum safe version. Still plausibly worth an upstream bug report so gsd-pi's own manifest-spec.md / building-extensions.md Quick Start docs (or the sweep logic itself, for anyone still on <=1.16.0) reflect this -- NOT filed, needs explicit authorization first per contributor governance.",
+			"branchHeadsAtLastSync": {
+				"feat/github-copilot-model-catalog-sync": "7053d35a",
+				"feat/copilot-catalog-session-refresh": "9e60b9c9",
+				"feat/copilot-cheaper-model-suggestions": "8d4a1e1d"
+			},
+			"syncPolicy": "Whenever feat/github-copilot-model-catalog-sync, feat/copilot-catalog-session-refresh, or feat/copilot-cheaper-model-suggestions receive new commits (rebase, review fixes, anything), diff the new HEAD against the recorded value here and decide whether ~/.gsd/agent/extensions/copilot-catalog-patch/index.ts needs a matching behavior update. Update the recorded SHA here after each review, even when no code change was needed, so this never silently goes stale.",
+			"retireWhen": "Uninstall (rm -rf ~/.gsd/agent/extensions/copilot-catalog-patch) once PR #1978, #1979, and #1980 have all merged and shipped in a released @opengsd/gsd-pi version.",
+			"status": "active",
+			"retiredAt": "2026-08-29",
+			"retiredReason": "Retired and deleted upon release of @opengsd/gsd-pi@1.17.0; all three underlying PRs (#1978, #1979, #1980) are merged upstream and natively included in GSD core."
+		}
+	]
 }
