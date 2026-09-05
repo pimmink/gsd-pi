@@ -84,6 +84,25 @@ for (const item of register.items) {
 		);
 	}
 
+	if (item.planRefs !== undefined) {
+		assert.ok(
+			Array.isArray(item.planRefs),
+			`${item.id}: planRefs must be an array`,
+		);
+		assert.equal(
+			new Set(item.planRefs).size,
+			item.planRefs.length,
+			`${item.id}: duplicate planRefs reference`,
+		);
+		for (const planRef of item.planRefs) {
+			assert.match(
+				planRef,
+				/^PLAN-[A-Z0-9-]+$/,
+				`${item.id}: invalid plan reference ${planRef}`,
+			);
+		}
+	}
+
 	for (const field of ["title", "context", "validation", "nextAction"]) {
 		assert.ok(
 			typeof item[field] === "string" && item[field].trim(),

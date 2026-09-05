@@ -72,6 +72,12 @@
 						"uniqueItems": true,
 						"items": { "type": "string", "minLength": 1 }
 					},
+					"planRefs": {
+						"type": "array",
+						"uniqueItems": true,
+						"description": "Stable identifiers of local planning artifacts. These are memory and traceability references, not authoritative status or evidence.",
+						"items": { "type": "string", "pattern": "^PLAN-[A-Z0-9-]+$" }
+					},
 					"branches": {
 						"type": "array",
 						"uniqueItems": true,
