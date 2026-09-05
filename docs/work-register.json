@@ -594,7 +594,7 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Repair evidence-backed lifecycle shadow authority before Milestone validation",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [
 				2055
 			],
@@ -614,11 +614,12 @@
 				"4061bc41",
 				"4fff9598",
 				"0713f16c",
-				"cf873bf9"
+				"cf873bf9",
+				"647c4a07"
 			],
 			"context": "Adopted Milestones could contain legacy-complete Tasks or Slices with durable completion evidence but no workflow_item_lifecycles authority, causing strict closeout validation to fail with missing canonical lifecycle authority. The fix adds a narrow evidence-gated forward repair before validation, preserving strict Milestone completion guards. Post-review found two additional stop-ship gaps in the original bb75b2f9 patch: (1) taskCompletionFacts() accepted any non-empty verification_result instead of requiring an exact passed verdict; (2) repairMilestoneLifecycleShadowsForward() committed each repairable descendant as its own separate Domain Operation while iterating, so a later unresolved sibling did not roll back earlier already-committed repairs.",
-			"validation": "All review findings from PR #2002 addressed in commits 0713f16c and cf873bf9: (1) Milestone state guard added to repairMilestoneLifecycleShadowsForward to refuse repair when canonical status is completed, pending, or cancelled; (2) deterministic per-category batch keys with content digest hashes added to executeMilestoneSingleStepRepairBatch to allow idempotency convergence across partial multi-batch retries; (3) Task repairs partitioned and committed before Slice repairs; (4) schema test fixtures updated to match exact SQLite table columns (workflow_item_lifecycles). All 32 focused tests in lifecycle-shadow-forward-repair.test.ts and milestone-validation-domain-operation.test.ts pass locally (100%). tsc --noEmit --project tsconfig.extensions.json clean. Commit cf873bf9 pushed to origin/fix/lifecycle-shadow-authority-repair.",
-			"nextAction": "Review finding addressed in validation commit cf873bf9. Linked issue #2055. Await maintainer review."
+			"validation": "PR #2002 is merged upstream as of 2026-08-29 and closes issue #2055. Review findings were addressed before merge, including exact `passed` evidence, single-step repair batching, Task-before-Slice repair ordering, and schema fixture corrections. Local search found no active lifecycle-shadow-authority worktree to remove; only historical recovery refs remain.",
+			"nextAction": "None; contribution merged upstream and no active worktree remains."
 		},
 		{
 			"id": "GSD-W022",
