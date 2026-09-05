@@ -25,21 +25,21 @@ removing it.
 **2026-08-28**: maintainer `jeremymcs` commented on PR #1978 that it now conflicts with
 [#2035](https://github.com/open-gsd/gsd-pi/pull/2035) (merged upstream), which landed a
 dotted-aware `canonicalModelId` normalization in the model router touching
-`auto-model-selection.ts`. All three branches (GSD-W014, GSD-W018, GSD-W017) have since
-been rebased onto the post-#2035 upstream/main tip, fixed for the same dotted-ID root
-cause in their own files (a `bareModelId()` helper had been silently reintroduced by an
-auto-merge, plus several direct registry lookups across all three branches keyed on raw
-dotted IDs instead of `canonicalizeModelId`), fully re-verified, and force-pushed.
+`auto-model-selection.ts`. The related local branches (GSD-W014, GSD-W018, GSD-W017) were
+rebased onto the post-#2035 upstream/main tip and re-verified during that review cycle, but
+only GSD-W014 ultimately merged; GSD-W017 and GSD-W018 are retained as closed-unmerged
+historical proposals.
 
 **2026-08-30**: opened upstream issue [#2088](https://github.com/open-gsd/gsd-pi/issues/2088)
 for post-merge GitHub Copilot catalog regressions. GSD-W029 through GSD-W031 track the
 dependent normalization, account-scoped runtime activation, and safe-suggestion fixes;
-they preserve GSD-W014, GSD-W017, and GSD-W018 as merged historical work.
+they preserve GSD-W014 as merged historical work and supersede or replace parts of the
+closed-unmerged GSD-W017/GSD-W018 proposals where applicable.
 
 **2026-08-30 merged-worktree cleanup**: removed clean local worktrees and local branch
-refs for merged GSD-W017, GSD-W018, GSD-W019, and GSD-W020 after checking their upstream
-ancestry. GSD-W014 remains because it has an uncommitted user change in
-`docs/zh-CN/user-docs/custom-models.md`; it was not altered.
+refs for completed historical work after checking upstream ancestry. Later v1.18 cleanup
+removed the remaining local Copilot catalog/model-stack worktrees whose PRs were merged,
+closed-unmerged, or superseded.
 
 ## Active work
 
@@ -51,10 +51,7 @@ ancestry. GSD-W014 remains because it has an uncommitted user change in
 | GSD-W022 | Agent-core resolved tool result `isError` dropped in the agent loop | Upstream | PR required | [#2015](https://github.com/open-gsd/gsd-pi/issues/2015) | [#2016](https://github.com/open-gsd/gsd-pi/pull/2016) | `fix/agent-core-tool-result-iserror` | **PR open / Ready for review** — `01332005` pushed to PR #2016 after rebase on `upstream/main`. AgentToolResult gains optional `isError?: boolean` field, `normalizeAgentToolResult` and `raceToolExecutionAgainstAbort` preserve `isError`, and awaited promise is captured once. All 30 tests in `agent-loop.test.ts` pass and `verify:fast` passed. PR title/description updated to fix; review comments addressed | Await maintainer review and merge on PR #2016; local patch active in `~/.gsd/agent/extensions/` for local execution |
 | GSD-W023 | Recovery runtime patch tracking (orphan guard, upstream PR #1946) | Fork-local | No PR planned | — | [#1946](https://github.com/open-gsd/gsd-pi/pull/1946) | `track/recovery-runtime-patch-1946` | **Complete** — PR #1946 is merged and included in release `v1.16.2` (published 2026-08-25); global CLI upgraded from `1.16.1` to `1.16.2` and verified in a fresh process; no independent W023 runtime patch remains. The unrelated Copilot catalog patch was retired upon v1.17.0 release | None for W023 |
 | GSD-W024 | UAT issue #1993 follow-up (schema-error poisoning / stale abort) | Upstream | PR required | [#1993](https://github.com/open-gsd/gsd-pi/issues/1993) | [#2017](https://github.com/open-gsd/gsd-pi/pull/2017) | `fix/uat-1993-schema-error-poisoning` | **PR open / Ready for review** — `73f14476` rebased onto `upstream/main`; register-hooks-loop-guard-auto tests pass 17/17 (including timeout-heal, cross-tool-heal, and atomic turn-abort protection tests); `verify:fast` green. Description updated with explicit Option 1 invariants; atomic `withRecordLock` conditional clear implemented; draft status removed | Await maintainer review and merge on PR #2017 |
-| GSD-W029 | Truthful GitHub Copilot catalog normalization and bounded diagnostics | Upstream | PR required | [#2088](https://github.com/open-gsd/gsd-pi/issues/2088) | [#2092](https://github.com/open-gsd/gsd-pi/pull/2092) | `fix/copilot-catalog-truthful-normalization` | PR open / review-ready — `954fb042` pushed; placeholder completions remain removed, real model-ID completion for `pricing`/`why` is covered, unknown metadata stays unknown, provider-live/static transport conflicts are recorded, and authoritative input modality is required before overlay synthesis. Focused suites 95/95 and 65/65 green; extension typecheck, diff check, and upstream CI run 33659240128 green; Copilot review threads resolved | Await maintainer review on PR #2092 |
 | GSD-W030 | Account-scoped GitHub Copilot runtime catalog activation | Upstream | PR required | [#2088](https://github.com/open-gsd/gsd-pi/issues/2088) | — | `fix/copilot-runtime-catalog-activation` | Blocked — refresh classifications and bounded join are dead relative to the registry/picker; the only registry extension seam requires unsafe provider replacement and fabricated concrete fields | Open the focused RFC from `docs/adr/w030-account-scoped-copilot-runtime-catalog-rfc-draft.md` and obtain approval before implementation |
-| GSD-W031 | Safe account-scoped GitHub Copilot model suggestions | Upstream | PR required | [#2088](https://github.com/open-gsd/gsd-pi/issues/2088) | [#2093](https://github.com/open-gsd/gsd-pi/pull/2093) | `fix/copilot-suggestion-safety` | PR open / review-ready — `00f9ee0f` pushed after rebase to current `upstream/main`; dominance now fails closed on missing/non-finite dimensions, resolves inherited profiles through the router resolver, preserves unknown tool-call diagnostics, and covers the three-model ordering regression. Focused suites 204/204 green; extension typecheck, diff check, and upstream CI run 33650154545 green; Copilot review threads resolved | Await maintainer review on PR #2093 |
-| GSD-W032 | Route bundled Copilot Kimi, Gemini 3.x, Grok 4.6, MAI Flash Picker, and GPT-5.4 Nano models | Upstream | PR required | [#2132](https://github.com/open-gsd/gsd-pi/issues/2132) | [#2133](https://github.com/open-gsd/gsd-pi/pull/2133) | `fix/copilot-router-model-coverage` | PR open — `85dd3513`; router covers remaining bundled Copilot chat IDs missing tier/profile rows, and Copilot Kimi catalog transport is covered. Local pi-ai/router/typecheck/verify:fast checks are green. Sharded remote run 33664264464 is green: aggregate 14759/0/31. Upstream PR CI run 33666763144 is green | Wait for maintainer review on PR #2133 |
 | GSD-W033 | DB-authoritative GSD project progress in the VS Code sidebar | Upstream | PR required | [#2136](https://github.com/open-gsd/gsd-pi/issues/2136) | [#2143](https://github.com/open-gsd/gsd-pi/pull/2143) | `feat/vscode-project-progress` | **PR open / re-review requested** — `69e3d75c` keeps CLI/MCP progress compatibility, moves details to host-only RPC, propagates DB-open errors, bounds/indexes hierarchy, caches 10-second refreshes, and restores open sections. Focused DB/RPC 10/10 and VS Code contracts 14/14 pass; clean-runner `33957899813` green on exact SHA: `14781 passed, 0 failed, 31 skipped`. Five Copilot threads resolved | Await upstream PR CI and maintainer/Copilot re-review; then assess #2150 and #2102 follow-up scope |
 | GSD-W034 | Phase D1 timing evidence and shard strategy decision | Fork-local | No PR planned | — | — | `chore/remote-verify-triage` | **Measurement complete; decision: greedy not approved** — commit `cc6ef4b` adds the harness self-check; comparable runs `33971239244`, `33976665364`, and `33977584296` are green with `14781 passed, 0 failed, 31 skipped`; each validates 1327 timing records with identical manifest, Node, runner, and lockfile provenance. Slowest shard remained approximately 808s, 787s, and 814s; no greedy A/B result proves the required >=10% improvement. | Keep contiguous as default and fallback; reopen only for a separately authorized greedy A/B experiment. |
 
@@ -74,10 +71,13 @@ ancestry. GSD-W014 remains because it has an uncommitted user change in
 | GSD-W010 | Native/MCP canonical read error parity | Upstream | Historical | #1729 | #1734 | Merged in `e728a95714c7fa78cb2f41c91d978a93e6e56a5f` (2026-08-16) |
 | GSD-W011 | MAI Code 1.1 Flash Copilot routing | Upstream | Historical | — | #1758 | Merged upstream; fork main fast-forwarded to `09ae3c22`; retired `fix/mai-cost-table-provider-section` is no longer the MAI branch |
 | GSD-W012 | Pre-fork model routing snapshot | Fork-local | No PR planned | — | — | Superseded recovery branch; extract only proven missing MAI tests |
-| GSD-W014 | GitHub Copilot model-catalog sync (`/gsd copilot-models`) | Upstream | Historical | — | #1978 | Merged in `4b26a642` (released in v1.17.0) |
+| GSD-W014 | GitHub Copilot model-catalog sync (`/gsd copilot-models`) | Upstream | Historical | — | #1978 | Merged in `4b26a642` (released in v1.17.0); local catalog worktree removed during v1.18 cleanup |
 | GSD-W016 | Recovery artifact for GSD-W014 Phase I/J economics and routing spike | Fork-local | No PR planned | — | — | Commit `e8e46fe9450f326641fccf7bbf3929f10be80f09` archived on `recovery/github-copilot-catalog-phase-i-j-e8e46fe9` (pushed to origin, same SHA); provenance for GSD-W014 Phase I/J, not directly mergeable |
-| GSD-W017 | Cheaper same-tier Copilot suggestions in `pricing`/`why`, plus proactive notifications | Upstream | Historical | — | #1980 | Merged in `31fab790` (released in v1.17.0) |
-| GSD-W018 | Session-start GitHub Copilot catalog refresh and runtime model activation | Upstream | Historical | — | #1979 | Merged in `40553f41` (released in v1.17.0) |
+| GSD-W017 | Cheaper same-tier Copilot suggestions in `pricing`/`why`, plus proactive notifications | Upstream | Historical | — | #1980 | Closed unmerged; local proposal retained as historical context only |
+| GSD-W018 | Session-start GitHub Copilot catalog refresh and runtime model activation | Upstream | Historical | — | #1979 | Closed unmerged; activation work remains tracked separately under GSD-W030 |
+| GSD-W029 | Truthful GitHub Copilot catalog normalization and bounded diagnostics | Upstream | PR required | #2088 | #2092 | Merged upstream; local worktree removed during v1.18 cleanup |
+| GSD-W031 | Safe account-scoped GitHub Copilot model suggestions | Upstream | PR required | #2088 | #2093 | Merged upstream; local worktree removed during v1.18 cleanup |
+| GSD-W032 | Route bundled Copilot Kimi, Gemini 3.x, Grok 4.6, MAI Flash Picker, and GPT-5.4 Nano models | Upstream | PR required | #2132 | #2133 | Merged upstream; local worktree removed during v1.18 cleanup |
 | GSD-W019 | `verify-merge` heavy-gate classifier and compile-once optimization | Upstream | Historical | — | #1990 | Merged in `31094b0f` (released in v1.17.0) |
 | GSD-W020 | Repo-wide markdownlint config: disable MD013/MD060 | Upstream | Historical | #1992 | #1991 | Merged in `a1b55909` (released in v1.17.0) |
 | GSD-W025 | Verify multilingual verify-command fixtures | Upstream | Historical | #1994 | — | Dropped — out of scope for this fork (external issue #1994 by @efrembaraldo; won't implement) |
@@ -119,7 +119,7 @@ committed to any PR branch and are not upstream contributions in their own right
 
 | Extension ID | Path | Related work | Status | Reimplementation | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `copilot-catalog-patch` | `~/.gsd/agent/extensions/copilot-catalog-patch` | GSD-W014, GSD-W017, GSD-W018 | **Retired & deleted** (2026-08-29) | Yes | Retired upon release of `@opengsd/gsd-pi@1.17.0` (all 3 underlying PRs #1978, #1979, #1980 merged upstream and natively supported in GSD core). |
+| `copilot-catalog-patch` | `~/.gsd/agent/extensions/copilot-catalog-patch` | GSD-W014, GSD-W017, GSD-W018 | **Retired & deleted** (2026-08-29) | Yes | Retired after the local workaround was no longer needed; #1978 merged, while #1979/#1980 closed unmerged and must not be carried into the v1.18 fork update. |
 | `w022-iserror-patch` | `~/.gsd/agent/extensions/w022-iserror-patch` | GSD-W022 (PR #2016) | **Active** | Yes | Preserves `isError` in `tool_result` event handlers during `/gsd auto` runs until PR #2016 merges. |
 
 **Known gsd-pi issue (fixed in 1.16.1)**: on gsd-pi `<=1.16.0`, the documented global location
@@ -138,12 +138,9 @@ the documented global location as the sole install and removed the project-local
 version. Plausibly worth an upstream bug report/doc note someday for anyone still on
 `<=1.16.0` (not filed — needs explicit authorization first).
 
-**Sync policy**: whenever `feat/github-copilot-model-catalog-sync`,
-`feat/copilot-catalog-session-refresh`, or `feat/copilot-cheaper-model-suggestions` receive
-new commits (review fixes, another rebase, anything), check whether
-`~/.gsd/agent/extensions/copilot-catalog-patch/index.ts` needs a matching behavior update,
-then update `branchHeadsAtLastSync` in `work-register.json` regardless — even a "no change
-needed" review should bump the recorded SHA so drift never goes unnoticed.
+**Retirement policy**: `copilot-catalog-patch` is retired and has no branch-head sync duty.
+`w022-iserror-patch` remains active until PR #2016 merges and the active local runtime is
+upgraded to a release containing the same behavior.
 
 Quick drift check (run from `worktrees/workspace-governance`, or any worktree with all three
 branches fetched):
