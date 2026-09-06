@@ -15,6 +15,10 @@ customer-specific code, assets, credentials, or private project context.
 - Base new work on freshly fetched `upstream/main`, never stale `origin/main`.
 - Do not commit directly to `main`.
 - Keep one concern per branch, worktree, and PR unless a maintainer requests otherwise.
+- Keep one active patch per work-register ID. Once an issue or PR exists, that patch must cover
+  exactly that one `GSD-W###` and one `#issue` or `#PR`; never use a patch as a shared staging
+  area for several work items. Name it `YYYY-MM-DD-w###-<topic>.patch` and record its source
+  revision and disposition in the matching register entry or local plan.
 - An issue is not automatically required for every concern. Search existing issues and PRs
   first and follow current upstream `CONTRIBUTING.md` and maintainer direction.
 - Current upstream policy requires an issue first for new features, while obvious bug fixes
@@ -152,6 +156,10 @@ Never treat a mixed staged state in an old fork checkout as a PR candidate: firs
 focused concerns against current `upstream/main`. A diff from a stale checkout can look like it
 deletes code that upstream has since added. Generated/catalog churn must be regenerated from the
 current source when needed, not carried as an old patch.
+
+The sole exception is a clearly named historical archive such as `*-mixed-archive.patch`: it is
+read-only evidence, must not be applied or published wholesale, and must point to the individual
+W-scoped patches or register records that superseded it.
 
 For each open PR branch, record `upstream/main...HEAD` ahead/behind counts, the PR head SHA,
 mergeability, and current CI conclusion. For each local patch, compare its affected paths and

@@ -109,6 +109,10 @@ specific generic component is deliberately selected later as its own contributio
 - Add regression coverage for resolved bugs.
 - Keep generated files generator-owned.
 - Keep one concern per commit and PR.
+- Keep one active patch per `GSD-W###`. After an issue or PR exists, its patch must contain only
+   that work item and its single `#issue` or `#PR`; never add unrelated review fixes or local
+   experiments to it. Store active patch evidence as `plans/patches/YYYY-MM-DD-w###-<topic>.patch`
+   and record the source SHA, scope, and disposition in the matching register record or plan.
 - Avoid unrelated formatting or generated churn.
 - Update diagnostics when failure behavior changes.
 - Preserve all unknown dirty work.
@@ -257,6 +261,10 @@ against current upstream first: stale indexes can represent already-merged upstr
 deletions. Regenerate generated/model-catalog output from current sources rather than carrying
 old generated churn. Run the work-register validator after updating the classification; only
 then may an explicitly authorized cleanup remove obsolete worktrees or branches.
+
+An old multi-concern export is allowed only as `*-mixed-archive.patch` evidence. It is never an
+active patch, never a PR source, and must link to its successor W-scoped patches or register
+records before cleanup.
 
 ## Official references
 
