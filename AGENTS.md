@@ -131,6 +131,35 @@ behavior. Record commands, exit codes, and relevant results in the PR or work re
 - Include provider, transport, parsing, fallback, and error-path tests when routing behavior
   changes.
 
+## Upstream release reconciliation and cleanup
+
+Before updating the fork to a new upstream release, rebasing a long-lived branch, or cleaning
+an old checkout, inventory every non-clean checkout and every preserved patch under
+`$GSD_PI_WORKSPACE/plans/patches/`. Fetch `upstream/main`, then classify each item against that
+exact revision as one of:
+
+1. **Already upstream** — its intended behavior or commit is present in `upstream/main`.
+  Keep only archival evidence; do not recreate or push a competing PR.
+2. **Open PR** — a remotely published branch has a live PR. Preserve the branch/worktree,
+  inspect current CI and mergeability, and rebase only when it is behind or conflicting.
+3. **Local-only** — unique commits or dirty changes with no live PR. Export or retain a
+  focused patch and record its scope, source revision, validation, and next action in the
+  work register before cleanup. Do not silently drop it.
+4. **Blocked or intentionally retired** — retain its explicit decision/evidence, but do not
+  carry it forward as an implementation candidate without the required RFC or fresh repro.
+
+Never treat a mixed staged state in an old fork checkout as a PR candidate: first split it into
+focused concerns against current `upstream/main`. A diff from a stale checkout can look like it
+deletes code that upstream has since added. Generated/catalog churn must be regenerated from the
+current source when needed, not carried as an old patch.
+
+For each open PR branch, record `upstream/main...HEAD` ahead/behind counts, the PR head SHA,
+mergeability, and current CI conclusion. For each local patch, compare its affected paths and
+intent against the new upstream revision before deciding whether it is obsolete, requires a
+focused PR, or remains local-only. Update `docs/work-register.json` first, then its Markdown
+projection, and validate with `node scripts/validate-work-register.mjs` before destructive
+cleanup. Removing worktrees, branches, or the old fork requires explicit authorization.
+
 ## GitHub writes
 
 - GitHub MCP is the primary GitHub integration.

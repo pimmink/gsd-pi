@@ -239,6 +239,25 @@ Before deleting an old clone, preserve unique commits on a named recovery branch
 meaningful dirty diffs. Dependencies and build caches are reproducible only after confirming
 that no active process uses them.
 
+### Release-upgrade reconciliation
+
+Treat an upstream release update as a reconciliation operation, not just a pull. Before making
+the fork clean, fetch `upstream/main` and audit every worktree plus
+`$GSD_PI_WORKSPACE/plans/patches/`.
+
+| Classification | Required action |
+| --- | --- |
+| Already upstream | Verify the behavior or commit is present in current upstream; retain only archival patch evidence and do not open a duplicate PR. |
+| Open PR | Preserve its worktree and remote branch; record head SHA, CI, mergeability, and ahead/behind counts. Rebase only if it is behind/conflicting or needs the latest base. |
+| Local-only | Preserve focused commits/diffs and create or update a work-register entry before cleanup. Compare the patch to current upstream before proposing a new PR. |
+| Blocked/retired | Retain the decision and source patch, but do not carry it into the new release without the required RFC, approval, or fresh reproduction. |
+
+Do not apply or publish a whole staged diff from a stale fork checkout. Split it by concern
+against current upstream first: stale indexes can represent already-merged upstream files as
+deletions. Regenerate generated/model-catalog output from current sources rather than carrying
+old generated churn. Run the work-register validator after updating the classification; only
+then may an explicitly authorized cleanup remove obsolete worktrees or branches.
+
 ## Official references
 
 - VS Code Profiles: <https://code.visualstudio.com/docs/configure/profiles>
