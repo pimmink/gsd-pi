@@ -135,6 +135,18 @@ behavior. Record commands, exit codes, and relevant results in the PR or work re
 - Include provider, transport, parsing, fallback, and error-path tests when routing behavior
   changes.
 
+## Formatter and editor safety
+
+This workspace contains many stale and active worktrees side by side. Do not use automatic
+editor formatting, organize-imports, or save-time fix-all actions as part of cleanup or review:
+they can rewrite old PR branches and make local patches look substantive. The workspace root
+`.vscode/settings.json` disables format-on-save, format-on-paste, format-on-type, save-time
+fix-all, save-time organize-imports, Biome, Prettier, and ESLint formatting by default.
+
+Formatting is allowed only as an explicit, scoped command for the active concern after a preflight
+dirty-state check. Record the command and run `git diff --check`; never save-open files across
+multiple worktrees to “clean up” style.
+
 ## Upstream release reconciliation and cleanup
 
 Before updating the fork to a new upstream release, rebasing a long-lived branch, or cleaning
