@@ -142,6 +142,11 @@ editor formatting, organize-imports, or save-time fix-all actions as part of cle
 they can rewrite old PR branches and make local patches look substantive. The workspace root
 `.vscode/settings.json` disables format-on-save, format-on-paste, format-on-type, save-time
 fix-all, save-time organize-imports, Biome, Prettier, and ESLint formatting by default.
+It also disables TypeScript project-wide diagnostics and excludes generated `dist/`, `dist-test/`,
+`node_modules/`, and `native/target/` folders from editor watching. This prevents stale build
+outputs in old worktrees from surfacing `TS5055 Cannot write file ... because it would overwrite
+input file` in the Problems panel. Local `plans/**` files are ignored by markdownlint because they
+are private planning memory, not upstream documentation.
 
 Formatting is allowed only as an explicit, scoped command for the active concern after a preflight
 dirty-state check. Record the command and run `git diff --check`; never save-open files across
