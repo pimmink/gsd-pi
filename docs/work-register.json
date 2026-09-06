@@ -1018,17 +1018,21 @@
 		},
 		{
 			"id": "GSD-W037",
-			"type": "docs",
+			"type": "feature",
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
-			"title": "VS Code Copilot read tools implementation plan",
+			"title": "Native VS Code Copilot project read tools",
 			"status": "in-progress",
 			"issues": [
 				2099
 			],
 			"pullRequests": [],
 			"relatedRefs": [
+				"#2101",
+				"#2105",
 				"#2102",
+				"#2136",
+				"#2143",
 				"#2170",
 				"#2172",
 				"GSD-W033",
@@ -1038,14 +1042,16 @@
 				"PLAN-2026-09-06-VSCODE-COPILOT-READ-TOOLS-IMPLEMENTATION-PLAN"
 			],
 			"branches": [
-				"docs/vscode-copilot-read-tools-plan"
+				"docs/vscode-copilot-read-tools-plan",
+				"feat/vscode-copilot-read-tools"
 			],
 			"commits": [
-				"bd8ce46e6091cf49076b331ba8e7cf72419c84d1"
+				"bd8ce46e6091cf49076b331ba8e7cf72419c84d1",
+				"e182d5bf885b9d6adedc45c926d0e355dbcf520f"
 			],
-			"context": "Public-safe docs/dev implementation plan for exposing existing DB-authoritative project progress and snapshot reads to Copilot Chat as native VS Code language model tools. The plan scopes implementation to the packaged VS Code extension, reuses the existing long-lived RPC process, rejects a separate first-party MCP server, avoids snapshot contract expansion, and treats GSD-W035/#2172 snapshot DB-handle isolation as a prerequisite before exposing another snapshot host surface.",
-			"validation": "2026-09-06: branch docs/vscode-copilot-read-tools-plan created from upstream/main f0c4ac52535b8ae9ea9855a2772ef43838d68bac and committed locally at bd8ce46e6091cf49076b331ba8e7cf72419c84d1. Local preflight confirmed origin=pimmink/gsd-pi, upstream=open-gsd/gsd-pi, correct local identity, node >=22.18.0, and pnpm@10.12.1. Read-only GitHub inspection confirmed #2099 open, #2102 closed, #2170 merged at 1af48f0d15a89155f343ab0679fe41b4e4e58ddf, and #2172 open. Official VS Code docs confirmed languageModelTools plus vscode.lm.registerTool and did not document readOnlyHint as a languageModelTools manifest property. New plan commit passed git diff --check; markdownlint-cli2 and scripts/check-github-markdown.mjs are unavailable in the feature checkout.",
-			"nextAction": "Decide whether to keep this as a docs/plan PR or use it to seed a fresh implementation branch after #2172 merges; before any public GitHub write, run the available Markdown/GitHub preflight in a checkout that has the helper or use an equivalent maintained docs check."
+			"context": "Native VS Code Copilot Chat read tools for the #2099 consumer-led integration path. The implementation branch adds gsd_project_progress and gsd_project_snapshot language model tools to the packaged VS Code extension, reusing the existing long-lived RPC process, DB-authoritative progress from #2105/#2143, the reduced project snapshot from #2170, and the #2172 snapshot DB-handle isolation branch as its stack base. Microsoft Learn MCP was added only to the local governance/profile MCP config as an official-docs helper; it is not part of the upstream feature branch because it complements but does not fully replace the vscode-docs GitHub repository for code.visualstudio.com API docs.",
+			"validation": "2026-09-06: implementation branch feat/vscode-copilot-read-tools created on #2172 head 31b77759c57e2bd2312e89044e08bb09c1e5ca9f and committed locally at e182d5bf885b9d6adedc45c926d0e355dbcf520f. Targeted validation passed: npm ci --ignore-scripts in vscode-extension; pnpm --dir vscode-extension run build; pnpm --dir vscode-extension test (15/15); pnpm exec tsx --test packages/contracts/src/rpc.test.ts packages/gsd-agent-modes/src/modes/rpc/rpc-project-progress.test.ts packages/gsd-agent-modes/src/modes/rpc/rpc-protocol-v2.test.ts (74/74); node --import ./src/resources/extensions/gsd/tests/resolve-ts.mjs --experimental-strip-types --test src/resources/extensions/gsd/tests/extension-bootstrap-isolation.test.ts (10/10); pnpm run build:agent-modes; pnpm run build:rpc-client; pnpm --filter @opengsd/contracts run build; git diff --check. pnpm run build:core passed earlier after the ProjectSnapshot import fix. pnpm run verify:fast passed 250/250 and strict audits, but the running verification also refreshed unrelated GPT-6 Astra model catalog generated output, which was removed from the worktree and is not part of the implementation commit. pnpm run typecheck:extensions still fails on upstream-identical src/headless-answers.ts importing @gsd/agent-modes/modes/rpc/jsonl.js; this is outside the current diff.",
+			"nextAction": "Wait for #2172 to merge or keep this branch explicitly stacked on #2172; then rebase onto current upstream/main, rerun focused checks plus verify:fast without model-catalog churn, and request authorization before any push or upstream PR. In PR/issue text, separate already-implemented foundations (#2105/#2143/#2170), skipped original-plan scope (writes, external MCP setup, telemetry, arbitrary path input, snapshot expansion), and this branch's native VS Code LM tool work."
 		}
 	],
 	"localExtensionPatches": [
