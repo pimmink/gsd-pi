@@ -1015,6 +1015,37 @@
 			"context": "Contributor-developed method for optional, manually dispatched sharded pre-review verification. The proposal is intentionally framed as faster/reproducible clean-runner evidence for broad contributor changes, not a replacement for upstream ci.yml or a merge-parity gate. Draft PR #2177 now includes the concrete review implementation files: .github/workflows/pre-review-verification-sharded.yml, scripts/pre-review-verify.sh, and docs/dev/sharded-pre-review-verification.md.",
 				"validation": "2026-09-06: searched for overlapping sharded pre-review verification issues/PRs; no relevant existing issue/PR found. Issue #2176 opened as an enhancement proposal. Draft PR #2177 opened, then updated at commit 6a3ed5953ea28ff69227d2f06e927ad387dded43 to include the concrete workflow and dispatch helper in addition to the review doc. CI initially failed repository runner policy because the workflow used ubuntu-24.04; commit fa3873d6bb8732441b78c5910299e36add6b3249 switched all jobs to approved blacksmith-4vcpu-ubuntu-2404. CI then failed actionlint shellcheck SC2153 for GitHub Actions env-injected SOURCE_REPO; commit 0c88e7d23bdbffed6780ba26fd1cbbfcaf9bf135 added targeted shellcheck annotations. Workflow-lint and fast-gates passed on 0c88e7d2. Commit d23ee84156242871b82d06f1f7077f0c3e418908 clarified that richer contributor-side watch/resume/logs/triage/timing/fallback pieces are deliberately omitted from the first upstream draft. Commit f1f963cd6976aa557d5541c38fceebee59234650 links the complete public contributor-harness component inventory and each component's purpose, while preserving the narrow review scope. Public issue comments 5558843480 and 5558853046 clarify the review boundary and that the omitted pieces already exist in the separate public harness. At PR head f1f963cd6976aa557d5541c38fceebee59234650, Agent Workflow Guard, fast-gates, workflow-lint, GitGuardian, and Socket checks are green; build remains pending. Local validation: bash -n scripts/pre-review-verify.sh, helper --help, actionlint -config-file .config/actionlint.yaml .github/workflows/pre-review-verification-sharded.yml, node --test scripts/__tests__/github-workflows-runner-contract.test.mjs (6/6), git diff --check, and VS Code diagnostics for the new files all passed. Cost evidence is conservative: measured sharded proof reduced wall-clock from about 19m11s to about 12m04s but used about 27.1 summed runner-minutes versus about 19.2 unsharded; public fork-local GitHub usage API reported billable.UBUNTU.total_ms=0 for measured runs.",
 			"nextAction": "Await maintainer response on issue #2176 and draft PR #2177. Treat PR #2177 as clarification/review-only until maintainers request an implementation workflow."
+		},
+		{
+			"id": "GSD-W037",
+			"type": "docs",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "VS Code Copilot read tools implementation plan",
+			"status": "in-progress",
+			"issues": [
+				2099
+			],
+			"pullRequests": [],
+			"relatedRefs": [
+				"#2102",
+				"#2170",
+				"#2172",
+				"GSD-W033",
+				"GSD-W035"
+			],
+			"planRefs": [
+				"PLAN-2026-09-06-VSCODE-COPILOT-READ-TOOLS-IMPLEMENTATION-PLAN"
+			],
+			"branches": [
+				"docs/vscode-copilot-read-tools-plan"
+			],
+			"commits": [
+				"bd8ce46e6091cf49076b331ba8e7cf72419c84d1"
+			],
+			"context": "Public-safe docs/dev implementation plan for exposing existing DB-authoritative project progress and snapshot reads to Copilot Chat as native VS Code language model tools. The plan scopes implementation to the packaged VS Code extension, reuses the existing long-lived RPC process, rejects a separate first-party MCP server, avoids snapshot contract expansion, and treats GSD-W035/#2172 snapshot DB-handle isolation as a prerequisite before exposing another snapshot host surface.",
+			"validation": "2026-09-06: branch docs/vscode-copilot-read-tools-plan created from upstream/main f0c4ac52535b8ae9ea9855a2772ef43838d68bac and committed locally at bd8ce46e6091cf49076b331ba8e7cf72419c84d1. Local preflight confirmed origin=pimmink/gsd-pi, upstream=open-gsd/gsd-pi, correct local identity, node >=22.18.0, and pnpm@10.12.1. Read-only GitHub inspection confirmed #2099 open, #2102 closed, #2170 merged at 1af48f0d15a89155f343ab0679fe41b4e4e58ddf, and #2172 open. Official VS Code docs confirmed languageModelTools plus vscode.lm.registerTool and did not document readOnlyHint as a languageModelTools manifest property. New plan commit passed git diff --check; markdownlint-cli2 and scripts/check-github-markdown.mjs are unavailable in the feature checkout.",
+			"nextAction": "Decide whether to keep this as a docs/plan PR or use it to seed a fresh implementation branch after #2172 merges; before any public GitHub write, run the available Markdown/GitHub preflight in a checkout that has the helper or use an equivalent maintained docs check."
 		}
 	],
 	"localExtensionPatches": [
