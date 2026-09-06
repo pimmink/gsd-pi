@@ -266,6 +266,26 @@ An old multi-concern export is allowed only as `*-mixed-archive.patch` evidence.
 active patch, never a PR source, and must link to its successor W-scoped patches or register
 records before cleanup.
 
+### Compare A Patch With Its PR
+
+Use the governance helper after retrieving the current PR head SHA through GitHub MCP:
+
+```text
+cd $GSD_PI_WORKSPACE/worktrees/workspace-governance
+node scripts/contribution-snapshot.mjs GSD-W### ../<worktree> <PR> \
+   --patch ../../plans/patches/YYYY-MM-DD-w###-<topic>.patch \
+   --remote-head <GitHub-MCP-PR-head-SHA>
+```
+
+Interpret the JSON mechanically:
+
+- `remoteHeadMatchesLocal: true` means the local worktree and online PR head are identical.
+- `patch.matchesWorktreeDelta: true` means the patch artifact is exactly the current branch delta.
+- `patch.matchesWorktreeDelta: false` means the artifact is partial or superseded; preserve it as
+   evidence only after recording its successor or final disposition.
+- `null` or `unknown` means the remote source was not read successfully; fetch it through GitHub
+   MCP before making a publication or cleanup decision.
+
 ## Official references
 
 - VS Code Profiles: <https://code.visualstudio.com/docs/configure/profiles>

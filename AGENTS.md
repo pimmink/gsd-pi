@@ -168,6 +168,14 @@ focused PR, or remains local-only. Update `docs/work-register.json` first, then 
 projection, and validate with `node scripts/validate-work-register.mjs` before destructive
 cleanup. Removing worktrees, branches, or the old fork requires explicit authorization.
 
+Use `scripts/contribution-snapshot.mjs` from the governance anchor for one W-scoped comparison.
+Pass the PR head SHA retrieved through GitHub MCP with `--remote-head`; `remoteHeadMatchesLocal:
+true` proves the local worktree equals the online PR head. Add `--patch <file>` to compare stable
+patch IDs: `matchesWorktreeDelta: true` means the artifact exactly matches the current branch
+delta, while `false` means it is partial or superseded and must be retained only with an explicit
+successor/disposition. `unknown` means the remote SHA was not available and is not evidence of
+equality.
+
 ## GitHub writes
 
 - GitHub MCP is the primary GitHub integration.
