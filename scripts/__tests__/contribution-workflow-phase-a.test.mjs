@@ -13,7 +13,7 @@ const exec = promisify(execFile);
 const testDir = dirname(fileURLToPath(import.meta.url));
 const scripts = resolve(testDir, "..");
 const governanceRoot = resolve(testDir, "../..");
-const phaseWorktree = resolve(governanceRoot, "../contribution-workflow-phase-a");
+const snapshotWorktree = resolve(governanceRoot, "../project-snapshot-db-handle");
 
 test("Markdown preflight accepts an approved Mermaid block with prose", () => {
   const findings = checkGitHubMarkdown("Summary.\n\n```mermaid\nflowchart LR\nbase[Base] --> consumer[Consumer]\n```\n");
@@ -70,14 +70,16 @@ test("runtime receipt checker flags a stale SHA", async () => {
 test("contribution snapshot reports the selected worktree and register references", async () => {
   const { stdout } = await exec(
     process.execPath,
-    [join(scripts, "contribution-snapshot.mjs"), "GSD-W013", phaseWorktree],
+    [join(scripts, "contribution-snapshot.mjs"), "GSD-W035", snapshotWorktree],
     { cwd: governanceRoot },
   );
   const snapshot = JSON.parse(stdout);
-  assert.equal(snapshot.workRegisterId, "GSD-W013");
-  assert.equal(snapshot.worktree, "worktrees/contribution-workflow-phase-a");
+  assert.equal(snapshot.workRegisterId, "GSD-W035");
+  assert.equal(snapshot.worktree, "worktrees/project-snapshot-db-handle");
   assert.ok(Array.isArray(snapshot.references.pullRequests));
   assert.equal(snapshot.pullRequest.status, "unknown");
+  assert.equal(snapshot.remoteHeadMatchesLocal, null);
+  assert.deepEqual(snapshot.patch, { status: "not-supplied" });
   assert.equal(typeof snapshot.identity.name, "string");
   assert.equal(typeof snapshot.identity.emailPresent, "boolean");
   assert.deepEqual(snapshot.cleanRunnerRunIds, []);
@@ -86,6 +88,22 @@ test("contribution snapshot reports the selected worktree and register reference
   assert.ok(Array.isArray(snapshot.dirty.untracked));
   assert.match(snapshot.headSha, /^[0-9a-f]{40}$/);
   assert.match(snapshot.upstreamRelation, /^\d+\s+\d+$/);
+
+  const { stdout: comparedStdout } = await exec(
+    process.execPath,
+    [
+      join(scripts, "contribution-snapshot.mjs"),
+      "GSD-W035",
+      snapshotWorktree,
+      "2172",
+      "--remote-head",
+      snapshot.headSha,
+    ],
+    { cwd: governanceRoot },
+  );
+  const compared = JSON.parse(comparedStdout);
+  assert.equal(compared.remoteHeadSource, "supplied");
+  assert.equal(compared.remoteHeadMatchesLocal, true);
 });
 
 test("rebase contract sweep detects API, RPC, constructor, factory, and mock changes", () => {
@@ -101,7 +119,7 @@ test("rebase contract sweep reports no APIs for an unrelated fixed diff", async 
   const { stdout } = await exec(
     process.execPath,
     [join(scripts, "rebase-contract-sweep.mjs"), "HEAD~1"],
-    { cwd: phaseWorktree },
+    { cwd: governanceRoot },
   );
   const sweep = JSON.parse(stdout);
   assert.equal(sweep.status, "advisory");

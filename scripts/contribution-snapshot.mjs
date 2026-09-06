@@ -1,12 +1,29 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { resolve, relative, sep } from "node:path";
 
-const [workRegisterId, requestedWorktree, requestedPullRequest] = process.argv.slice(2);
-if (!workRegisterId || !requestedWorktree) {
-  throw new Error("usage: contribution-snapshot.mjs <GSD-W###> <feature-worktree> [pull-request]");
+const argumentsList = process.argv.slice(2);
+const takeOption = (name) => {
+  const index = argumentsList.indexOf(name);
+  if (index === -1) return undefined;
+  const value = argumentsList[index + 1];
+  if (!value) {
+    throw new Error(`missing value for ${name}`);
+  }
+  argumentsList.splice(index, 2);
+  return value;
+};
+const requestedPatch = takeOption("--patch");
+const requestedRemoteHead = takeOption("--remote-head");
+const [workRegisterId, requestedWorktree, requestedPullRequest] = argumentsList;
+if (!workRegisterId || !requestedWorktree || argumentsList.length > 3) {
+  throw new Error("usage: contribution-snapshot.mjs <GSD-W###> <feature-worktree> [pull-request] [--patch <patch-file>] [--remote-head <sha>]");
+}
+if (requestedRemoteHead && !/^[0-9a-f]{7,40}$/i.test(requestedRemoteHead)) {
+  throw new Error("remote head must be a Git SHA");
 }
 
 const governanceRoot = resolve(process.cwd());
@@ -21,6 +38,18 @@ const optional = (command, args) => {
     return execFileSync(command, args, { cwd: worktree, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
   } catch {
     return "";
+  }
+};
+const patchId = (content) => {
+  try {
+    const output = execFileSync("git", ["patch-id", "--stable"], {
+      input: content,
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "ignore"],
+    }).trim();
+    return output.split(/\s+/)[0] || null;
+  } catch {
+    return null;
   }
 };
 
@@ -48,6 +77,26 @@ if (pullRequest) {
     pullRequestState = { status: "unknown", reason: "GitHub CLI unavailable or read failed" };
   }
 }
+const remoteHeadSha = requestedRemoteHead ?? (pullRequestState.status === "observed" ? pullRequestState.headRefOid : null);
+const remoteHeadMatchesLocal = remoteHeadSha ? remoteHeadSha === startHead : null;
+const allowedPatchRoot = resolve(workspaceRoot, "plans/patches");
+let patch = { status: "not-supplied" };
+if (requestedPatch) {
+  const patchPath = resolve(requestedPatch);
+  if (!patchPath.startsWith(`${allowedPatchRoot}${sep}`)) {
+    throw new Error("patch file is outside the allowlisted plans/patches directory");
+  }
+  if (!existsSync(patchPath)) throw new Error("patch file does not exist");
+  const artifactPatchId = patchId(await readFile(patchPath, "utf8"));
+  const worktreePatchId = patchId(git(["diff", "--binary", "upstream/main...HEAD"]));
+  patch = {
+    status: artifactPatchId && worktreePatchId ? "compared" : "uncomparable",
+    path: relative(workspaceRoot, patchPath),
+    artifactPatchId,
+    worktreePatchId,
+    matchesWorktreeDelta: artifactPatchId === worktreePatchId,
+  };
+}
 const endHead = git(["rev-parse", "HEAD"]);
 const relatedRunIds = (item[0].relatedRefs || []).filter((ref) => /(?:run|actions\/runs)[/:]?[0-9]+/i.test(ref));
 console.log(JSON.stringify({
@@ -64,6 +113,10 @@ console.log(JSON.stringify({
   },
   remotes: git(["remote", "-v"]).split("\n").filter((line) => /^(origin|upstream)\s/.test(line)),
   pullRequest: pullRequestState,
+  remoteHeadSha,
+  remoteHeadSource: requestedRemoteHead ? "supplied" : pullRequestState.status === "observed" ? "github-cli" : "unknown",
+  remoteHeadMatchesLocal,
+  patch,
   cleanRunnerRunIds: relatedRunIds.filter((ref) => ref.includes(startHead)),
   worktree: relative(workspaceRoot, worktree),
   references: { issues: item[0].issues, pullRequests: item[0].pullRequests },
