@@ -1104,6 +1104,27 @@
 			"context": "Follow-up to m13v's #2099 progress authority concern: `gsd_progress` is DB-first but can fall back to projection reads, and prior v1 payloads did not tell consumers which authority answered. Draft PR #2187 adds optional shared `readMetadata` provenance to progress payloads so MCP, CLI, RPC, and VS Code consumers can distinguish DB-authoritative reads from projection fallback without changing tool names or the CLI envelope shape.",
 			"validation": "2026-09-07: clean worktree progress-read-metadata created from upstream/main 68acbe786 on branch feat/progress-read-metadata. Commit 30ef769c3cd4a7c63f974cdebd59a755819a3e4a adds discriminated ProjectProgressReadMetadata, DB/projection producers, MCP tool description coverage, and focused tests. Local focused validation passed: pnpm --filter @opengsd/contracts build, pnpm --filter @opengsd/rpc-client build, pnpm --filter @opengsd/mcp-server build, node --import ./src/resources/extensions/gsd/tests/resolve-ts.mjs --experimental-strip-types --test src/resources/extensions/gsd/tests/progress-from-db.test.ts src/tests/read-cli-progress-db.test.ts packages/gsd-agent-modes/src/modes/rpc/rpc-project-progress.test.ts vscode-extension/test/manifest.test.ts packages/mcp-server/src/mcp-server.test.ts (111/111), git diff --check. Independent high-review found no blockers; minor type-strengthening feedback was applied before the final green run. Diff hygiene found only the expected 9 source/test files and no generated, lockfile, or artifact churn. Branch pushed to origin and upstream draft PR #2187 opened. #2099 comment https://github.com/open-gsd/gsd-pi/issues/2099#issuecomment-5566959938 acknowledges m13v's concern and links the draft PR scope.",
 			"nextAction": "Watch GitHub CI for PR #2187 and address review or CI feedback."
+		},
+		{
+			"id": "GSD-W040",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Fresh-worktree focused tests fail on missing workspace dist artifacts",
+			"status": "investigating",
+			"issues": [
+				2189
+			],
+			"pullRequests": [],
+			"relatedRefs": [
+				"GSD-W039"
+			],
+			"planRefs": [],
+			"branches": [],
+			"commits": [],
+			"context": "Upstream issue #2189 tracks recurring contributor focused-test failures where fresh worktrees lack node_modules links or focused source/compiled test resolvers follow package exports to missing package dist artifacts. The issue uses sanitized examples from the 2026-09-07 contributor chat: `tsc: command not found`, missing `@opengsd/rpc-client/dist/index.js`, missing `@opengsd/mcp-server/dist/readers/graph.js`, and prior checked-in task evidence around `@opengsd/contracts/dist/index.js` and native dist-test subpaths.",
+			"validation": "2026-09-07: read-only scout inspected package scripts, resolve-ts.mjs, dist-redirect.mjs, dist-test-resolve.mjs, compile-tests.mjs, link-workspace-packages.cjs, workspace manifest code, and chatlog evidence. Duplicate issue search found related packaging/install issues but no exact fresh-worktree focused-test resolver umbrella. Public issue body was sanitized to avoid local absolute paths and passed scripts/check-github-markdown.mjs before creation. Issue #2189 opened upstream.",
+			"nextAction": "Await maintainer triage on #2189; if accepted, plan a focused resolver/preflight fix that makes fresh-worktree focused-test failures actionable rather than low-level module resolution reds."
 		}
 	],
 	"localExtensionPatches": [
