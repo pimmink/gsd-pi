@@ -1082,7 +1082,9 @@
 			"issues": [
 				2099
 			],
-			"pullRequests": [],
+			"pullRequests": [
+				2187
+			],
 			"relatedRefs": [
 				"GSD-W033",
 				"GSD-W037",
@@ -1099,9 +1101,9 @@
 			"commits": [
 				"30ef769c3cd4a7c63f974cdebd59a755819a3e4a"
 			],
-			"context": "Follow-up to m13v's #2099 progress authority concern: `gsd_progress` is DB-first but can fall back to projection reads, and prior v1 payloads did not tell consumers which authority answered. The focused implementation adds optional shared `readMetadata` provenance to progress payloads so MCP, CLI, RPC, and VS Code consumers can distinguish DB-authoritative reads from projection fallback without changing tool names or the CLI envelope shape.",
-			"validation": "2026-09-07: clean worktree progress-read-metadata created from upstream/main 68acbe786 on branch feat/progress-read-metadata. Commit 30ef769c3cd4a7c63f974cdebd59a755819a3e4a adds discriminated ProjectProgressReadMetadata, DB/projection producers, MCP tool description coverage, and focused tests. Local focused validation passed: pnpm --filter @opengsd/contracts build, pnpm --filter @opengsd/rpc-client build, pnpm --filter @opengsd/mcp-server build, node --import ./src/resources/extensions/gsd/tests/resolve-ts.mjs --experimental-strip-types --test src/resources/extensions/gsd/tests/progress-from-db.test.ts src/tests/read-cli-progress-db.test.ts packages/gsd-agent-modes/src/modes/rpc/rpc-project-progress.test.ts vscode-extension/test/manifest.test.ts packages/mcp-server/src/mcp-server.test.ts (111/111), git diff --check. Independent high-review found no blockers; minor type-strengthening feedback was applied before the final green run. Diff hygiene found only the expected 9 source/test files and no generated, lockfile, or artifact churn.",
-			"nextAction": "Push feat/progress-read-metadata to origin, open an upstream draft PR against main with public #2099 traceability, use GitHub CI for broader build evidence, and comment on #2099 acknowledging m13v's concern with the new draft PR link."
+			"context": "Follow-up to m13v's #2099 progress authority concern: `gsd_progress` is DB-first but can fall back to projection reads, and prior v1 payloads did not tell consumers which authority answered. Draft PR #2187 adds optional shared `readMetadata` provenance to progress payloads so MCP, CLI, RPC, and VS Code consumers can distinguish DB-authoritative reads from projection fallback without changing tool names or the CLI envelope shape.",
+			"validation": "2026-09-07: clean worktree progress-read-metadata created from upstream/main 68acbe786 on branch feat/progress-read-metadata. Commit 30ef769c3cd4a7c63f974cdebd59a755819a3e4a adds discriminated ProjectProgressReadMetadata, DB/projection producers, MCP tool description coverage, and focused tests. Local focused validation passed: pnpm --filter @opengsd/contracts build, pnpm --filter @opengsd/rpc-client build, pnpm --filter @opengsd/mcp-server build, node --import ./src/resources/extensions/gsd/tests/resolve-ts.mjs --experimental-strip-types --test src/resources/extensions/gsd/tests/progress-from-db.test.ts src/tests/read-cli-progress-db.test.ts packages/gsd-agent-modes/src/modes/rpc/rpc-project-progress.test.ts vscode-extension/test/manifest.test.ts packages/mcp-server/src/mcp-server.test.ts (111/111), git diff --check. Independent high-review found no blockers; minor type-strengthening feedback was applied before the final green run. Diff hygiene found only the expected 9 source/test files and no generated, lockfile, or artifact churn. Branch pushed to origin and upstream draft PR #2187 opened. #2099 comment https://github.com/open-gsd/gsd-pi/issues/2099#issuecomment-5566959938 acknowledges m13v's concern and links the draft PR scope.",
+			"nextAction": "Watch GitHub CI for PR #2187 and address review or CI feedback."
 		}
 	],
 	"localExtensionPatches": [
