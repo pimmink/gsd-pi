@@ -1128,6 +1128,28 @@
 			"context": "Upstream issue #2189 tracks recurring contributor focused-test failures where fresh worktrees lack node_modules links or focused source/compiled test resolvers follow package exports to missing package dist artifacts. The issue uses sanitized examples from the 2026-09-07 contributor chat: `tsc: command not found`, missing `@opengsd/rpc-client/dist/index.js`, missing `@opengsd/mcp-server/dist/readers/graph.js`, and prior checked-in task evidence around `@opengsd/contracts/dist/index.js` and native dist-test subpaths.",
 			"validation": "2026-09-07: read-only scout inspected package scripts, resolve-ts.mjs, dist-redirect.mjs, dist-test-resolve.mjs, compile-tests.mjs, link-workspace-packages.cjs, workspace manifest code, and chatlog evidence. Duplicate issue search found related packaging/install issues but no exact fresh-worktree focused-test resolver umbrella. Public issue body was sanitized to avoid local absolute paths and passed scripts/check-github-markdown.mjs before creation. Issue #2189 opened upstream.",
 			"nextAction": "Await maintainer triage on #2189; if accepted, plan a focused resolver/preflight fix that makes fresh-worktree focused-test failures actionable rather than low-level module resolution reds."
+		},
+		{
+			"id": "GSD-W041",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Bugception version check misreads Markdown-formatted current version",
+			"status": "investigating",
+			"issues": [
+				2191
+			],
+			"pullRequests": [],
+			"relatedRefs": [
+				"#2189",
+				"GSD-W040"
+			],
+			"planRefs": [],
+			"branches": [],
+			"commits": [],
+			"context": "Upstream issue #2191 tracks a version-check automation false positive discovered on #2189: the bot reported `GSD v`1.18.0`` as older than latest `v1.18.0`, apparently because the issue-template version field preserved Markdown inline-code formatting and `.github/workflows/version-check.yml` did not strip backticks before semver comparison.",
+			"validation": "2026-09-07: inspected #2189 live comments and confirmed the automated `<!-- gsd-version-check -->` comment said the reporter was running `v`1.18.0`` while latest was `v1.18.0`. Narrow source lookup found `.github/workflows/version-check.yml` extracts `### GSD version` with a first-token regex and only removes a leading `v`, so backtick-formatted values can parse incorrectly. Duplicate issue search found no existing bugception/version-check issue. Public issue body passed scripts/check-github-markdown.mjs before #2191 was opened upstream.",
+			"nextAction": "Await maintainer triage on #2191; if accepted, normalize Markdown-formatted version field values before version comparison."
 		}
 	],
 	"localExtensionPatches": [
