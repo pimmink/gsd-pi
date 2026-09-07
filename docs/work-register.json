@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-09-06",
+	"evidenceAsOf": "2026-09-07",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -627,7 +627,7 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Agent-core resolved tool result isError flag dropped in the agent loop",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [
 				2015
 			],
@@ -644,7 +644,7 @@
 			],
 			"context": "A normally resolved tool result carrying isError: true is re-wrapped by the agent loop as isError: false, silently discarding a caller's error signal. The native MCP adapter already preserves the MCP error flag and the external Claude adapter already preserves externalResult.isError; the loss is in the shared pi-agent-core execution path. Preserves isError directly on the public AgentToolResult contract.",
 			"validation": "Fix implemented and rebased onto latest upstream/main (commit 01332005): AgentToolResult gains optional isError?: boolean field, normalizeAgentToolResult preserves isError, executePreparedToolCall captures awaited promise once, and raceToolExecutionAgainstAbort preserves isError with explicit abort-race test coverage. All 30 tests in agent-loop.test.ts pass (100%) and verify:fast passed completely. PR #2016 title, description, and status updated; review comments addressed in comment 5537169051. A separate local runtime patch remains outside the public register.",
-			"nextAction": "Await maintainer review and merge on PR #2016.",
+			"nextAction": "None; PR #2016 merged upstream at 9212937f and is contained in v1.18.0. Content verified at file level on 2026-09-07 in packages/pi-agent-core/src/agent-loop.ts (isError: result?.isError ?? false at L1093 and L1123) and packages/pi-agent-core/src/types.ts (optional isError at L77/L362). Local worktree removed and the redundant w022-iserror-patch runtime extension retired.",
 			"localExtensionPatchRef": "w022-iserror-patch"
 		},
 		{
@@ -673,7 +673,7 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "UAT issue #1993 follow-up (schema-error run poisoning / stale abort)",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [
 				1993
 			],
@@ -689,7 +689,7 @@
 			],
 			"context": "A schema-invalid gsd_uat_exec could poison a run by recording a durable harnessAbort, causing later gsd_uat_result_save calls to be rejected and sending the unit into a finalize-retry wedge. The fix separates model-fixable schema validation from genuine harness truncation and heals stale same-run tool-error aborts (including prior deadline timeouts) after subsequent successful gsd_exec/gsd_uat_exec while preserving turn-abort precedence and atomic locking. Existing workflow tool-surface preflight and finalize rerun mechanisms remain unchanged.",
 			"validation": "Issue #1993 was reproduced in the owning register-hooks path. Commit 73f14476 adds the narrow predicate, locked atomic conditional clear operation under withRecordLock, turn-abort precedence protection, and execution-based regressions (including timeout-to-heal, cross-tool-heal, and turn-abort-preservation tests). Rebased onto upstream/main; register-hooks-loop-guard-auto tests pass 17/17 and verify:fast passed completely. Upstream PR #2017 is marked ready for review; maintainer and Copilot review comments addressed in comments 5536929514 and 5537790471.",
-			"nextAction": "Await maintainer review and merge on PR #2017."
+			"nextAction": "None; PR #2017 merged upstream at dcdf4fc9 and is contained in v1.18.0. Content verified at file level on 2026-09-07: isRetryableHarnessToolError (register-hooks.ts L801) with isToolSchemaValidationError discrimination (L808), isAbortedExecutionToolResult (L795), clearCurrentUnitToolErrorHarnessAbort (L110, called at L1934/L2146), and turn-abort precedence in unit-runtime.ts L188. Local worktree removed."
 		},
 		{
 			"id": "GSD-W025",
@@ -803,22 +803,23 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Account-scoped GitHub Copilot runtime catalog activation",
-			"status": "blocked",
+			"status": "closed-unmerged",
 			"issues": [
 				2088
 			],
 			"pullRequests": [],
 			"relatedRefs": [
 				"GSD-W029",
-				"GSD-W018"
+				"GSD-W018",
+				"rfc:open-gsd/gsd-pi#2091:closed-wontfix:2026-08-30"
 			],
 			"branches": [
 				"fix/copilot-runtime-catalog-activation"
 			],
 			"commits": [],
 			"context": "Dependent post-merge correction for session-refresh classifications that do not consistently become account-scoped runtime registry and picker entries. Must preserve account isolation and sanitized last-known-good state without mutating static or user catalogs. Tracked by upstream issue #2088.",
-			"validation": "Inspection on 2026-08-30 confirmed session refresh classifications and its bounded join are not consumed by the ModelRegistry or picker. The only registry extension seam replaces all provider models and requires concrete Model cost/capability fields, so it cannot safely represent account-scoped Class B records with unknown economics without fabricating data.",
-			"nextAction": "Use docs/adr/w030-account-scoped-copilot-runtime-catalog-rfc-draft.md to open a focused RFC issue and obtain maintainer approval before implementing registry-to-picker activation without static overlay or models.json mutation."
+			"validation": "Closed unmerged. RFC #2091 was closed as wontfix by the maintainer on 2026-08-30T15:27:16Z (label wontfix), and parent issue #2088 was closed the same day. The maintainer's rationale: the safety goal of Class A/B/C runtime gating is already met at write time because copilot-models sync --register only writes complete models into the overlay, so incomplete models can never reach picker or router; gating reads with a per-model status service would re-solve that at much higher complexity. gsd update --models plus the weekly catalog bot already refresh the published catalog into ~/.gsd/agent/models-catalog.json with bundled < overlay < user models.json precedence. Account-scoped facts stay in the manual copilot-models sync snapshot behind opt-in why/doctor/promos diagnostics. The maintainer also stated the W018 3-tier classification will be removed, leaving the refresh coordinator only as the feed for cheaper/better notifications. Local inspection on 2026-09-07 confirmed the branch contained no activation implementation: its only commit c2b0222fc belongs to GSD-W029 (merged via #2092), and the uncommitted diff was roughly 70 percent formatter churn plus a pre-W031 regression that replaced deterministic capability dominance with an average-score comparison. Only 2 matches for ModelRegistry/registerProvider/picker/classA-B-C/lastKnownGood/accountScoped/quarantine appeared across the whole diff.",
+			"nextAction": "None; direction rejected upstream and the narrow real bugs already landed via #2089/GSD-W029 (PR #2092) and #2090/GSD-W031 (PR #2093). Worktree and patch removed on 2026-09-07; the uncommitted working state is archived at plans/patches/archive/2026-09-07-pre-cleanup/w030-runtime-catalog-activation-dirty.patch and the branch tip c2b0222fc is recorded in removed-branch-tips.txt. Do not apply it: doing so would revert the merged W031 deterministic capability dominance."
 		},
 		{
 			"id": "GSD-W031",
@@ -950,7 +951,7 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Project snapshot must not reuse another project's open DB handle",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [
 				2102
 			],
@@ -976,7 +977,7 @@
 			],
 			"context": "Follow-up bugfix for merged PR #2170 / issue #2102. The original stacked PR #2171 carried the fix while #2170 was still open, but #2171 was closed unmerged after #2170 landed; current upstream/main therefore had the snapshot feature without the DB-handle isolation fix. The initial bug was that readProjectSnapshotFromDb(projectB) could reuse project A's process-global DB handle when project A was opened first in the same process. Copilot/Codex review then exposed the related missing-requested-DB edge and progress-reader parity edge, so the PR now treats the requested DB open result as authoritative and preserves/restores global DB state for canonical snapshot surfaces.",
 			"validation": "2026-09-06: PR #2172 is open and mergeable clean at head 31b77759c57e2bd2312e89044e08bb09c1e5ca9f, rebased onto upstream/main f0c4ac52535b8ae9ea9855a2772ef43838d68bac after merged #2175. The reconciliation retains requested file-backed DB path validation (with the existing :memory: contract), preserveGlobalDbHandle restore, and canonical projectRootForReads opens alongside #2175's read-only syncQueueOrder suppression and native error parity. Post-rebase validation passed: combined affected suite 117/117, extension tsc --noEmit, build:pi, build:rpc-client, build:mcp-server, and git diff --check. All PR checks passed: build, node22-smoke, ci-gate, fast-gates, workflow-lint, contract-tests, Socket Security, and GitGuardian. PR comments 5557636164 and 5557732464 document the fixes and reconciliation.",
-			"nextAction": "Await maintainer review and merge on PR #2172; all checks are green at 31b77759c. Verify the isolation fix is present in main after merge."
+			"nextAction": "None; PR #2172 merged upstream 2026-09-06T18:16:55Z at 59d5a358 and is contained in v1.18.0. Content verified at file level on 2026-09-07: isSameOpenDatabase with realpath canonicalization (state/derive/db-open.ts L28/L33), preserveGlobalDbHandle option with finally-restore (state/project-snapshot.ts L79/L198/L220), openedRequestedDb as authoritative (progress-from-db.ts L151), and caller opt-in in packages/mcp-server/src/workflow-tools.ts L2967. Note: no identifier named projectRootForReads exists; that intent is served by basePath + openedRequestedDb. Local worktree removed."
 		},
 		{
 			"id": "GSD-W036",
@@ -1018,23 +1019,17 @@
 		},
 		{
 			"id": "GSD-W037",
-			"type": "feature",
+			"type": "docs",
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
-			"title": "Native VS Code Copilot project read tools",
-			"status": "pr-open",
+			"title": "VS Code Copilot read tools implementation plan",
+			"status": "in-progress",
 			"issues": [
 				2099
 			],
-			"pullRequests": [
-				2179
-			],
+			"pullRequests": [],
 			"relatedRefs": [
-				"#2101",
-				"#2105",
 				"#2102",
-				"#2136",
-				"#2143",
 				"#2170",
 				"#2172",
 				"GSD-W033",
@@ -1044,17 +1039,32 @@
 				"PLAN-2026-09-06-VSCODE-COPILOT-READ-TOOLS-IMPLEMENTATION-PLAN"
 			],
 			"branches": [
-				"docs/vscode-copilot-read-tools-plan",
-				"feat/vscode-copilot-read-tools"
+				"docs/vscode-copilot-read-tools-plan"
 			],
 			"commits": [
-				"bd8ce46e6091cf49076b331ba8e7cf72419c84d1",
-				"e182d5bf885b9d6adedc45c926d0e355dbcf520f",
-				"f92f2e31ffe88fb05ec69b9bfc275e55e5525d06"
+				"bd8ce46e6091cf49076b331ba8e7cf72419c84d1"
 			],
-			"context": "Native VS Code Copilot Chat read tools for the #2099 consumer-led integration path. The implementation branch adds gsd_project_progress and gsd_project_snapshot language model tools to the packaged VS Code extension, reusing the existing long-lived RPC process, DB-authoritative progress from #2105/#2143, the reduced project snapshot from #2170, and the #2172 snapshot DB-handle isolation branch as its stack base. Microsoft Learn MCP was added only to the local governance/profile MCP config as an official-docs helper; it is not part of the upstream feature branch because it complements but does not fully replace the vscode-docs GitHub repository for code.visualstudio.com API docs.",
-			"validation": "2026-09-06: implementation branch feat/vscode-copilot-read-tools created on #2172 head 31b77759c57e2bd2312e89044e08bb09c1e5ca9f and committed locally at e182d5bf885b9d6adedc45c926d0e355dbcf520f. Follow-up commit f92f2e31ffe88fb05ec69b9bfc275e55e5525d06 applies independent-review and official VS Code docs corrections: parameterless tools omit inputSchema; runtime input is strictly rejected unless an empty object; tools require exactly one workspace root; connection and cancellation errors are actionable. Targeted validation passed: npm ci --ignore-scripts in vscode-extension; pnpm --dir vscode-extension run build; pnpm --dir vscode-extension test (15/15); pnpm exec tsx --test packages/contracts/src/rpc.test.ts packages/gsd-agent-modes/src/modes/rpc/rpc-project-progress.test.ts packages/gsd-agent-modes/src/modes/rpc/rpc-protocol-v2.test.ts (74/74); node --import ./src/resources/extensions/gsd/tests/resolve-ts.mjs --experimental-strip-types --test src/resources/extensions/gsd/tests/extension-bootstrap-isolation.test.ts (10/10); pnpm run build:agent-modes; pnpm run build:rpc-client; pnpm --filter @opengsd/contracts run build; git diff --check. pnpm run build:core passed earlier after the ProjectSnapshot import fix. pnpm run verify:fast passed 250/250 and strict audits, but the running verification also refreshed unrelated GPT-6 Astra model catalog generated output, which was removed from the worktree and is not part of the implementation commits. pnpm run typecheck:extensions still fails on upstream-identical src/headless-answers.ts importing @gsd/agent-modes/modes/rpc/jsonl.js; this is outside the current diff. Draft upstream PR #2179 opened against main, intentionally carrying the ordered #2172 prerequisite plus read-tools commits because GitHub cannot base an upstream PR on the fork-only #2172 head branch. Issue #2099 was updated in comment 5559891454 with the consumer-led traceability chain and deferred scope.",
-			"nextAction": "Await maintainer review of #2172 and draft PR #2179. After #2172 merges, rebase feat/vscode-copilot-read-tools onto current upstream/main, force-with-lease push only after explicit authorization, update #2179 to its standalone diff, rerun focused checks plus verify:fast without model-catalog churn, and record fresh CI evidence."
+			"context": "Public-safe docs/dev implementation plan for exposing existing DB-authoritative project progress and snapshot reads to Copilot Chat as native VS Code language model tools. The plan scopes implementation to the packaged VS Code extension, reuses the existing long-lived RPC process, rejects a separate first-party MCP server, avoids snapshot contract expansion, and treats GSD-W035/#2172 snapshot DB-handle isolation as a prerequisite before exposing another snapshot host surface.",
+			"validation": "2026-09-06: branch docs/vscode-copilot-read-tools-plan created from upstream/main f0c4ac52535b8ae9ea9855a2772ef43838d68bac and committed locally at bd8ce46e6091cf49076b331ba8e7cf72419c84d1. Local preflight confirmed origin=pimmink/gsd-pi, upstream=open-gsd/gsd-pi, correct local identity, node >=22.18.0, and pnpm@10.12.1. Read-only GitHub inspection confirmed #2099 open, #2102 closed, #2170 merged at 1af48f0d15a89155f343ab0679fe41b4e4e58ddf, and #2172 open. Official VS Code docs confirmed languageModelTools plus vscode.lm.registerTool and did not document readOnlyHint as a languageModelTools manifest property. New plan commit passed git diff --check after the metadata-block trailing whitespace fix. markdownlint-cli2 is not declared in package.json or the lockfile, so ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL Command \"markdownlint-cli2\" not found is a missing-tool limitation rather than a failing repo check. scripts/check-github-markdown.mjs is unavailable in the feature checkout; the governance anchor's GitHub Markdown helper was run instead and returned valid with no findings.",
+			"nextAction": "Decide whether to keep this as a docs/plan PR or use it to seed a fresh implementation branch after #2172 merges; before any public GitHub write, confirm the final branch diff still matches the validated plan commit."
+		},
+		{
+			"id": "GSD-W038",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Add GPT-6 Astra support for GitHub Copilot",
+			"status": "pr-open",
+			"issues": [2185],
+			"pullRequests": [2186],
+			"relatedRefs": ["GSD-W032"],
+			"planRefs": [],
+			"branches": ["fix/copilot-gpt6-astra"],
+			"commits": ["38175fad5"],
+			"context": "GitHub Copilot publishes the tool-capable gpt-6-astra model, but the bundled catalog and dynamic router lacked its static metadata, heavy-tier capability profile, and economics. The focused contribution adds generator fallback coverage, generated catalog metadata using the existing Copilot OpenAI-compatible transport, router coverage, pricing, and regression tests.",
+			"validation": "2026-09-07: public models.dev lists github-copilot/gpt-6-astra with reasoning/tool calls, 1,050,000-token context, 128,000 max output, and $10/$50/$1 per-million token pricing. Isolated branch was created from upstream/main at 68acbe786 and pushed to origin at 38175fad5. Catalog tests passed 18/18 and pi-ai typecheck passed. Router/pricing execution reached 26 passing tests before the clean worktree lacked the locally built @gsd/native directory-sync artifact. Upstream PR #2186 is ready for review; AI Triage, fast-gates, build, node22-smoke, ci-gate, GitGuardian, and Socket checks are green; Windows portability is skipped by workflow policy.",
+			"nextAction": "Await maintainer review on PR #2186; address review feedback and verify the final merge state.",
+			"localExtensionPatchRef": "copilot-gpt6-astra"
 		}
 	],
 	"localExtensionPatches": [
@@ -1085,13 +1095,13 @@
 				"GSD-W022"
 			],
 			"reimplementation": true,
-			"reimplementationNote": "Temporary local runtime patch that preserves resolved tool results with isError: true for local workflow execution while upstream PR #2016 remains open. Do not retire until #2016 is merged and included in the active installed runtime.",
+			"reimplementationNote": "Temporary local runtime patch that preserved resolved tool results with isError: true while upstream PR #2016 was open. Retired on 2026-09-07: #2016 merged upstream at 9212937f and is contained in v1.18.0, which the active local runtime now runs. Equivalent behavior verified at file level in packages/pi-agent-core/src/agent-loop.ts L1093/L1123. The removed extension is archived at plans/patches/archive/2026-09-07-pre-cleanup/w022-iserror-patch-runtime-extension/.",
 			"branchHeadsAtLastSync": {
 				"fix/agent-core-tool-result-iserror": "01332005"
 			},
-			"syncPolicy": "Keep in sync with GSD-W022 and remove after PR #2016 merges and the active runtime is upgraded to a release containing it.",
-			"retireWhen": "PR #2016 is merged upstream and the active local runtime is upgraded to a release containing commit 01332005 or equivalent behavior.",
-			"status": "active"
+			"syncPolicy": "Retired patch: no branch-head sync duty remains.",
+			"retireWhen": "Already retired on 2026-09-07 after PR #2016 merged and the active runtime was upgraded to v1.18.0 containing it.",
+			"status": "retired"
 		}
 	]
 }
