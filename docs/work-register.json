@@ -1157,15 +1157,18 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Validate canonical evidence in the MCP host smoke probe",
-			"status": "in-progress",
+			"status": "pr-open",
 			"issues": [
 				2099
 			],
-			"pullRequests": [],
+			"pullRequests": [
+				2273
+			],
 			"relatedRefs": [
 				"#2174",
 				"#2187",
-				"GSD-W039"
+				"GSD-W039",
+				"https://github.com/open-gsd/gsd-pi/issues/2099#issuecomment-5632799085"
 			],
 			"planRefs": [
 				"PLAN-2026-09-11-MCP-HOST-SMOKE-VALIDATION"
@@ -1177,8 +1180,8 @@
 				"9a8146a7c"
 			],
 			"context": "The MCP smoke probe is a separate evidence boundary for #2099. Its progress assertion predates readMetadata, its snapshot assertion predates truncation fields, and its authority/parity checks do not validate the properties they claim. This work fixes the probe and its behavioral regression coverage without changing consumer policy or host integrations.",
-			"validation": "2026-09-11: commit 9a8146a7c was created and pushed to origin/fix/mcp-host-smoke-validation. Focused syntax/tests passed 5/5, direct @opengsd/mcp-server build passed, packaged MCP stdio smoke passed 4/4, git diff checks passed, and verify:fast passed with ci-fast-gates all checks passed. Full build:core reached the final root typecheck but failed on pre-existing @opengsd/mcp-server module-resolution errors in src/resources/extensions/gsd/graph-context.ts and tools/complete-slice.ts; no W042 file was implicated. No native VS Code, third-party host, or upstream CI evidence has been collected.",
-			"nextAction": "Open an upstream PR from pimmink/gsd-pi:fix/mcp-host-smoke-validation to open-gsd/gsd-pi:main, then record the PR number and CI result. Keep host compatibility as separate evidence."
+			"validation": "2026-09-11: commit 9a8146a7c was created and pushed to origin/fix/mcp-host-smoke-validation. Focused syntax/tests passed 5/5, direct @opengsd/mcp-server build passed, packaged MCP stdio smoke passed 4/4, git diff checks passed, and verify:fast passed with ci-fast-gates all checks passed. Full build:core reached the final root typecheck but failed on pre-existing @opengsd/mcp-server module-resolution errors in src/resources/extensions/gsd/graph-context.ts and tools/complete-slice.ts; no W042 file was implicated. Upstream PR #2273 is open; #2099 comment https://github.com/open-gsd/gsd-pi/issues/2099#issuecomment-5632799085 addresses @m13v's fail-closed provenance concern and links the PR. No native VS Code, third-party host, or upstream CI evidence has been collected.",
+			"nextAction": "Watch PR #2273 CI and maintainer review; address feedback if requested. Keep host compatibility as separate evidence."
 		}
 	],
 	"localExtensionPatches": [
