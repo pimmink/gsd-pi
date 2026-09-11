@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-09-07",
+	"evidenceAsOf": "2026-09-11",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -1150,6 +1150,35 @@
 			"context": "Upstream issue #2191 tracks a version-check automation false positive discovered on #2189: the bot reported `GSD v`1.18.0`` as older than latest `v1.18.0`, apparently because the issue-template version field preserved Markdown inline-code formatting and `.github/workflows/version-check.yml` did not strip backticks before semver comparison.",
 			"validation": "2026-09-07: inspected #2189 live comments and confirmed the automated `<!-- gsd-version-check -->` comment said the reporter was running `v`1.18.0`` while latest was `v1.18.0`. Narrow source lookup found `.github/workflows/version-check.yml` extracts `### GSD version` with a first-token regex and only removes a leading `v`, so backtick-formatted values can parse incorrectly. Duplicate issue search found no existing bugception/version-check issue. Public issue body passed scripts/check-github-markdown.mjs before #2191 was opened upstream.",
 			"nextAction": "Await maintainer triage on #2191; if accepted, normalize Markdown-formatted version field values before version comparison."
+		},
+		{
+			"id": "GSD-W042",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Validate canonical evidence in the MCP host smoke probe",
+			"status": "in-progress",
+			"issues": [
+				2099
+			],
+			"pullRequests": [],
+			"relatedRefs": [
+				"#2174",
+				"#2187",
+				"GSD-W039"
+			],
+			"planRefs": [
+				"PLAN-2026-09-11-MCP-HOST-SMOKE-VALIDATION"
+			],
+			"branches": [
+				"fix/mcp-host-smoke-validation"
+			],
+			"commits": [
+				"9a8146a7c"
+			],
+			"context": "The MCP smoke probe is a separate evidence boundary for #2099. Its progress assertion predates readMetadata, its snapshot assertion predates truncation fields, and its authority/parity checks do not validate the properties they claim. This work fixes the probe and its behavioral regression coverage without changing consumer policy or host integrations.",
+			"validation": "2026-09-11: commit 9a8146a7c was created and pushed to origin/fix/mcp-host-smoke-validation. Focused syntax/tests passed 5/5, direct @opengsd/mcp-server build passed, packaged MCP stdio smoke passed 4/4, git diff checks passed, and verify:fast passed with ci-fast-gates all checks passed. Full build:core reached the final root typecheck but failed on pre-existing @opengsd/mcp-server module-resolution errors in src/resources/extensions/gsd/graph-context.ts and tools/complete-slice.ts; no W042 file was implicated. No native VS Code, third-party host, or upstream CI evidence has been collected.",
+			"nextAction": "Open an upstream PR from pimmink/gsd-pi:fix/mcp-host-smoke-validation to open-gsd/gsd-pi:main, then record the PR number and CI result. Keep host compatibility as separate evidence."
 		}
 	],
 	"localExtensionPatches": [
