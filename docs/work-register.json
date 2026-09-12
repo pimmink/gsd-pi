@@ -1179,10 +1179,11 @@
 			"commits": [
 				"9a8146a7c",
 				"f2f8137e",
-				"ef95f152"
+				"ef95f152",
+				"94193db0"
 			],
 			"context": "The MCP smoke probe is a separate evidence boundary for #2099. Its progress assertion predates readMetadata, its snapshot assertion predates truncation fields, and its authority/parity checks do not validate the properties they claim. This work fixes the probe and its behavioral regression coverage without changing consumer policy or host integrations.",
-			"validation": "2026-09-11: commits 9a8146a7c, f2f8137e, and ef95f152 are pushed to origin/fix/mcp-host-smoke-validation. Copilot review findings were addressed: bounded stderr, exact typed text blocks, safe import guard, malformed canonical errors, strict nested payloads, strict timestamps, and object collection items. Focused syntax/tests passed 5/5, direct @opengsd/mcp-server build passed, packaged MCP stdio smoke passed 4/4, git diff checks passed, and verify:fast passed with 267 tests and ci-fast-gates all checks passed. Full build:core previously reached the final root typecheck but failed on pre-existing @opengsd/mcp-server module-resolution errors; no W042 file was implicated. Upstream PR #2273 is open; its three inline Copilot threads are resolved and PR comment https://github.com/open-gsd/gsd-pi/pull/2273#issuecomment-5633117523 records final packaged validation. #2099 comment https://github.com/open-gsd/gsd-pi/issues/2099#issuecomment-5632799085 addresses @m13v's fail-closed provenance concern. No native VS Code, third-party host, or upstream CI evidence has been collected.",
+			"validation": "2026-09-12: commits 9a8146a7c, f2f8137e, ef95f152, and 94193db0 are pushed to origin/fix/mcp-host-smoke-validation. Copilot review findings were addressed: bounded stderr, exact typed text blocks, safe import guard, malformed canonical errors, strict nested payloads, strict timestamps, object collection items, and independent DB-vs-projection fixture evidence. Focused tests passed 6/6, direct @opengsd/mcp-server build passed, packaged MCP stdio smoke passed 5/5, git diff checks passed, and verify:fast passed with 267 tests and ci-fast-gates all checks passed. The prior online build failure was traced to runner Ubuntu package-download network failures, not W042 source. Upstream PR #2273 is open; PR comment https://github.com/open-gsd/gsd-pi/pull/2273#issuecomment-5645273131 and #2099 comment https://github.com/open-gsd/gsd-pi/issues/2099#issuecomment-5645273902 record both fixes. No native VS Code, third-party host, or upstream CI evidence has been collected.",
 			"nextAction": "Watch PR #2273 CI and maintainer review; address feedback if requested. Keep host compatibility as separate evidence."
 		}
 	],
