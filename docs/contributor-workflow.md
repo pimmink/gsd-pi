@@ -202,7 +202,12 @@ GitHub writes always require explicit authorization.
 4. Push to `origin`; open upstream PRs against `open-gsd/gsd-pi:main`.
 5. Link an issue only when one exists or upstream policy requires it.
 6. Describe reproduction, root cause, changes, validation, risks, and remaining work.
-7. Update the work register from the governance anchor.
+7. Write issue and PR bodies in rich [GitHub Flavored Markdown](https://github.github.com/gfm/):
+   headings, tables, language-tagged fenced code blocks, collapsible `<details>` evidence
+   sections, task lists, and alert blockquotes (`> [!NOTE]`, `> [!IMPORTANT]`, `> [!WARNING]`)
+   wherever they improve reviewability. Plain walls of text are reserved for trivially small
+   changes.
+8. Update the work register from the governance anchor.
 
 Never force-push, merge, close, delete a remote branch, or rewrite history without a separate
 explicit decision.
