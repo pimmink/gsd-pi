@@ -9,8 +9,10 @@ import type {
 } from "@gsd/pi-coding-agent";
 
 import { deriveState } from "./state.js";
+import { heldProjectionChangesBeforeDispatch } from "./state-reconciliation.js";
 import { loadFile } from "./files.js";
-import { isDbAvailable, getClosedSliceIds } from "./gsd-db.js";
+import { isDbAvailable } from "./gsd-db.js";
+import { readClosedSliceIds } from "./db/lifecycle-read.js";
 import {
   resolveSliceFile, relSliceFile,
 } from "./paths.js";
@@ -52,6 +54,14 @@ export async function dispatchDirectPhase(
   base: string,
   opts: { milestoneId?: string } = {},
 ): Promise<void> {
+  // A tracked projection changed by pull, merge, rebase or branch switch stops
+  // the dispatch until the user imports or discards it.
+  const heldProjectionChanges = await heldProjectionChangesBeforeDispatch(base);
+  if (heldProjectionChanges) {
+    ctx.ui.notify(heldProjectionChanges, "error");
+    return;
+  }
+
   const parsed = parseDirectDispatchPhase(phase);
   const state = await deriveState(base);
   const mid = opts.milestoneId ?? parsed.milestoneId ?? state.activeMilestone?.id;
@@ -97,7 +107,7 @@ export async function dispatchDirectPhase(
             `Slice ${sid} requires discussion before planning. Run /gsd discuss to discuss this slice, then /gsd auto to resume.`,
             "info",
           );
-          await pauseAuto(ctx, pi);
+          await pauseAuto(ctx, pi, "ambiguous_intent");
           return;
         }
 
@@ -201,7 +211,7 @@ export async function dispatchDirectPhase(
     case "reassess-roadmap": {
       // DB-authoritative read (ADR-017) — markdown projections are never
       // consulted for dispatch decisions. No DB rows means no completed slices.
-      const completedSliceIds = isDbAvailable() ? getClosedSliceIds(mid) : [];
+      const completedSliceIds = isDbAvailable() ? readClosedSliceIds(mid) : [];
       if (completedSliceIds.length === 0) {
         ctx.ui.notify("Cannot dispatch reassess-roadmap: no completed slices.", "warning");
         return;
@@ -229,7 +239,7 @@ export async function dispatchDirectPhase(
       // roadmap instead (#1693).
       // DB-authoritative read (ADR-017) — no markdown fallback for dispatch
       // decisions.
-      const uatCompletedSliceIds = isDbAvailable() ? getClosedSliceIds(mid) : [];
+      const uatCompletedSliceIds = isDbAvailable() ? readClosedSliceIds(mid) : [];
       if (uatCompletedSliceIds.length === 0) {
         ctx.ui.notify("Cannot dispatch run-uat: no completed slices.", "warning");
         return;

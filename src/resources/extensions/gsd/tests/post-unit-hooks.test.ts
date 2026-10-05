@@ -1,8 +1,8 @@
 // GSD Extension — Hook Engine Tests (Post-Unit, Pre-Dispatch, State Persistence)
 
-import { describe, test } from 'node:test';
+import { after, describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync, readFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -24,14 +24,23 @@ import {
   triggerHookManually,
 } from "../post-unit-hooks.ts";
 import { invalidateAllCaches } from "../cache.ts";
+import { closeDatabase, openDatabase } from "../gsd-db.ts";
+import { readHookStateJson, writeHookStateJson } from "../db/writers/runtime-control.ts";
+import { hookStateScope } from "../rule-registry.ts";
+import { listQueuedSidecarItems } from "../db/unit-dispatch-sidecars.ts";
+import { enqueueSidecarItem } from "../db/writers/unit-dispatch-sidecars.ts";
 
 // ─── Fixture Helpers ───────────────────────────────────────────────────────
 
 function createFixtureBase(): string {
   const base = mkdtempSync(join(tmpdir(), "gsd-hook-test-"));
   mkdirSync(join(base, ".gsd", "milestones", "M001", "slices", "S01", "tasks"), { recursive: true });
+  // Hook state is persisted in the database, keyed by the base path.
+  openDatabase(":memory:");
   return base;
 }
+
+after(() => closeDatabase());
 
 function writeHookPreferences(base: string, hookYaml: string): void {
   writeFileSync(join(base, ".gsd", "PREFERENCES.md"), `---\npost_unit_hooks:\n${hookYaml}\n---\n`, "utf-8");
@@ -245,21 +254,23 @@ test('Restore reconciliation re-enqueues the lost hook dispatch (#1246)', () => 
     assert.equal(dispatch.unitType, "hook/plan-review");
     persistHookState(base);
 
-    // Pause/resume: activeHook restored, but the session-local sidecar queue is
-    // gone (never persisted).
+    // Pause/resume: activeHook restored, but the pause closed the queue row
+    // of the hook dispatch.
     resetHookState();
     restoreHookState(base);
     assert.ok(getActiveHook(), "activeHook restored from disk");
 
     // Reconciliation re-enqueues the missing dispatch so the hook actually runs.
-    const sidecarQueue: any[] = [];
-    reconcileRestoredHookDispatch(base, sidecarQueue);
+    openDatabase(join(base, ".gsd", "gsd.db"));
+    reconcileRestoredHookDispatch(base);
+    const sidecarQueue = listQueuedSidecarItems();
     assert.equal(sidecarQueue.length, 1, "lost hook dispatch is re-enqueued");
     assert.equal(sidecarQueue[0].kind, "hook");
     assert.equal(sidecarQueue[0].unitType, "hook/plan-review");
     assert.equal(sidecarQueue[0].unitId, "M002/S01");
     assert.match(sidecarQueue[0].prompt, /Review the plan for M002\/S01/);
   } finally {
+    closeDatabase();
     resetHookState();
     invalidateAllCaches();
     rmSync(base, { recursive: true, force: true });
@@ -284,13 +295,16 @@ test('Restore reconciliation is a no-op when the dispatch is already queued (#12
     resetHookState();
     restoreHookState(base);
 
-    const sidecarQueue: any[] = [
-      { kind: "hook", unitType: "hook/plan-review", unitId: "M002/S01", prompt: "already here" },
-    ];
-    reconcileRestoredHookDispatch(base, sidecarQueue);
+    openDatabase(join(base, ".gsd", "gsd.db"));
+    enqueueSidecarItem({ kind: "hook", unitType: "hook/plan-review", unitId: "M002/S01", prompt: "already here" },
+      null,
+    );
+    reconcileRestoredHookDispatch(base);
+    const sidecarQueue = listQueuedSidecarItems();
     assert.equal(sidecarQueue.length, 1, "does not duplicate an existing hook dispatch");
     assert.equal(sidecarQueue[0].prompt, "already here");
   } finally {
+    closeDatabase();
     resetHookState();
     invalidateAllCaches();
     rmSync(base, { recursive: true, force: true });
@@ -301,10 +315,11 @@ test('Restore reconciliation is a no-op with no active hook (#1246)', () => {
   resetHookState();
   const base = createFixtureBase();
   try {
-    const sidecarQueue: any[] = [];
-    reconcileRestoredHookDispatch(base, sidecarQueue);
-    assert.equal(sidecarQueue.length, 0, "nothing enqueued when no active hook");
+    openDatabase(join(base, ".gsd", "gsd.db"));
+    reconcileRestoredHookDispatch(base);
+    assert.equal(listQueuedSidecarItems().length, 0, "nothing enqueued when no active hook");
   } finally {
+    closeDatabase();
     resetHookState();
     invalidateAllCaches();
     rmSync(base, { recursive: true, force: true });
@@ -548,6 +563,13 @@ test('Pre-dispatch: hook units bypass', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 // Phase 3: State Persistence Tests
 // ═══════════════════════════════════════════════════════════════════════════
+// Hook state is a database row. hook-state.json is a diagnostic copy.
+function storedHookState(base: string): { savedAt?: unknown; cycleCounts: Record<string, number> } {
+  const raw = readHookStateJson(hookStateScope(base));
+  assert.ok(raw !== null, "hook state row exists");
+  return JSON.parse(raw);
+}
+
 test('State persistence: persist and restore', () => {
   const base = createFixtureBase();
   try {
@@ -555,10 +577,9 @@ test('State persistence: persist and restore', () => {
 
     // Persist empty state
     persistHookState(base);
-    const filePath = join(base, ".gsd", "hook-state.json");
-    assert.ok(existsSync(filePath), "hook-state.json created");
+    assert.ok(existsSync(join(base, ".gsd", "hook-state.json")), "diagnostic hook-state.json written");
 
-    const content = JSON.parse(readFileSync(filePath, "utf-8"));
+    const content = storedHookState(base);
     assert.deepStrictEqual(typeof content.savedAt, "string", "savedAt is a string");
     assert.deepStrictEqual(Object.keys(content.cycleCounts).length, 0, "empty cycle counts");
   } finally {
@@ -566,18 +587,21 @@ test('State persistence: persist and restore', () => {
   }
 });
 
-test('State persistence: restore from disk', () => {
+test('State persistence: restore reads the database row, not hook-state.json', () => {
   const base = createFixtureBase();
   try {
     resetHookState();
 
-    // Write a state file with some cycle counts
-    const stateFile = join(base, ".gsd", "hook-state.json");
-    writeFileSync(stateFile, JSON.stringify({
+    writeHookStateJson(hookStateScope(base), JSON.stringify({
       cycleCounts: {
         "review/execute-task/M001/S01/T01": 2,
         "simplify/execute-task/M001/S01/T02": 1,
       },
+      savedAt: new Date().toISOString(),
+    }));
+    // A file that disagrees with the row must not be restored.
+    writeFileSync(join(base, ".gsd", "hook-state.json"), JSON.stringify({
+      cycleCounts: { "review/execute-task/M001/S01/T01": 9 },
       savedAt: new Date().toISOString(),
     }), "utf-8");
 
@@ -586,7 +610,7 @@ test('State persistence: restore from disk', () => {
 
     // Verify by persisting and reading back
     persistHookState(base);
-    const restored = JSON.parse(readFileSync(stateFile, "utf-8"));
+    const restored = storedHookState(base);
     assert.deepStrictEqual(restored.cycleCounts["review/execute-task/M001/S01/T01"], 2, "cycle count restored for review");
     assert.deepStrictEqual(restored.cycleCounts["simplify/execute-task/M001/S01/T02"], 1, "cycle count restored for simplify");
   } finally {
@@ -600,38 +624,36 @@ test('State persistence: clear', () => {
     resetHookState();
 
     // Write then clear
-    const stateFile = join(base, ".gsd", "hook-state.json");
-    writeFileSync(stateFile, JSON.stringify({
+    writeHookStateJson(hookStateScope(base), JSON.stringify({
       cycleCounts: { "review/execute-task/M001/S01/T01": 3 },
       savedAt: new Date().toISOString(),
-    }), "utf-8");
+    }));
 
     clearPersistedHookState(base);
 
-    const cleared = JSON.parse(readFileSync(stateFile, "utf-8"));
-    assert.deepStrictEqual(Object.keys(cleared.cycleCounts).length, 0, "cycle counts cleared");
+    assert.deepStrictEqual(Object.keys(storedHookState(base).cycleCounts).length, 0, "cycle counts cleared");
   } finally {
     rmSync(base, { recursive: true, force: true });
   }
 });
 
-test('State persistence: restore handles missing file', () => {
+test('State persistence: restore handles a missing row', () => {
   const base = createFixtureBase();
   try {
     resetHookState();
     // Should not throw
     restoreHookState(base);
-    assert.deepStrictEqual(getActiveHook(), null, "no active hook after restore from missing file");
+    assert.deepStrictEqual(getActiveHook(), null, "no active hook after restore with no row");
   } finally {
     rmSync(base, { recursive: true, force: true });
   }
 });
 
-test('State persistence: restore handles corrupt file', () => {
+test('State persistence: restore handles a corrupt row', () => {
   const base = createFixtureBase();
   try {
     resetHookState();
-    writeFileSync(join(base, ".gsd", "hook-state.json"), "not json", "utf-8");
+    writeHookStateJson(hookStateScope(base), "not json");
     // Should not throw
     restoreHookState(base);
     assert.deepStrictEqual(getActiveHook(), null, "no active hook after corrupt restore");

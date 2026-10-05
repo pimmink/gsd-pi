@@ -29,26 +29,31 @@ import {
   insertArtifact,
   openDatabase,
 } from "../gsd-db.js";
+import { readCompatMarker, writeCompatMarker } from "../compat/compat-marker.js";
 import { stripProjectionStamp } from "../markdown-renderer.js";
-import { clearPathCache } from "../paths.js";
+import { clearPathCache, targetTaskFile } from "../paths.js";
 import {
   claimTaskAttempt,
   readLatestTaskAttempt,
   settleTaskAttempt,
 } from "../task-execution-domain-operation.js";
 import { reopenTask } from "../task-lifecycle-domain-operation.js";
+import { assertWorkerRendersStaleProjection } from "./projection-render-failure-gate.ts";
 import {
   recordFailureAndSelectRecovery,
   resumeTaskRecovery,
 } from "../task-recovery-domain-operation.js";
 import { resolveTaskCompletionAuthority } from "../task-completion-compatibility-adapter.js";
 import { recordTaskTechnicalVerdict } from "../task-verification-domain-operation.js";
+import { recordExecRun } from "../db/writers/exec-runs.js";
 import { captureVerificationSourceSnapshot } from "../verification-source-integrity.js";
 import {
+  adoptOrTransitionLifecycle,
   appendKernelCheckpoint,
   readDomainOperationFence,
 } from "../db/writers/lifecycle-commands.js";
 import { checkEngineHealth } from "../doctor-engine-checks.js";
+import { clearGSDPreferencesCache } from "../preferences.js";
 import type { DoctorIssue } from "../doctor-types.js";
 import type { ExecutionInvocation } from "../execution-invocation.js";
 import {
@@ -102,12 +107,14 @@ interface StagedTaskCompletionReceipt {
   resultId: string;
   summaryPath: string;
   nextStage: "verify" | "route";
+  stale?: true;
 }
 
 interface PublishedTaskCompletionReceipt {
   status: "committed" | "replayed";
   attemptId: string;
   summaryPath: string;
+  stale?: true;
 }
 
 interface TaskCompletionCompatibilityAdapter {
@@ -221,9 +228,18 @@ function activateExactMergedClosure(basePath: string): string {
   return execFileSync("git", ["rev-parse", "HEAD"], { cwd: basePath, encoding: "utf8" }).trim();
 }
 
-function recordExactMergedUatVerdict(basePath: string, attemptId: string, mergeCommit: string): void {
+/**
+ * Record the exact-merged evidence of the Task: a successful gsd_uat_exec run,
+ * the saved passing run-uat run `savedRunId`, and the host verdict that cites
+ * the exec run. The exec run is recorded in run-uat attempt 1.
+ */
+function recordExactMergedUatVerdict(
+  basePath: string,
+  attemptId: string,
+  mergeCommit: string,
+  savedRunId = "uat:M001:S01:attempt-1",
+): void {
   const evidenceId = "exact-merged-uat";
-  const runId = "uat:M001:S01:attempt-2";
   const source = captureVerificationSourceSnapshot([{ id: "project", cwd: basePath }]);
   assert.equal(source.ok, true, source.ok ? undefined : source.error);
   const environment = {
@@ -233,15 +249,9 @@ function recordExactMergedUatVerdict(basePath: string, attemptId: string, mergeC
     localMergeCommit: mergeCommit,
     sourceContentRevision: source.snapshot.aggregateRevision,
   };
+  // ASSESSMENT text that names every value. The text decides nothing.
   const assessment = [
-    "---",
-    "sliceId: S01",
-    "uatType: runtime-executable",
-    "verdict: PASS",
-    "attempt: 2",
-    `runId: ${runId}`,
-    "---",
-    "",
+    `runId: ${savedRunId}`,
     `gsd_uat_exec:${evidenceId}`,
     mergeCommit,
     source.snapshot.aggregateRevision,
@@ -249,22 +259,23 @@ function recordExactMergedUatVerdict(basePath: string, attemptId: string, mergeC
     CAPSTONE_HASH,
     "",
   ].join("\n");
-  const execDir = join(basePath, ".gsd", "exec");
-  mkdirSync(execDir, { recursive: true });
-  writeFileSync(join(execDir, `${evidenceId}.meta.json`), JSON.stringify({
+  recordExecRun({
+    kind: "uat_exec",
+    milestoneId: TASK.milestoneId,
+    sliceId: TASK.sliceId,
+    checkId: "exact-merge-capstone",
     id: evidenceId,
+    runtime: "bash",
+    command: "node capstone.js",
+    cwd: basePath,
     exit_code: 0,
     signal: null,
-    timed_out: false,
+    timedOut: false,
     aborted: false,
-    metadata: {
-      kind: "uat_exec",
-      milestoneId: TASK.milestoneId,
-      sliceId: TASK.sliceId,
-      checkId: "exact-merge-capstone",
-      intent: "uat-runtime-check",
-    },
-  }));
+    started_at: "2026-07-12T00:02:00.000Z",
+    duration_ms: 1,
+    output_hash: "sha256:test",
+  });
   db().prepare(`
     INSERT INTO assessments (
       path, milestone_id, slice_id, status, scope, full_content, created_at
@@ -290,9 +301,9 @@ function recordExactMergedUatVerdict(basePath: string, attemptId: string, mergeC
     ) VALUES (
       'uat:M001:S01', :run_id, 'UAT', 'uat', 'run-uat', 'run-uat:M001/S01',
       'M001', 'S01', 'pass', 'none', 'Exact-merged UAT passed.',
-      :findings, 2, 2, 0, '2026-07-12T00:03:00.000Z'
+      :findings, 1, 1, 0, '2026-07-12T00:03:00.000Z'
     )
-  `).run({ ":run_id": runId, ":findings": assessment });
+  `).run({ ":run_id": savedRunId, ":findings": assessment });
   recordTaskTechnicalVerdict({
     invocation: invocation(`pi:exact-merged-verification:${attemptId}`),
     attemptId,
@@ -835,6 +846,97 @@ test("#1763: verified publication from a milestone worktree restores both SUMMAR
   );
 });
 
+function revertLifecycleToReadyFixture(): void {
+  // in_progress → ready is not a canonical transition, so the #2417 side-door
+  // shadow cannot exist on one legal edge. Build it the way real databases
+  // reached it — a sequence of fenced lifecycle writes that each satisfy the
+  // transition trigger (in_progress → paused → ready).
+  for (const status of ["paused", "ready"] as const) {
+    const fence = readDomainOperationFence();
+    executeDomainOperation({
+      operationType: "test.task.side-door-revert",
+      idempotencyKey: `fixture/2417-revert-${status}`,
+      expectedRevision: fence.revision,
+      expectedAuthorityEpoch: fence.authorityEpoch,
+      actorType: "test",
+      sourceTransport: "test",
+      payload: { taskId: "T01", to: status },
+    }, (context) => {
+      adoptOrTransitionLifecycle(context, {
+        itemKind: "task",
+        milestoneId: "M001",
+        sliceId: "S01",
+        taskId: "T01",
+        lifecycleStatus: status,
+      });
+      return {
+        events: [{
+          eventType: "test.task.side-door-revert",
+          entityType: "task",
+          entityId: "M001/S01/T01",
+          payload: { to: status },
+          destinations: ["test"],
+        }],
+        projections: [{
+          projectionKey: "test/m001/s01/t01",
+          projectionKind: "test",
+          rendererVersion: "1",
+        }],
+      };
+    });
+  }
+}
+
+test("#2417: publication commits from a reverted ready lifecycle shadow", async () => {
+  const { publishVerifiedTaskCompletion, stageTaskCompletion } = await subject();
+  const { basePath, attemptId } = createFixture();
+  await stageTaskCompletion(stageInput(basePath));
+  recordPassingHostVerdict(basePath, attemptId);
+
+  revertLifecycleToReadyFixture();
+
+  const published = await publishVerifiedTaskCompletion(publishInput(basePath, attemptId));
+
+  assert.equal(published.status, "committed");
+  assert.equal(
+    row(`SELECT lifecycle_status AS s FROM workflow_item_lifecycles WHERE item_kind = 'task' AND task_id = 'T01'`).s,
+    "completed",
+    "publication re-adopts the reverted shadow to completed",
+  );
+  assert.equal(row(`SELECT status AS s FROM tasks WHERE id = 'T01'`).s, "complete");
+});
+
+test("#2417: a ready lifecycle shadow without a passing verdict stays fail-closed", async () => {
+  const { publishVerifiedTaskCompletion, stageTaskCompletion } = await subject();
+  const { basePath, attemptId } = createFixture();
+  await stageTaskCompletion(stageInput(basePath));
+  revertLifecycleToReadyFixture();
+
+  await assert.rejects(
+    () => publishVerifiedTaskCompletion(publishInput(basePath, attemptId)),
+    /passing host Technical Verdict/,
+  );
+  assert.equal(
+    row(`SELECT lifecycle_status AS s FROM workflow_item_lifecycles WHERE item_kind = 'task' AND task_id = 'T01'`).s,
+    "ready",
+    "a refused publication must not move the lifecycle",
+  );
+});
+
+test("#2417: doctor reports a settled succeeded verify-stage Attempt on a non-terminal Task", async () => {
+  const { stageTaskCompletion } = await subject();
+  const { basePath, attemptId } = createFixture();
+  await stageTaskCompletion(stageInput(basePath));
+
+  const issues: DoctorIssue[] = [];
+  await checkEngineHealth(basePath, issues, []);
+
+  const stranded = issues.filter((issue) => issue.code === "unpublished_succeeded_attempt");
+  assert.equal(stranded.length, 1);
+  assert.equal(stranded[0].unitId, "M001/S01/T01");
+  assert.match(stranded[0].message, new RegExp(attemptId));
+});
+
 test("#1677: inside a worktree the classifier falls back to the project-root copy", async () => {
   const { stageTaskCompletion } = await subject();
   const { basePath } = createFixture();
@@ -979,6 +1081,200 @@ test("#1726: an interrupted retry quarantines its abandoned staged SUMMARY witho
   );
 });
 
+// ─── Trailing-newline stamp separator (issue #2427) ────────────────────────
+//
+// The stamper inserts a "\n" separator before the stamp when the render intent
+// does not end with a newline, and stripProjectionStamp cannot remove it (at
+// strip time it is indistinguishable from the content's own trailing newline).
+// Stamp-insensitive comparisons must therefore also be trailing-newline-
+// insensitive, or newline-less DB intents can never compare equal to their
+// own stamped projections.
+
+function stagedArtifactAndTask(): {
+  artifact: { path: string; fullContent: string };
+  task: { status: string; fullSummaryMd: string };
+} {
+  const artifact = row(
+    "SELECT path, full_content FROM artifacts WHERE artifact_type = 'SUMMARY' AND task_id = 'T01'",
+  );
+  const taskRow = row("SELECT status, full_summary_md FROM tasks WHERE id = 'T01'");
+  return {
+    artifact: {
+      path: String(artifact.path),
+      fullContent: String(artifact.full_content),
+    },
+    task: {
+      status: String(taskRow.status),
+      fullSummaryMd: String(taskRow.full_summary_md),
+    },
+  };
+}
+
+function forgetProjectionInCompatMarker(basePath: string): void {
+  const marker = readCompatMarker(basePath);
+  marker.projections = {};
+  writeCompatMarker(basePath, marker);
+}
+
+function interruptedRetryFixture(basePath: string, attemptId: string): void {
+  db().prepare(`
+    INSERT INTO unit_dispatches (
+      trace_id, turn_id, worker_id, milestone_lease_token,
+      milestone_id, slice_id, task_id, unit_type, unit_id,
+      status, attempt_n, started_at
+    ) VALUES (
+      'trace-dispatch-2', 'turn-dispatch-2', 'worker-1', 7,
+      'M001', 'S01', 'T01', 'execute-task', 'M001/S01/T01',
+      'claimed', 2, '2026-07-12T00:10:00.000Z'
+    )
+  `).run();
+  const retry = claimTaskAttempt({
+    invocation: invocation("task-completion/interrupted-retry-claim"),
+    task: TASK,
+    workerId: "worker-1",
+    milestoneLeaseToken: 7,
+    coordinationDispatchId: Number(row("SELECT MAX(id) AS id FROM unit_dispatches").id),
+    retryOfAttemptId: attemptId,
+  });
+  settleTaskAttempt({
+    invocation: invocation("task-completion/interrupted-retry-settle"),
+    attemptId: retry.attemptId,
+    outcome: "interrupted",
+    failureClass: "operator-cancelled",
+    summary: "The retry was cancelled",
+    output: { cancelled: true },
+  });
+}
+
+test("#2427: a staged SUMMARY whose DB intent lost its trailing newline stays canonical", async () => {
+  const { stageTaskCompletion } = await subject();
+  const { basePath } = createFixture();
+  await stageTaskCompletion(stageInput(basePath));
+
+  // Rewrite the DB render intent without its trailing newline — the stamped
+  // projection keeps the separator newline the stamper inserted.
+  const { artifact, task } = stagedArtifactAndTask();
+  const trimmed = task.fullSummaryMd.replace(/\n+$/u, "");
+  assert.notEqual(trimmed, task.fullSummaryMd, "fixture staged summary ends with a newline");
+  db().prepare("UPDATE tasks SET full_summary_md = :md WHERE id = 'T01'").run({ ":md": trimmed });
+
+  const { isCanonicalStagedTaskSummaryProjection } = await import(
+    "../task-summary-projection-classification.js"
+  );
+  assert.equal(
+    isCanonicalStagedTaskSummaryProjection(basePath, {
+      path: artifact.path,
+      milestoneId: "M001",
+      sliceId: "S01",
+      taskId: "T01",
+      fullContent: artifact.fullContent,
+    }, {
+      milestoneId: "M001",
+      sliceId: "S01",
+      taskId: "T01",
+      status: "in_progress",
+      fullSummaryMd: trimmed,
+    }),
+    true,
+    "a trailing-newline-only difference must not declassify the staged SUMMARY",
+  );
+  assert.deepEqual(
+    await taskSummaryDivergence(basePath),
+    { doctorDivergence: false, reconciliationDivergence: false },
+    "doctor and reconciliation must accept the newline-less staged SUMMARY",
+  );
+});
+
+test("#2427: genuinely changed DB intent still classifies a staged SUMMARY as drift", async () => {
+  const { stageTaskCompletion } = await subject();
+  const { basePath } = createFixture();
+  await stageTaskCompletion(stageInput(basePath));
+
+  const changed = String(row("SELECT full_summary_md FROM tasks WHERE id = 'T01'").full_summary_md)
+    .replace("Implemented the compatibility seam", "Implemented an entirely different seam");
+  db().prepare("UPDATE tasks SET full_summary_md = :md WHERE id = 'T01'").run({ ":md": changed });
+
+  const { artifact } = stagedArtifactAndTask();
+  const { isCanonicalStagedTaskSummaryProjection } = await import(
+    "../task-summary-projection-classification.js"
+  );
+  assert.equal(
+    isCanonicalStagedTaskSummaryProjection(basePath, {
+      path: artifact.path,
+      milestoneId: "M001",
+      sliceId: "S01",
+      taskId: "T01",
+      fullContent: artifact.fullContent,
+    }, {
+      milestoneId: "M001",
+      sliceId: "S01",
+      taskId: "T01",
+      status: "in_progress",
+      fullSummaryMd: changed,
+    }),
+    false,
+    "an interior content change is still classified as non-canonical",
+  );
+});
+
+test("#2427: an abandoned staged SUMMARY matches a newline-less DB intent without a blocker", async () => {
+  const { stageTaskCompletion } = await subject();
+  const { basePath, attemptId } = createFixture();
+  const staged = await stageTaskCompletion(stageInput(basePath));
+  const stagedMd = String(row("SELECT full_summary_md FROM tasks WHERE id = 'T01'").full_summary_md);
+
+  interruptedRetryFixture(basePath, attemptId);
+  assert.equal(existsSync(staged.summaryPath), true, "the abandoned disk projection awaits quarantine");
+
+  // Restore a DB intent that matches the projection except for the trailing
+  // newline, and forget the projection in the compat marker so the content
+  // comparison is the only acceptance path left.
+  const trimmed = stagedMd.replace(/\n+$/u, "");
+  assert.notEqual(trimmed, stagedMd, "fixture staged summary ends with a newline");
+  db().prepare("UPDATE tasks SET full_summary_md = :md WHERE id = 'T01'").run({ ":md": trimmed });
+  forgetProjectionInCompatMarker(basePath);
+
+  const state = reconciliationState();
+  const drift = detectArtifactDbDrift(state, { basePath, state }).find((record) =>
+    record.kind === "artifact-db-status-divergence" && record.taskId === "T01"
+  );
+  assert.ok(drift && drift.kind === "artifact-db-status-divergence");
+  assert.equal(
+    describeArtifactDbDriftBlocker(drift, { basePath, state }),
+    null,
+    "a trailing-newline-only difference must not fail-closed the abandoned staged SUMMARY",
+  );
+});
+
+test("#2427: an abandoned staged SUMMARY with genuinely different DB intent still blocks", async () => {
+  const { stageTaskCompletion } = await subject();
+  const { basePath, attemptId } = createFixture();
+  const staged = await stageTaskCompletion(stageInput(basePath));
+  const stagedMd = String(row("SELECT full_summary_md FROM tasks WHERE id = 'T01'").full_summary_md);
+
+  interruptedRetryFixture(basePath, attemptId);
+  assert.equal(existsSync(staged.summaryPath), true);
+
+  db().prepare("UPDATE tasks SET full_summary_md = :md WHERE id = 'T01'").run({
+    ":md": stagedMd.replace(
+      "Implemented the compatibility seam",
+      "Implemented an entirely different seam",
+    ),
+  });
+  forgetProjectionInCompatMarker(basePath);
+
+  const state = reconciliationState();
+  const drift = detectArtifactDbDrift(state, { basePath, state }).find((record) =>
+    record.kind === "artifact-db-status-divergence" && record.taskId === "T01"
+  );
+  assert.ok(drift && drift.kind === "artifact-db-status-divergence");
+  assert.match(
+    describeArtifactDbDriftBlocker(drift, { basePath, state }) ?? "",
+    /Artifact\/DB status drift/,
+    "genuinely different content must stay fail-closed",
+  );
+});
+
 test("staging normalizes a pending legacy Task and clears its stale completion timestamp", async () => {
   const { stageTaskCompletion } = await subject();
   const { basePath } = createFixture();
@@ -1046,7 +1342,7 @@ test("changed stage replay payload conflicts without restaging Task metadata or 
   assert.deepEqual(settlementState(), before);
 });
 
-test("a summary projection failure leaves the immutable Result and staged legacy state intact for replay repair", async () => {
+test("a summary projection failure returns the committed staging receipt with a stale flag", async () => {
   const { stageTaskCompletion } = await subject();
   const { basePath, attemptId } = createFixture();
   _setManagedMutationBoundaryForTest((boundary, target) => {
@@ -1055,7 +1351,12 @@ test("a summary projection failure leaves the immutable Result and staged legacy
     }
   });
 
-  await assert.rejects(stageTaskCompletion(stageInput(basePath)), /projection|summary/i);
+  const staged = await stageTaskCompletion(stageInput(basePath));
+  assert.equal(staged.status, "committed");
+  assert.equal(staged.attemptId, attemptId);
+  assert.equal(staged.nextStage, "verify");
+  assert.equal(staged.stale, true);
+  assert.equal(staged.summaryPath, "");
 
   assert.deepEqual(row("SELECT attempt_state, settle_outcome FROM workflow_execution_attempts"), {
     attempt_state: "settled",
@@ -1071,9 +1372,14 @@ test("a summary projection failure leaves the immutable Result and staged legacy
   assert.equal(count("verification_evidence"), 1);
 
   _setManagedMutationBoundaryForTest(null);
+  await assertWorkerRendersStaleProjection(
+    basePath,
+    targetTaskFile(basePath, "M001", "S01", "T01", "SUMMARY", "Compatibility adapter"),
+  );
   const replayed = await stageTaskCompletion(stageInput(basePath));
   assert.equal(replayed.status, "replayed");
   assert.equal(replayed.attemptId, attemptId);
+  assert.equal(replayed.stale, undefined);
   assert.equal(existsSync(replayed.summaryPath), true);
   assert.equal(count("workflow_attempt_results"), 1);
   assert.equal(count("verification_evidence"), 1);
@@ -1183,6 +1489,23 @@ test("exact-merged UAT evidence authorizes dossier task publication", async () =
   assert.equal(published.status, "committed");
   assert.equal(taskState().status, "complete");
   assert.equal(row("SELECT lifecycle_status FROM workflow_item_lifecycles").lifecycle_status, "completed");
+});
+
+test("an exec run outside the saved passing UAT run does not authorize dossier task publication", async () => {
+  const { publishVerifiedTaskCompletion, stageTaskCompletion } = await subject();
+  const { basePath, attemptId } = createFixture();
+  const mergeCommit = activateExactMergedClosure(basePath);
+  await stageTaskCompletion(stageInput(basePath));
+  // The ASSESSMENT text names the exec run, the merge commit and the hashes,
+  // but the saved passing run is another run than the one the exec run is in.
+  recordExactMergedUatVerdict(basePath, attemptId, mergeCommit, "uat:M001:S01:attempt-2");
+
+  await assert.rejects(
+    publishVerifiedTaskCompletion(publishInput(basePath, attemptId)),
+    /passing canonical exact-merged UAT gate receipt/,
+  );
+
+  assert.equal(taskState().status, "in_progress");
 });
 
 test("verified publication atomically closes only its task gates from durable Attempt evidence", async () => {
@@ -1487,7 +1810,7 @@ test("exact stage and publication replay repair projections without duplicate fa
   }, beforeReplay);
 });
 
-test("auto publication replays a committed Task completion after PLAN projection failure", async () => {
+test("auto publication commits the Task completion when the PLAN projection fails, and a replay renders it", async () => {
   const { publishVerifiedTaskCompletion, stageTaskCompletion } = await subject();
   const { publishVerifiedTaskExecution } = await import("../auto/task-execution-cutover.js");
   const { basePath, planPath, attemptId } = createFixture();
@@ -1508,10 +1831,7 @@ test("auto publication replays a committed Task completion after PLAN projection
   };
   const dependencies = { readLatestTaskAttempt, publishVerifiedTaskCompletion };
 
-  await assert.rejects(
-    publishVerifiedTaskExecution(input, dependencies),
-    /PLAN projection failed/i,
-  );
+  await publishVerifiedTaskExecution(input, dependencies);
   assert.equal(taskState().status, "complete");
   assert.equal(
     readLatestTaskAttempt(TASK)?.nextStage,
@@ -1526,6 +1846,7 @@ test("auto publication replays a committed Task completion after PLAN projection
   };
 
   _setManagedMutationBoundaryForTest(null);
+  await assertWorkerRendersStaleProjection(basePath, planPath);
   await publishVerifiedTaskExecution(input, dependencies);
 
   assert.match(readFileSync(planPath, "utf8"), /\[x\][^\n]*\*\*T01/i);
@@ -1579,6 +1900,200 @@ test("#1973: attempt-gate rejection names the settled outcome and recovery lever
     "blockerDiscovered reports must route to the legacy durable write instead of dead-ending on the gate",
   );
 });
+
+test("#2348: a legacy blocker write for a watchdog-settled Task records the blocker but refuses completion projections", async () => {
+  const { basePath, planPath, attemptId } = createFixture();
+  // The watchdog settle: the supervisor fails the Attempt out from under the
+  // session without an executor Result, leaving the canonical lifecycle
+  // in_progress with no running Attempt — the exact state that previously
+  // routed blockerDiscovered reports into the legacy completion writer.
+  settleTaskAttempt({
+    invocation: invocation("task-completion/watchdog-settle"),
+    attemptId,
+    outcome: "failed",
+    failureClass: "missing-executor-result",
+    summary: "The supervisor settled the stalled Attempt without an executor Result.",
+    output: {},
+  });
+  assert.equal(
+    resolveTaskCompletionAuthority(TASK, undefined, { blockerReport: true }),
+    "legacy",
+    "pre-fix baseline: the blocker report still resolves to the legacy durable write",
+  );
+
+  const { handleCompleteTask } = await import("../tools/complete-task.js");
+  const result = await handleCompleteTask({
+    taskId: "T01",
+    sliceId: "S01",
+    milestoneId: "M001",
+    oneLiner: "Discovered a blocker after the supervisor settled the Attempt",
+    narrative: "The executor hit a blocker but its Attempt was already watchdog-settled.",
+    verification: "Blocker report; there is no completion to verify.",
+    blockerDiscovered: true,
+    keyFiles: ["src/task.ts"],
+    keyDecisions: [],
+    verificationEvidence: [{
+      command: "npm test",
+      exitCode: 1,
+      verdict: "fail",
+      durationMs: 10,
+    }],
+  }, basePath);
+
+  assert.ok("error" in result, "the legacy write must refuse instead of reporting completion");
+  assert.match(result.error, /no running Attempt/);
+  assert.ok(result.error.includes(attemptId), "the refusal must name the settled Attempt");
+  assert.match(result.error, /outcome=failed/);
+
+  // The blocker/disposition is still recorded durably — the legacy shadow row
+  // keeps its canonical-owned status (insertTask refuses to flip it while a
+  // lifecycle row exists) but carries the blocker fields and evidence…
+  const recorded = row(`
+    SELECT status, blocker_discovered, completed_at, one_liner
+    FROM tasks WHERE milestone_id = 'M001' AND slice_id = 'S01' AND id = 'T01'
+  `);
+  assert.equal(recorded.status, "in_progress", "the canonical lifecycle owns the legacy shadow status");
+  assert.equal(Number(recorded.blocker_discovered), 1);
+  assert.equal(recorded.completed_at, null);
+  assert.equal(recorded.one_liner, "Discovered a blocker after the supervisor settled the Attempt");
+  assert.equal(Number(row("SELECT COUNT(*) AS count FROM verification_evidence").count), 1);
+  // …but no SUMMARY projection exists and the plan checkbox stays unchecked (#1726).
+  assert.equal(
+    Number(row("SELECT COUNT(*) AS count FROM artifacts WHERE artifact_type = 'SUMMARY'").count),
+    0,
+    "no SUMMARY artifact may be projected for a non-terminal canonical Task",
+  );
+  const phaseDir = join(basePath, ".gsd", "phases", "01-test");
+  const summaryFile = readdirSync(phaseDir).find((entry) => entry.endsWith("T01-SUMMARY.md"));
+  assert.equal(summaryFile, undefined, "no SUMMARY file may be written for a non-terminal canonical Task");
+  assert.match(readFileSync(planPath, "utf8"), /\[ \][^\n]*\*\*T01/);
+});
+
+test("#2348: the legacy refusal still records the escalation question for a recorded blocker", async () => {
+  const { basePath, attemptId } = createFixture();
+  settleTaskAttempt({
+    invocation: invocation("task-completion/watchdog-settle-escalation"),
+    attemptId,
+    outcome: "failed",
+    failureClass: "missing-executor-result",
+    summary: "The supervisor settled the stalled Attempt without an executor Result.",
+    output: {},
+  });
+  // The escalation is not a completion projection, so it must survive the
+  // refusal as an Open Question on the Task lifecycle that pauses the slice.
+  writeFileSync(join(basePath, ".gsd", "PREFERENCES.md"), "---\nphases:\n  mid_execution_escalation: true\n---\n");
+  clearGSDPreferencesCache();
+  const previousCwd = process.cwd();
+  process.chdir(basePath);
+  try {
+    const { handleCompleteTask } = await import("../tools/complete-task.js");
+    const result = await handleCompleteTask({
+      taskId: "T01",
+      sliceId: "S01",
+      milestoneId: "M001",
+      oneLiner: "Discovered a hard blocker after the supervisor settled the Attempt",
+      narrative: "The executor hit a hard blocker but its Attempt was already watchdog-settled.",
+      verification: "Blocker report; there is no completion to verify.",
+      blockerDiscovered: true,
+      keyFiles: ["src/task.ts"],
+      keyDecisions: [],
+      verificationEvidence: [{
+        command: "npm test",
+        exitCode: 1,
+        verdict: "fail",
+        durationMs: 10,
+      }],
+      escalation: {
+        question: "Should execution pause for the hard blocker?",
+        options: [
+          { id: "continue", label: "Continue", tradeoffs: "Keeps execution moving with the default path." },
+          { id: "pause", label: "Pause", tradeoffs: "Stops execution until the blocker is reviewed." },
+        ],
+        recommendation: "pause",
+        recommendationRationale: "The blocker should not be silently advanced.",
+        continueWithDefault: false,
+      },
+    }, basePath);
+
+    assert.ok("error" in result, "the refusal must still carry the recovery-context error");
+    assert.match(result.error, /no running Attempt/);
+    assert.deepEqual(row(`
+      SELECT question.question_text, question.question_status, task.escalation_pending
+      FROM workflow_open_questions question
+      JOIN workflow_item_lifecycles lifecycle ON lifecycle.lifecycle_id = question.lifecycle_id
+      JOIN tasks task
+        ON task.milestone_id = lifecycle.milestone_id
+       AND task.slice_id = lifecycle.slice_id
+       AND task.id = lifecycle.task_id
+    `), {
+      question_text: "Should execution pause for the hard blocker?",
+      question_status: "open",
+      escalation_pending: 0,
+    }, "the escalation question must survive the projection refusal, and it is the pause: the task flag is not written");
+    assert.equal(
+      Number(row("SELECT COUNT(*) AS count FROM artifacts WHERE artifact_type = 'SUMMARY'").count),
+      0,
+      "no SUMMARY artifact may accompany the refusal",
+    );
+  } finally {
+    process.chdir(previousCwd);
+    clearGSDPreferencesCache();
+  }
+});
+
+test("#2348: the missing-summary repair also refuses to project for a non-terminal canonical Task", async () => {
+  const { basePath, attemptId } = createFixture();
+  settleTaskAttempt({
+    invocation: invocation("task-completion/watchdog-settle-repair"),
+    attemptId,
+    outcome: "failed",
+    failureClass: "missing-executor-result",
+    summary: "The supervisor settled the stalled Attempt without an executor Result.",
+    output: {},
+  });
+  // Drifted legacy row: closed with an intact summary intent but the SUMMARY
+  // file is gone — the exact precondition the repair sentinel exists for. The
+  // repair must not resurrect a projection the canonical lifecycle rejects.
+  db().prepare(`
+    UPDATE tasks
+    SET status = 'complete', completed_at = '2026-07-12T00:20:00.000Z',
+        full_summary_md = '# T01 Summary
+
+Previously recorded completion.
+'
+    WHERE milestone_id = 'M001' AND slice_id = 'S01' AND id = 'T01'
+  `).run();
+
+  const { handleCompleteTask } = await import("../tools/complete-task.js");
+  const result = await handleCompleteTask({
+    taskId: "T01",
+    sliceId: "S01",
+    milestoneId: "M001",
+    oneLiner: "Discovered a blocker after the supervisor settled the Attempt",
+    narrative: "The executor hit a blocker but its Attempt was already watchdog-settled.",
+    verification: "Blocker report; there is no completion to verify.",
+    blockerDiscovered: true,
+    keyFiles: ["src/task.ts"],
+    keyDecisions: [],
+    verificationEvidence: [{
+      command: "npm test",
+      exitCode: 1,
+      verdict: "fail",
+      durationMs: 10,
+    }],
+  }, basePath);
+
+  assert.ok("error" in result, "the repair branch must not bypass the canonical projection refusal");
+  assert.match(result.error, /no running Attempt/);
+  const phaseDir = join(basePath, ".gsd", "phases", "01-test");
+  const summaryFile = readdirSync(phaseDir).find((entry) => entry.endsWith("T01-SUMMARY.md"));
+  assert.equal(summaryFile, undefined, "the repair must not write a SUMMARY for a non-terminal canonical Task");
+  assert.match(readFileSync(planPathOf(basePath), "utf8"), /\[ \][^\n]*\*\*T01/);
+});
+
+function planPathOf(basePath: string): string {
+  return join(basePath, ".gsd", "phases", "01-test", "01-01-PLAN.md");
+}
 
 test("settled remediate recovery resumes through a fresh verified completion", async () => {
   const { publishVerifiedTaskCompletion, stageTaskCompletion } = await subject();

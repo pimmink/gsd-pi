@@ -21,6 +21,8 @@ import {
   resolveAllSkillReferences,
   clearGSDPreferencesCache,
 } from "./preferences.js";
+import { GSD_MODEL_PHASE_KEYS } from "./preferences-types.js";
+import { defaultRoutingConfig } from "./model-router.js";
 import { loadFile, saveFile, splitFrontmatter, parseFrontmatterMap } from "./files.js";
 import { runClaudeImportFlow } from "./claude-import.js";
 import { clearSessionModelOverride } from "./session-model-override.js";
@@ -605,17 +607,38 @@ export function toPersistedModelId(provider: string, modelId: string): string {
     : `${normalizedProvider}/${normalizedModelId}`;
 }
 
+/**
+ * Write a new model ID for a phase while preserving any `thinking` sub-field
+ * carried on the object form.
+ *
+ * ADR-026 keeps model and reasoning effort together as a `(model, thinking)`
+ * pair, so a phase configured as `{ model, thinking }` must not be downgraded
+ * to a bare string just because the wizard only edits the model half. Before
+ * this helper the wizard assigned `models[phase] = <string>` unconditionally,
+ * silently dropping the user's thinking level on every re-selection.
+ *
+ * A bare-string (or absent) current value stays a bare string — there is no
+ * thinking to preserve.
+ */
+export function setPhaseModel(
+  models: Record<string, unknown>,
+  phase: string,
+  modelId: string,
+): void {
+  const existing = models[phase];
+  if (existing && typeof existing === "object" && !Array.isArray(existing)) {
+    models[phase] = { ...(existing as Record<string, unknown>), model: modelId };
+    return;
+  }
+  models[phase] = modelId;
+}
+
 async function configureModels(ctx: ExtensionCommandContext, prefs: Record<string, unknown>): Promise<void> {
-  const modelPhases = [
-    "research",
-    "planning",
-    "discuss",
-    "execution",
-    "execution_simple",
-    "completion",
-    "validation",
-    "subagent",
-  ] as const;
+  // Derive from the canonical phase list rather than a local copy. The previous
+  // hand-maintained list had drifted out of step with GSD_MODEL_PHASE_KEYS: it
+  // omitted `uat`, so a uat model could only be set by hand-editing
+  // PREFERENCES.md. Deriving keeps the wizard in step as the phase set grows.
+  const modelPhases = GSD_MODEL_PHASE_KEYS;
   const models: Record<string, unknown> = (prefs.models as Record<string, unknown>) ?? {};
 
   const availableModels = ctx.modelRegistry.getAvailable();
@@ -678,7 +701,7 @@ async function configureModels(ctx: ExtensionCommandContext, prefs: Record<strin
         );
         if (input !== null && input !== undefined) {
           const val = input.trim();
-          if (val) models[phase] = val;
+          if (val) setPhaseModel(models, phase, val);
         }
         continue;
       }
@@ -696,7 +719,7 @@ async function configureModels(ctx: ExtensionCommandContext, prefs: Record<strin
         if (modelChoice === "(clear)") {
           delete models[phase];
         } else {
-          models[phase] = toPersistedModelId(providerName, modelChoice);
+          setPhaseModel(models, phase, toPersistedModelId(providerName, modelChoice));
         }
       }
     }
@@ -710,7 +733,7 @@ async function configureModels(ctx: ExtensionCommandContext, prefs: Record<strin
       if (input !== null && input !== undefined) {
         const val = input.trim();
         if (val) {
-          models[phase] = val;
+          setPhaseModel(models, phase, val);
         } else if (current) {
           delete models[phase];
         }
@@ -755,7 +778,10 @@ async function configureDynamicRouting(ctx: ExtensionCommandContext, prefs: Reco
     // If routing is disabled / kept-off, still let the user configure sub-fields (they may enable later).
   }
 
-  const cap = await promptBoolean(ctx, "Capability-aware routing", dr.capability_routing, false);
+  // Default comes straight from the router's defaultRoutingConfig() — the
+  // single source of truth for routing defaults (#2397 stage 1) — so this
+  // hint cannot drift from the runtime gate again.
+  const cap = await promptBoolean(ctx, "Capability-aware routing", dr.capability_routing, defaultRoutingConfig().capability_routing);
   if (cap !== undefined) dr.capability_routing = cap;
 
   const escalate = await promptBoolean(ctx, "Escalate to heavier tier on failure", dr.escalate_on_failure, true);

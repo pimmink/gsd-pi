@@ -2,6 +2,7 @@
 // File Purpose: Auto-loop finalize phase — post-unit verification and UAT pause.
 
 import type { SidecarItem } from "./session.js";
+import { setBeforeAgentStartContext } from "@gsd/pi-coding-agent";
 import {
   type PostUnitContext,
   type PreVerificationOpts,
@@ -23,14 +24,15 @@ import {
   hasAnyIssues,
 } from "../workflow-logger.js";
 import { debugLog } from "../debug-logger.js";
+import { releaseUnitRetry } from "../db/unit-dispatch-retries.js";
 import { buildPhaseHandoffOutcome, setAutoOutcomeWidget } from "../auto-dashboard.js";
 import {
   applyVerificationRetryPolicy,
-  rememberRetryDispatch,
   _resolveCurrentUnitStartedAtForTest,
   isIsolatedWorktreeSession,
 } from "./phase-helpers.js";
 import { _runMilestoneMergeOnceWithStashRestore } from "./closeout.js";
+import { isTaskExecutionReadyForHostVerification } from "./task-execution-cutover.js";
 import type { IterationContext, IterationData, LoopState, PhaseResult } from "./types.js";
 import { MAX_FINALIZE_TIMEOUTS } from "./types.js";
 
@@ -53,6 +55,7 @@ export async function failClosedOnFinalizeTimeout(
     timeoutAt: now,
     lastProgressAt: now,
     lastProgressKind: progressKind,
+    unitEnd: { status: "timed-out-finalize", artifactVerified: false },
   });
 
   deps.emitJournalEvent({
@@ -83,9 +86,10 @@ export async function failClosedOnFinalizeTimeout(
     "warning",
   );
 
-  await deps.pauseAuto(ctx, pi);
+  await deps.pauseAuto(ctx, pi, "machine_fixable");
   s.clearCurrentUnit();
   clearCurrentPhase();
+  setBeforeAgentStartContext(undefined);
   drainLogs();
   return { action: "break", reason: progressKind };
 }
@@ -100,6 +104,7 @@ export async function runFinalize(
   loopState: LoopState,
   sidecarItem?: SidecarItem,
   publishVerifiedTask?: () => Promise<void>,
+  onExecuteWorkComplete?: () => void,
 ): Promise<PhaseResult> {
   const { ctx, pi, s, deps } = ic;
   const { pauseAfterUatDispatch } = iterData;
@@ -150,6 +155,7 @@ export async function runFinalize(
     s.rootWriteBaseline = null;
   };
   clearCurrentPhase();
+  setBeforeAgentStartContext(undefined);
   const preResultGuard = await withTimeout(
     deps.postUnitPreVerification(postUnitCtx, preVerificationOpts),
     FINALIZE_PRE_TIMEOUT_MS,
@@ -216,24 +222,56 @@ export async function runFinalize(
           unitType: preUnitSnapshot?.type,
           unitId: retryInfo?.unitId,
           attempt: retryInfo?.attempt,
+          // #2443: the retry reason was previously not captured anywhere for
+          // the finalize-only path (which clears the marker before the
+          // post-unit-finalize-end event reads it).
+          ...(retryInfo?.failureContext ? { failureContext: retryInfo.failureContext } : {}),
         },
       });
-      const retryPolicyResult = await applyVerificationRetryPolicy(
-        ic,
-        preUnitSnapshot?.type,
-        "artifact-verification-retry",
-      );
-      if (retryPolicyResult) {
+      // #2443: an execute-task whose canonical Attempt already sits at the
+      // verify stage has a verified artifact — the pre-verification read
+      // raced the DB or failed transiently. Re-dispatching the unit would
+      // claim a fresh Attempt that can only re-execute completed work and
+      // abort on lease fencing (#2443), so re-run ONLY finalize/publication:
+      // fall through to the verification gate with the retry context
+      // cleared. A git-commit remediation retry re-dispatches the published
+      // task on purpose (#2119) and keeps its existing path.
+      const finalizeOnlyArtifactRetry =
+        preUnitSnapshot?.type === "execute-task"
+        && !retryInfo?.signature?.startsWith("git-commit:")
+        && isTaskExecutionReadyForHostVerification(preUnitSnapshot.type, preUnitSnapshot.id);
+      if (finalizeOnlyArtifactRetry) {
+        s.pendingVerificationRetry = null;
+        releaseUnitRetry(preUnitSnapshot.type, preUnitSnapshot.id);
+        debugLog("autoLoop", {
+          phase: "finalize-only-retry-verified-artifact",
+          iteration: ic.iteration,
+          unitType: preUnitSnapshot.type,
+          unitId: preUnitSnapshot.id,
+        });
+      } else {
+        const retryPolicyResult = await applyVerificationRetryPolicy(
+          ic,
+          preUnitSnapshot?.type,
+          "artifact-verification-retry",
+        );
+        if (retryPolicyResult) {
+          clearFinalizingUnit();
+          return retryPolicyResult;
+        }
+        // Continue the loop. The dispatch rules select the unit again from the
+        // database, and the unit prompt gets the retry context.
+        debugLog("autoLoop", { phase: "artifact-verification-retry", iteration: ic.iteration });
         clearFinalizingUnit();
-        return retryPolicyResult;
+        return { action: "continue" };
       }
-      // Continue the loop — next iteration will inject the retry context into the prompt.
-      rememberRetryDispatch(s, preUnitSnapshot, iterData);
-      debugLog("autoLoop", { phase: "artifact-verification-retry", iteration: ic.iteration });
-      clearFinalizingUnit();
-      return { action: "continue" };
     }
   }
+
+  // Keep this call after every pre-verification exit above. Those exits are
+  // for a unit with unfinished work, and its stage must stay `execute` so a
+  // resume replays the tool calls (ADR-048, stage checkpoint).
+  onExecuteWorkComplete?.();
 
   if (pauseAfterUatDispatch) {
     const pauseMid = iterData.mid;
@@ -251,7 +289,7 @@ export async function runFinalize(
       ? `UAT requires human execution. Auto-mode will pause after this unit writes the result file.\n\n${guidance}`
       : "UAT requires human execution. Auto-mode will pause after this unit writes the result file.";
     ctx.ui.notify(pauseMessage, "info");
-    await deps.pauseAuto(ctx, pi);
+    await deps.pauseAuto(ctx, pi, "subjective_uat");
     debugLog("autoLoop", { phase: "exit", reason: "uat-pause" });
     clearFinalizingUnit();
     return { action: "break", reason: "uat-pause" };
@@ -285,13 +323,38 @@ export async function runFinalize(
       const abortMessage = abortId
         ? `Verification auto-fix retries are exhausted — durable recovery aborted this task. Resume with /gsd recover ${abortId} after fixing the failure.`
         : "Verification was aborted by durable task recovery.";
-      await deps.pauseAuto(ctx, pi, { message: abortMessage, category: "unknown" });
+      await deps.pauseAuto(ctx, pi, "machine_fixable", { message: abortMessage, category: "unknown" });
       debugLog("autoLoop", { phase: "exit", reason: abortReason });
       clearFinalizingUnit();
       return { action: "break", reason: abortReason };
     }
 
     if (verificationResult === "pause") {
+      // #2334 — persist the pause durably. Without this receipt a succeeded
+      // Attempt stranded here has no sanctioned exit: the task-settle
+      // verification-paused reconcile gate reads this DB row as proof that the
+      // finalizer — not the operator — stopped the unit here.
+      try {
+        deps.recordVerificationPause(iterData.unitType, iterData.unitId);
+      } catch (err) {
+        const message =
+          `Could not record the verification-pause receipt for ${iterData.unitId}: ` +
+          `${err instanceof Error ? err.message : String(err)}. gsd task settle --reconcile-lifecycle ` +
+          "will refuse this Task until a new pause is recorded.";
+        logWarning("engine", message);
+        ctx.ui.notify(message, "warning");
+      }
+      // Diagnostic only; nothing reads this line as authority.
+      deps.emitJournalEvent({
+        ts: new Date().toISOString(),
+        flowId: ic.flowId,
+        seq: ic.nextSeq(),
+        eventType: "verification-paused",
+        data: {
+          unitType: iterData.unitType,
+          unitId: iterData.unitId,
+        },
+      });
       debugLog("autoLoop", { phase: "exit", reason: "verification-pause" });
       clearFinalizingUnit();
       return { action: "break", reason: "verification-pause" };
@@ -312,8 +375,8 @@ export async function runFinalize(
           clearFinalizingUnit();
           return retryPolicyResult;
         }
-        // Continue the loop — next iteration will inject the retry context into the prompt.
-        rememberRetryDispatch(s, preUnitSnapshot, iterData);
+        // Continue the loop. The dispatch rules select the unit again from the
+        // database, and the unit prompt gets the retry context.
         debugLog("autoLoop", { phase: "verification-retry", iteration: ic.iteration });
         clearFinalizingUnit();
         return { action: "continue" };
@@ -391,7 +454,7 @@ export async function runFinalize(
         clearFinalizingUnit();
         return retryPolicyResult;
       }
-      rememberRetryDispatch(s, preUnitSnapshot, iterData);
+      // ADR-048: the dispatch rules select the unit again from the database.
       debugLog("autoLoop", {
         phase: retryPhase,
         iteration: ic.iteration,

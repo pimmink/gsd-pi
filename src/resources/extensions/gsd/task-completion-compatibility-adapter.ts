@@ -24,12 +24,17 @@ import {
 } from "./quality-gate-closure.js";
 import {
   readLatestTaskAttempt,
+  readTaskLifecycleStatus,
   settleTaskAttempt,
   type StagedTaskCompletionMutation,
 } from "./task-execution-domain-operation.js";
-import { readTaskRecoveryRoute } from "./task-recovery-domain-operation.js";
+import {
+  readTaskRecoveryRoute,
+  type TaskRecoveryRouteSnapshot,
+} from "./task-recovery-domain-operation.js";
 import { readTaskTechnicalVerdict } from "./task-verification-domain-operation.js";
 import { loadEffectiveGSDPreferences } from "./preferences.js";
+import { logWarning } from "./workflow-logger.js";
 import {
   captureVerificationSourceSnapshot,
   resolveVerificationRepositoryTargets,
@@ -80,14 +85,20 @@ export interface StagedTaskCompletionReceipt {
   status: "committed" | "replayed";
   attemptId: string;
   resultId: string;
+  /** Empty when no summary file was rendered: a blocker staging, or a failed render (`stale`). */
   summaryPath: string;
   nextStage: "verify" | "route";
+  /** True when the committed change is not yet in the readable files. The Projection Worker retries the render. */
+  stale?: true;
 }
 
 export interface PublishedTaskCompletionReceipt {
   status: "committed" | "replayed";
   attemptId: string;
+  /** Empty when the summary render failed (`stale`). */
   summaryPath: string;
+  /** True when the committed change is not yet in the readable files. The Projection Worker retries the render. */
+  stale?: true;
 }
 
 interface AttemptRow {
@@ -145,8 +156,40 @@ export interface TaskCompletionAuthorityOptions {
    * when the supervisor already settled the Attempt out from under a surviving
    * session (#1973). When set, the running-attempt gate routes to the legacy
    * write path (a durable DB write that needs no Attempt) instead of throwing.
+   * The legacy writer still refuses its SUMMARY + plan-checkbox projections
+   * while the canonical lifecycle is non-terminal (#2348, see
+   * legacyCompletionProjectionRefusal) — recordable, not projectable.
    */
   blockerReport?: boolean;
+}
+
+/**
+ * Name the recorded recovery action and its sanctioned next move so a caller
+ * never has to guess the recoveryActionId (#2267). Shared by the
+ * running-attempt gate rejections and the canonical blocker receipt.
+ */
+export function recoveryRouteLever(route: TaskRecoveryRouteSnapshot): string {
+  if (route.resumeAuthorized) {
+    return ` Recovery action ${route.recoveryActionId} (${route.action}) already authorizes its successor — ` +
+      "rerun `/gsd auto` to continue from the repair checkpoint.";
+  }
+  if (route.resumeEligibility?.eligible) {
+    return ` Recovery action ${route.recoveryActionId} (${route.action}) is eligible for resume — ` +
+      `call gsd_task_recovery_resume with recoveryActionId "${route.recoveryActionId}".`;
+  }
+  return ` Recovery action ${route.recoveryActionId} (${route.action}) is recorded for this Attempt.`;
+}
+
+/**
+ * The gate error for a Task whose canonical lifecycle has no running Attempt
+ * to close. Shared by the running-attempt gate itself and by the legacy
+ * projection refusal (#2348), so both surfaces name the same sanctioned exit.
+ */
+function noRunningAttemptGateError(task: TaskCompletionIdentity): string {
+  return "Canonical Task completion has no running Attempt to close. Re-enter `/gsd auto` to resume " +
+    "the Task from its durable checkpoint; if its latest Attempt is settled succeeded at the verify " +
+    "stage, dry-run `gsd_task_settle` (reconcileLifecycle) to publish the verified completion." +
+    latestAttemptRecoveryContext(task);
 }
 
 /**
@@ -164,15 +207,7 @@ function latestAttemptRecoveryContext(task: TaskCompletionIdentity): string {
         attempt.resultFailureClass ? ` failureClass=${attempt.resultFailureClass}` : ""}`
       : " still marked running";
     const route = readTaskRecoveryRoute(attempt.attemptId);
-    const lever = route
-      ? route.resumeAuthorized
-        ? ` Recovery action ${route.recoveryActionId} (${route.action}) already authorizes its successor — ` +
-          "rerun `/gsd auto` to continue from the repair checkpoint."
-        : route.resumeEligibility?.eligible
-          ? ` Recovery action ${route.recoveryActionId} (${route.action}) is eligible for resume — ` +
-          `call gsd_task_recovery_resume with recoveryActionId "${route.recoveryActionId}".`
-          : ` Recovery action ${route.recoveryActionId} (${route.action}) is recorded for this Attempt.`
-      : "";
+    const lever = route ? recoveryRouteLever(route) : "";
     return ` Latest Attempt ${attempt.attemptId} is${settled}.${lever}`;
   } catch {
     return "";
@@ -243,11 +278,40 @@ export function resolveTaskCompletionAuthority(
       latestAttemptRecoveryContext(task),
     );
   }
-  throw new Error(
-    "Canonical Task completion has no running Attempt to close. Re-enter `/gsd auto` to resume " +
-    "the Task from its durable checkpoint." +
-    latestAttemptRecoveryContext(task),
-  );
+  throw new Error(noRunningAttemptGateError(task));
+}
+
+/**
+ * Canonical Task lifecycle dispositions that already carry their outcome.
+ * Matches the closed set doctor-engine-checks reconciles against, including
+ * the #2202 operator `blocker-accepted` closeout.
+ */
+const TERMINAL_TASK_LIFECYCLE_STATUSES: ReadonlySet<string> = new Set([
+  "completed",
+  "cancelled",
+  "blocker-accepted",
+]);
+
+/**
+ * The legacy projection refusal (#2348): when the Task already carries a
+ * canonical lifecycle that has not reached a terminal disposition, the legacy
+ * completion writer may still record the blocker/disposition durably, but it
+ * must not project a SUMMARY or flip plan checkboxes — a legacy completion
+ * projection would claim a completion the canonical lifecycle does not carry.
+ * This is the legacy-path twin of the #1726 staging invariant ("a failed
+ * Attempt has no completion to render"), and the returned message mirrors the
+ * running-attempt gate error so a stranded session learns the sanctioned exit
+ * (#1973) instead of a false completion. Returns null when the legacy
+ * projections may proceed (no canonical row, or a terminal disposition).
+ */
+export function legacyCompletionProjectionRefusal(
+  task: TaskCompletionIdentity,
+): string | null {
+  const lifecycleStatus = readTaskLifecycleStatus(task);
+  if (lifecycleStatus === null || TERMINAL_TASK_LIFECYCLE_STATUSES.has(lifecycleStatus)) {
+    return null;
+  }
+  return noRunningAttemptGateError(task);
 }
 
 function runningAttemptId(task: TaskCompletionIdentity): string {
@@ -313,17 +377,13 @@ async function renderTaskSummaryProjection(
   basePath: string,
   task: TaskCompletionIdentity,
 ): Promise<string> {
-  try {
-    const wroteSummary = await renderTaskSummary(
-      basePath,
-      task.milestoneId,
-      task.sliceId,
-      task.taskId,
-    );
-    if (!wroteSummary) throw new Error("summary projection write returned false");
-  } catch (error) {
-    throw new Error(`Task completion summary projection failed: ${(error as Error).message}`);
-  }
+  const wroteSummary = await renderTaskSummary(
+    basePath,
+    task.milestoneId,
+    task.sliceId,
+    task.taskId,
+  );
+  if (!wroteSummary) throw new Error("summary projection write returned false");
 
   clearPathCache();
   const summaryPath = resolveTaskFile(
@@ -333,32 +393,57 @@ async function renderTaskSummaryProjection(
     task.taskId,
     "SUMMARY",
   );
-  if (!summaryPath) throw new Error("Task completion projection failed: summary path is missing");
+  if (!summaryPath) throw new Error("summary path is missing");
   return summaryPath;
 }
 
+interface TaskCompletionProjection {
+  summaryPath: string;
+  stale?: true;
+}
+
+/**
+ * Render the summary at the project root and, in a worktree, at the worktree.
+ * The settlement is committed before this render, so a failed render never
+ * fails the caller: its Projection Work stays pending and the Projection
+ * Worker renders the file again.
+ */
 async function renderTaskSummaryProjections(
   basePath: string,
   task: TaskCompletionIdentity,
-): Promise<string> {
-  const contract = resolveGsdPathContract(basePath);
-  const canonicalPath = await renderTaskSummaryProjection(contract.projectRoot, task);
-  if (!contract.isWorktree || contract.workRoot === contract.projectRoot) return canonicalPath;
-  return renderTaskSummaryProjection(contract.workRoot, task);
+): Promise<TaskCompletionProjection> {
+  try {
+    const contract = resolveGsdPathContract(basePath);
+    const canonicalPath = await renderTaskSummaryProjection(contract.projectRoot, task);
+    if (!contract.isWorktree || contract.workRoot === contract.projectRoot) return { summaryPath: canonicalPath };
+    return { summaryPath: await renderTaskSummaryProjection(contract.workRoot, task) };
+  } catch (error) {
+    logWarning(
+      "projection",
+      `task completion summary render failed for ${task.milestoneId}/${task.sliceId}/${task.taskId}; the settlement stays committed`,
+      { error: (error as Error).message },
+    );
+    return { summaryPath: "", stale: true };
+  }
 }
 
 async function renderPublishedTaskCompletionProjections(
   basePath: string,
   task: TaskCompletionIdentity,
-): Promise<string> {
-  const summaryPath = await renderTaskSummaryProjections(basePath, task);
+): Promise<TaskCompletionProjection> {
+  const projection = await renderTaskSummaryProjections(basePath, task);
   try {
     const wrotePlan = await renderPlanCheckboxes(basePath, task.milestoneId, task.sliceId);
     if (!wrotePlan) throw new Error("plan projection write returned false");
   } catch (error) {
-    throw new Error(`Task completion PLAN projection failed: ${(error as Error).message}`);
+    logWarning(
+      "projection",
+      `task completion PLAN render failed for ${task.milestoneId}/${task.sliceId}/${task.taskId}; the completion stays committed`,
+      { error: (error as Error).message },
+    );
+    return { ...projection, stale: true };
   }
-  return summaryPath;
+  return projection;
 }
 
 export async function stageTaskCompletion(
@@ -401,16 +486,15 @@ export async function stageTaskCompletion(
 
   // A blockerDiscovered staging must not project a SUMMARY at all (#1726):
   // the Attempt failed, so there is no completion to render.
-  let summaryPath = "";
-  if (!blocked) {
-    summaryPath = await renderTaskSummaryProjections(input.basePath, input.task);
-  }
+  const projection: TaskCompletionProjection = blocked
+    ? { summaryPath: "" }
+    : await renderTaskSummaryProjections(input.basePath, input.task);
   return {
     status: settlement.status,
     attemptId,
     resultId: settlement.resultId,
-    summaryPath,
     nextStage: settlement.nextStage,
+    ...projection,
   };
 }
 
@@ -446,7 +530,12 @@ function loadSucceededAttempt(input: PublishVerifiedTaskCompletionInput): Attemp
       AND lifecycle.milestone_id = :milestone_id
       AND lifecycle.slice_id = :slice_id
       AND lifecycle.task_id = :task_id
-      AND lifecycle.lifecycle_status = 'in_progress'
+      -- 'ready' covers a durable success whose lifecycle shadow was reverted by
+      -- a side door (#2417): in_progress → ready is not a canonical transition,
+      -- so the Attempt and evidence predicates below carry the guarantee, not
+      -- the shadow. Publication first re-adopts in_progress in a separate
+      -- fenced operation, then completes the Task and its legacy row.
+      AND lifecycle.lifecycle_status IN ('in_progress', 'ready')
       AND attempt.attempt_state = 'settled'
       AND result.outcome = 'succeeded'
       AND checkpoint.next_stage = 'verify'
@@ -598,15 +687,73 @@ function requireCurrentVerifiedSource(input: PublishVerifiedTaskCompletionInput)
   });
 }
 
+/**
+ * A durable success behind a side-door `ready` lifecycle shadow (#2417) cannot
+ * complete in one step: the lifecycle trigger forbids ready → completed, and a
+ * second status change inside the publication domain operation cannot advance
+ * the causal revision. Re-adopt ready → in_progress as its own fenced
+ * operation first — the normal post-settle state, so a later failure leaves
+ * the Task in a shape the loop resume and a retry both understand.
+ */
+function readoptReadyLifecycleShadowForPublication(input: PublishVerifiedTaskCompletionInput): void {
+  const lifecycleStatus = readTaskLifecycleStatus(input.task);
+  if (lifecycleStatus !== "ready") return;
+  const idempotencyKey = `${input.invocation.idempotencyKey}:lifecycle:in_progress`;
+  const fence = readDomainOperationFence(idempotencyKey);
+  executeDomainOperation({
+    operationType: "task.lifecycle.reconcile",
+    idempotencyKey,
+    expectedRevision: fence.revision,
+    expectedAuthorityEpoch: fence.authorityEpoch,
+    actorType: input.invocation.actorType,
+    ...(input.invocation.actorId ? { actorId: input.invocation.actorId } : {}),
+    sourceTransport: input.invocation.sourceTransport,
+    ...(input.invocation.traceId ? { traceId: input.invocation.traceId } : {}),
+    ...(input.invocation.turnId ? { turnId: input.invocation.turnId } : {}),
+    payload: {
+      milestoneId: input.task.milestoneId,
+      sliceId: input.task.sliceId,
+      taskId: input.task.taskId,
+      from: "ready",
+      to: "in_progress",
+      reason: "Verified Task publication re-adopted a side-door ready lifecycle shadow (#2417)",
+    },
+  }, (context) => {
+    adoptOrTransitionLifecycle(context, {
+      itemKind: "task",
+      milestoneId: input.task.milestoneId,
+      sliceId: input.task.sliceId,
+      taskId: input.task.taskId,
+      lifecycleStatus: "in_progress",
+    });
+    const entityId = `${input.task.milestoneId}/${input.task.sliceId}/${input.task.taskId}`;
+    return {
+      events: [{
+        eventType: "task.lifecycle.reconciled",
+        entityType: "task",
+        entityId,
+        payload: { from: "ready", to: "in_progress", attemptId: input.attemptId },
+        destinations: ["projection"],
+      }],
+      projections: [{
+        projectionKey: `lifecycle/${entityId}`.toLowerCase(),
+        projectionKind: "task-lifecycle",
+        rendererVersion: "1",
+      }],
+    };
+  });
+}
+
 export async function publishVerifiedTaskCompletion(
   input: PublishVerifiedTaskCompletionInput,
 ): Promise<PublishedTaskCompletionReceipt> {
   requireCurrentVerifiedSource(input);
+  readoptReadyLifecycleShadowForPublication(input);
   const status = publishCanonicalCompletion(input);
-  const summaryPath = await renderPublishedTaskCompletionProjections(input.basePath, input.task);
+  const projection = await renderPublishedTaskCompletionProjections(input.basePath, input.task);
   return {
     status,
     attemptId: input.attemptId,
-    summaryPath,
+    ...projection,
   };
 }

@@ -29,7 +29,6 @@ export type Phase =
   | "complete"
   | "paused"
   | "blocked";
-export type ContinueStatus = "in_progress" | "interrupted" | "compacted";
 
 // ─── Roadmap (Milestone-level) ─────────────────────────────────────────────
 
@@ -169,27 +168,6 @@ export interface Summary {
   filesModified: FileModified[];
   followUps: string;
   knownLimitations: string;
-}
-
-// ─── Continue-Here ─────────────────────────────────────────────────────────
-
-export interface ContinueFrontmatter {
-  milestone: string;
-  slice: string;
-  task: string;
-  step: number;
-  totalSteps: number;
-  status: ContinueStatus;
-  savedAt: string;
-}
-
-export interface Continue {
-  frontmatter: ContinueFrontmatter;
-  completedWork: string;
-  remainingWork: string;
-  decisions: string;
-  context: string;
-  nextAction: string;
 }
 
 // ─── Secrets Manifest ──────────────────────────────────────────────────────
@@ -425,7 +403,7 @@ export interface PhaseSkipPreferences {
   reassess_after_slice?: boolean;
   /** When true, auto-mode pauses before each slice for discussion (#789). */
   require_slice_discussion?: boolean;
-  /** ADR-011 Phase 2: when true, executors may escalate task-level ambiguity via T##-ESCALATION.json. */
+  /** ADR-011 Phase 2: when true, executors may escalate task-level ambiguity as a database Open Question. */
   mid_execution_escalation?: boolean;
   /** ADR-011 Phase 1: when true, plan S01 in full and S02+ as sketches refined just-in-time. */
   progressive_planning?: boolean;
@@ -443,14 +421,12 @@ export interface EscalationOption {
 }
 
 export interface EscalationArtifact {
-  /** Schema version for the artifact file — bumps if we change the shape. */
-  version: 1;
   taskId: string;
   sliceId: string;
   milestoneId: string;
   /** The question the executor needs the user to resolve. */
   question: string;
-  /** 2-4 options the user can choose between. */
+  /** 2-3 options the user can choose between. */
   options: EscalationOption[];
   /** Which option the executor recommends (references `options[].id`). */
   recommendation: string;
@@ -666,23 +642,6 @@ export interface ReactiveExecutionConfig {
    * object form for parity with phase buckets (#1229).
    */
   subagent_model?: string | GSDPhaseModelConfig;
-}
-
-/** Per-slice reactive execution runtime state, persisted to disk. */
-export interface ReactiveExecutionState {
-  sliceId: string;
-  /** Task IDs that have been verified as completed. */
-  completed: string[];
-  /** Task IDs dispatched in the current/most recent reactive batch. */
-  dispatched: string[];
-  /** Snapshot of the graph at last dispatch. */
-  graphSnapshot: {
-    taskCount: number;
-    edgeCount: number;
-    readySetSize: number;
-    ambiguous: boolean;
-  };
-  updatedAt: string;
 }
 
 export interface BrowserFlowResult {

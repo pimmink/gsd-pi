@@ -32,12 +32,17 @@ import { findMilestoneIds } from "../../milestone-ids.js";
 import { removeProjectionTreeSync } from "../../atomic-write.js";
 import { invalidateStateCache } from "../../state.js";
 import type { GSDState } from "../../types.js";
-import { isAfter, latestExplicitReopenAt } from "../../milestone-reopen-events.js";
+import {
+  completedEventCoversDispatch,
+  isAfter,
+  latestExplicitReopenAt,
+  legacyReopenImportGuidance,
+} from "../../milestone-reopen-events.js";
 import { isCanonicalStagedTaskSummaryProjection } from "../../task-summary-projection-classification.js";
 import { readLatestTaskAttempt } from "../../task-execution-domain-operation.js";
 import { quarantineProjectionEvidence } from "../../projection-observation.js";
 import { computeProjectionSha, deriveCompatProjectionKey, readCompatMarker } from "../../compat/compat-marker.js";
-import { stripProjectionStamp } from "../../markdown-renderer.js";
+import { comparableProjectionContent } from "../../markdown-renderer.js";
 import type { DriftContext, DriftHandler, DriftRecord } from "../types.js";
 
 type DiskSliceIdDivergenceDrift = Extract<
@@ -85,13 +90,13 @@ function safeListArtifactRows(milestoneId: string): ArtifactStatusRow[] {
   }
 }
 
-function latestCompletedMilestoneDispatch(
+function completedMilestoneDispatches(
   milestoneId: string,
-): CompletedDispatchRow | null {
+): CompletedDispatchRow[] {
   const adapter = _getAdapter();
-  if (!adapter) return null;
+  if (!adapter) return [];
   try {
-    const row = adapter
+    return adapter
       .prepare(
         `SELECT started_at, ended_at
          FROM unit_dispatches
@@ -99,22 +104,19 @@ function latestCompletedMilestoneDispatch(
            AND unit_type = 'complete-milestone'
            AND unit_id = :mid
            AND status = 'completed'
-         ORDER BY COALESCE(ended_at, started_at) DESC, id DESC
-         LIMIT 1`,
+         ORDER BY COALESCE(ended_at, started_at) DESC, id DESC`,
       )
-      .get({ ":mid": milestoneId }) as CompletedDispatchRow | undefined;
-    return row ?? null;
+      .all({ ":mid": milestoneId }) as CompletedDispatchRow[];
   } catch {
-    return null;
+    return [];
   }
 }
 
 function hasExplicitReopenAfter(
-  basePath: string,
   milestoneId: string,
   completedDispatchAt: string | null | undefined,
 ): boolean {
-  const reopenAt = latestExplicitReopenAt(basePath, milestoneId);
+  const reopenAt = latestExplicitReopenAt(milestoneId);
   if (!reopenAt) return false;
   if (!completedDispatchAt) return true;
   return Date.parse(reopenAt) > Date.parse(completedDispatchAt);
@@ -219,7 +221,7 @@ function isAbandonedStagedTaskSummary(
   }
   if (
     task.full_summary_md &&
-    stripProjectionStamp(content) === stripProjectionStamp(task.full_summary_md)
+    comparableProjectionContent(content) === comparableProjectionContent(task.full_summary_md)
   ) return true;
 
   const projectionKey = deriveCompatProjectionKey(
@@ -276,7 +278,7 @@ function detectArtifactDbStatusDriftForMilestone(
   const milestone = getAllMilestones().find((m) => m.id === milestoneId);
   if (!milestone || isClosedStatus(milestone.status)) return [];
 
-  const latestReopen = latestExplicitReopenAt(basePath, milestoneId);
+  const latestReopen = latestExplicitReopenAt(milestoneId);
   const artifacts = safeListArtifactRows(milestoneId).filter((row) =>
     isAfter(row.imported_at, latestReopen),
   );
@@ -636,18 +638,27 @@ function computeArtifactDbDrift(
   for (const milestone of getAllMilestones()) {
     if (isClosedStatus(milestone.status)) continue;
 
-    const completedDispatch = latestCompletedMilestoneDispatch(milestone.id);
-    const completedAt = completedDispatch?.ended_at ?? completedDispatch?.started_at ?? null;
-    if (
-      completedDispatch &&
-      !hasExplicitReopenAfter(ctx.basePath, milestone.id, completedAt)
-    ) {
-      drifts.push({
-        kind: "completed-milestone-reopened",
-        milestoneId: milestone.id,
-        dbStatus: milestone.status,
-        completedDispatchAt: completedAt,
-      });
+    // #2398: a completed `complete-milestone` dispatch row alone is not proof
+    // the milestone was ever completed — a closeout whose attempts all fail
+    // (or whose session exits) still leaves a status='completed' row behind.
+    // Evaluate every completed dispatch, newest first: a later receiptless
+    // row must not hide an earlier event-backed completion that was never
+    // explicitly reopened, while a row with no covering milestone.completed
+    // event is closeout debris, not completed-then-reopened history.
+    for (const dispatch of completedMilestoneDispatches(milestone.id)) {
+      const completedAt = dispatch.ended_at ?? dispatch.started_at ?? null;
+      if (
+        completedEventCoversDispatch(milestone.id, dispatch.started_at) &&
+        !hasExplicitReopenAfter(milestone.id, completedAt)
+      ) {
+        drifts.push({
+          kind: "completed-milestone-reopened",
+          milestoneId: milestone.id,
+          dbStatus: milestone.status,
+          completedDispatchAt: completedAt,
+        });
+        break; // one drift record per milestone
+      }
     }
 
     drifts.push(...detectArtifactDbStatusDriftForMilestone(ctx.basePath, milestone.id));
@@ -706,6 +717,25 @@ function diskSliceIdDivergenceGuidance(record: DiskSliceIdDivergenceDrift): stri
   );
 }
 
+/**
+ * Recovery text for an artifact/DB status drift. A rebuild moves the file on
+ * disk aside but keeps the artifact row, so it cannot clear a drift that comes
+ * from a stale row. Do not tell the user that it can.
+ */
+function artifactDbStatusDivergenceExit(record: ArtifactDbStatusDivergenceDrift, basePath?: string): string {
+  const row = safeListArtifactRows(record.milestoneId).find((candidate) => candidate.path === record.artifactPath);
+  if (row) {
+    const legacyReopen = basePath ? legacyReopenImportGuidance(basePath, record.milestoneId, row.imported_at) : null;
+    if (legacyReopen) return legacyReopen;
+    return (
+      "This drift comes from a SUMMARY row in the database. " +
+      "`/gsd rebuild markdown` moves the file on disk to quarantine and keeps that row, so this blocker can remain after a rebuild. " +
+      "If it remains, the row is stale: `/gsd recover` with exact Preview approval is the only command that replaces artifact rows from markdown."
+    );
+  }
+  return "Run `/gsd rebuild markdown` after review to quarantine stale projections and re-render from the DB; use `/gsd recover` with exact Preview approval only when markdown should repopulate a lost or corrupt DB.";
+}
+
 export async function repairArtifactDbDrift(
   record:
     | DiskSliceIdDivergenceDrift
@@ -746,7 +776,7 @@ export async function repairArtifactDbDrift(
       `${record.sliceId ? `/${record.sliceId}` : ""}` +
       `${record.taskId ? `/${record.taskId}` : ""}: ${record.reason}. ` +
       "Runtime will not silently import completion artifacts into DB state. " +
-      "Run `/gsd rebuild markdown` after review to quarantine stale projections and re-render from the DB; use `/gsd recover` with exact Preview approval only when markdown should repopulate a lost or corrupt DB.",
+      artifactDbStatusDivergenceExit(record, ctx.basePath),
   );
 }
 
@@ -773,7 +803,7 @@ export function describeArtifactDbDriftBlocker(
     `${record.sliceId ? `/${record.sliceId}` : ""}` +
     `${record.taskId ? `/${record.taskId}` : ""}: ${record.reason}. ` +
     "Runtime will not silently import completion artifacts into DB state. " +
-    "Run `/gsd rebuild markdown` after review to quarantine stale projections and re-render from the DB; use `/gsd recover` with exact Preview approval only when markdown should repopulate a lost or corrupt DB."
+    artifactDbStatusDivergenceExit(record, ctx?.basePath)
   );
 }
 

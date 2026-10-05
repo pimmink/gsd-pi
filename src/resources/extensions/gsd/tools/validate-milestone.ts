@@ -22,8 +22,9 @@ import {
 import { clearPathCache, targetMilestoneFile } from "../paths.js";
 import { resolveCanonicalMilestoneRoot } from "../worktree-manager.js";
 import { resolveWorktreeProjectRoot } from "../worktree-root.js";
-import { saveFile, clearParseCache } from "../files.js";
-import { invalidateStateCache } from "../state.js";
+import { clearParseCache } from "../files.js";
+import { renderMilestoneValidation } from "../markdown-renderer.js";
+import { renderStateProjection } from "../workflow-projections.js";
 import { VALIDATION_VERDICTS, isValidMilestoneVerdict } from "../verdict-parser.js";
 import { insertMilestoneValidationGates } from "../milestone-validation-gates.js";
 import { logWarning } from "../workflow-logger.js";
@@ -34,6 +35,7 @@ import {
   applyBrowserEvidenceGate,
   browserEvidenceRequired,
   browserEvidenceGateRequiresAttention,
+  structuredBrowserEvidenceRejection,
 } from "../milestone-validation-evidence.js";
 import type { ExecutionInvocation } from "../execution-invocation.js";
 import { repairMilestoneLifecycleShadowsForward } from "../lifecycle-shadow-repair-domain-operation.js";
@@ -197,6 +199,7 @@ function recordCanonicalValidation(input: {
   validationPath: string;
   artifactBasePath: string;
   requiredClasses: string[];
+  gateSliceId: string;
   invocation: ExecutionInvocation;
 }): ValidateMilestoneReceipt | { error: string } {
   const evidenceByClass = new Map<string, MilestoneVerificationEvidence[]>();
@@ -269,11 +272,32 @@ function recordCanonicalValidation(input: {
   const canonical = canonicalOutcome(input.params.verdict);
   const classResults = input.requiredClasses.map((className) => {
     const evidence = evidenceByClass.get(className.toLowerCase())!;
+    const rawVerdict = evidenceVerdict(evidence);
+    // A per-class "pass" technical verdict is only valid inside a succeeded
+    // attempt. Two invariants forbid recording one otherwise:
+    //   1. the schema trigger trg_workflow_technical_verdict_scope enforces
+    //      (verdict != 'pass' OR result.outcome = 'succeeded'); and
+    //   2. the writer's validateEvidence requires the class verdict to agree
+    //      with its evidence observations (an "inconclusive" verdict needs an
+    //      "inconclusive" observation, not "passed").
+    // Under a needs-attention or needs-remediation Milestone verdict the attempt
+    // outcome is "interrupted"/"failed", so an all-"passed" class cannot be
+    // recorded as "pass" (trigger 1) and cannot be recorded as "inconclusive"
+    // while its observations still say "passed" (invariant 2) - previously this
+    // aborted the whole validation write with an opaque error. Clamp the class
+    // to "inconclusive" at the milestone-acceptance level, downgrading the class
+    // verdict AND its "passed" observations together so both invariants stay
+    // consistent. The raw command exit code, durable output ref, and rationale
+    // are preserved on every evidence row, and the prose Verification Class
+    // table retains the honest per-class detail.
+    const clampPassToInconclusive =
+      canonical.outcome !== "succeeded" && rawVerdict === "pass";
+    const classVerdict = clampPassToInconclusive ? "inconclusive" : rawVerdict;
     return {
       criterionKey: `milestone-validation:${className.toLowerCase()}`,
       evidenceClass: evidence[0]!.evidenceClass,
       description: `${className} verification planned for this Milestone must be current and pass.`,
-      verdict: evidenceVerdict(evidence),
+      verdict: classVerdict,
       rationale: evidence.map((entry) => entry.rationale).join("\n"),
       evidence: evidence.map(({
         verificationClass: _verificationClass,
@@ -283,6 +307,7 @@ function recordCanonicalValidation(input: {
         ...entry
       }) => ({
         ...entry,
+        observation: clampPassToInconclusive ? "inconclusive" : entry.observation,
         environment: {
           ...entry.environment,
           ...(sliceId ? { sliceId } : {}),
@@ -296,6 +321,12 @@ function recordCanonicalValidation(input: {
   return validateMilestone({
     invocation: input.invocation,
     milestoneId: input.params.milestoneId,
+    legacyAssessment: {
+      path: input.validationPath,
+      fullContent: input.validationMd,
+      status: input.params.verdict,
+      gateSliceId: input.gateSliceId,
+    },
     testedSourceRevision: sourceRevision,
     policyId: "milestone-validation",
     policyVersion: "1",
@@ -383,14 +414,14 @@ export async function handleValidateMilestone(
   }
 
   const artifactBasePath = resolveCanonicalMilestoneRoot(basePath, params.milestoneId);
-  const shouldApplyBrowserEvidenceGate = !opts?.skipBrowserEvidenceGate &&
-    await browserEvidenceGateRequiresAttention(params, artifactBasePath, {
-      structuredOnly: Boolean(canonicalInvocation),
-    });
-  if (canonicalInvocation && shouldApplyBrowserEvidenceGate) {
-    return {
-      error: "browser-required acceptance needs passed UAT browser/runtime evidence bound to every browser-required Slice",
-    };
+  let shouldApplyBrowserEvidenceGate = false;
+  if (!opts?.skipBrowserEvidenceGate) {
+    if (canonicalInvocation) {
+      const browserGateError = await structuredBrowserEvidenceRejection(params, artifactBasePath);
+      if (browserGateError) return { error: browserGateError };
+    } else {
+      shouldApplyBrowserEvidenceGate = await browserEvidenceGateRequiresAttention(params, artifactBasePath);
+    }
   }
   if (
     canonicalInvocation &&
@@ -402,7 +433,8 @@ export async function handleValidateMilestone(
     });
     if (shadowRepair.unresolved.length > 0) {
       return {
-        error: `Milestone ${params.milestoneId} has unresolved canonical lifecycle shadows: ${shadowRepair.unresolved.join(", ")}`,
+        error: `Milestone ${params.milestoneId} has unresolved canonical lifecycle shadows: ${shadowRepair.unresolved.join(", ")}. ` +
+          "A listed row with no canonical lifecycle row is adopted by /gsd db adopt --apply.",
       };
     }
     if (shadowRepair.repaired.length > 0) {
@@ -428,6 +460,9 @@ export async function handleValidateMilestone(
     getMilestone(effectiveParams.milestoneId)?.title,
   );
 
+  const slices = getMilestoneSlices(effectiveParams.milestoneId);
+  const gateSliceId = slices.length > 0 ? slices[0].id : "_milestone";
+
   const canonical = canonicalInvocation
     ? recordCanonicalValidation({
         params: effectiveParams,
@@ -435,6 +470,7 @@ export async function handleValidateMilestone(
         validationPath,
         artifactBasePath,
         requiredClasses,
+        gateSliceId,
         invocation: canonicalInvocation,
       })
     : undefined;
@@ -462,12 +498,10 @@ export async function handleValidateMilestone(
   // Write DB before disk so a crash between the two leaves a recoverable
   // state: the DB row exists but the file is missing, which projection
   // rendering can regenerate. The inverse (file exists, no DB row) is
-  // harder to detect and recover from (#2725).
-  const validatedAt = canonical?.endedAt ?? new Date().toISOString();
-  const slices = getMilestoneSlices(effectiveParams.milestoneId);
-  const gateSliceId = slices.length > 0 ? slices[0].id : "_milestone";
-
-  if (canonical?.status !== "replayed") {
+  // harder to detect and recover from (#2725). Adopted Milestones already
+  // committed these rows inside the milestone.validate operation.
+  if (!canonical) {
+    const validatedAt = new Date().toISOString();
     transaction(() => {
       insertAssessment({
         path: validationPath,
@@ -495,18 +529,14 @@ export async function handleValidateMilestone(
   // ── Filesystem render (outside transaction) ────────────────────────────
   let projectionStale = false;
   try {
-    await saveFile(validationPath, validationMd);
+    // The same renderer as the full rebuild: it reads the validation row that
+    // was just committed, so the tool and a rebuild write the same bytes.
+    renderMilestoneValidation(artifactBasePath, effectiveParams.milestoneId);
     const projectRoot = resolveWorktreeProjectRoot(basePath);
     if (projectRoot !== artifactBasePath) {
-      // Mirror to project root using the project root's layout (same logic as above).
-      const projectValidationPath = targetMilestoneFile(
-        projectRoot,
-        effectiveParams.milestoneId,
-        "VALIDATION",
-        getMilestone(effectiveParams.milestoneId)?.title,
-      );
+      // Mirror to project root using the project root's layout.
       try {
-        await saveFile(projectValidationPath, validationMd);
+        renderMilestoneValidation(projectRoot, effectiveParams.milestoneId);
       } catch (mirrorErr) {
         logWarning(
           "projection",
@@ -522,9 +552,9 @@ export async function handleValidateMilestone(
     });
   }
 
-  invalidateStateCache();
   clearPathCache();
   clearParseCache();
+  projectionStale ||= (await renderStateProjection(basePath)).stale;
 
   const prefs = loadEffectiveGSDPreferences()?.preferences;
   const gatesEnabled = opts?.uokGatesEnabled ?? resolveUokFlags(prefs).gates;

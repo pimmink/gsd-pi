@@ -12,7 +12,7 @@
 import { join } from "node:path";
 
 import type { CompleteSliceParams } from "../types.js";
-import { getDb } from "../gsd-db.js";
+import { getDb, getSlice } from "../gsd-db.js";
 import { clearPathCache, relSliceFile } from "../paths.js";
 import { resolveCanonicalMilestoneRoot } from "../worktree-manager.js";
 import { checkOwnership, sliceUnitKey } from "../unit-ownership.js";
@@ -23,6 +23,7 @@ import { renderMilestoneShellProjections } from "../workflow-projections.js";
 import { writeManifestAndFlush } from "../workflow-manifest.js";
 import { appendEvent } from "../workflow-events.js";
 import { logWarning } from "../workflow-logger.js";
+import { rebuildKnowledgeGraph } from "../knowledge-graph-build.js";
 import { removeProjectionFileSync } from "../atomic-write.js";
 import type { ExecutionInvocation } from "../execution-invocation.js";
 import {
@@ -31,7 +32,7 @@ import {
   SliceLifecycleValidationError,
   type SliceCompletionCloseout,
 } from "../slice-lifecycle-domain-operation.js";
-import { setSliceCompletionSummaryProjectionIfCurrent } from "../db/writers/slice-lifecycle.js";
+import { repairMilestoneLifecycleShadowsForward } from "../lifecycle-shadow-repair-domain-operation.js";
 
 export interface CompleteSliceResult {
   sliceId: string;
@@ -362,6 +363,22 @@ export async function handleCompleteSlice(
   }
 
   const closeout = normalizeCloseout(params, readPriorCloseout(params, invocation));
+  const shadowRepair = repairMilestoneLifecycleShadowsForward({
+    invocation,
+    milestoneId: params.milestoneId,
+  });
+  if (shadowRepair.unresolved.length > 0) {
+    return {
+      error: `Milestone ${params.milestoneId} has unresolved canonical lifecycle shadows: ${shadowRepair.unresolved.join(", ")}. ` +
+        "A listed row with no canonical lifecycle row is adopted by /gsd db adopt --apply.",
+    };
+  }
+  if (shadowRepair.repaired.length > 0) {
+    logWarning(
+      "db",
+      `Repaired ${shadowRepair.repaired.length} evidence-backed lifecycle shadow(s) before completing slice ${params.milestoneId}/${params.sliceId}`,
+    );
+  }
   let completion: ReturnType<typeof completeSlice>;
   try {
     completion = completeSlice({
@@ -369,6 +386,13 @@ export async function handleCompleteSlice(
       slice: { milestoneId: params.milestoneId, sliceId: params.sliceId },
       closeout,
       audit: { actorName: params.actorName, triggerReason: params.triggerReason },
+      carriers: (completedAt) => {
+        const completed: CompleteSliceParams = { ...closeout, milestoneId: params.milestoneId, sliceId: params.sliceId };
+        return {
+          summaryMd: renderSliceSummaryMarkdown(completed, completedAt),
+          uatMd: renderUatMarkdown(completed, completedAt),
+        };
+      },
     });
   } catch (error) {
     if (!(error instanceof SliceLifecycleValidationError)) throw error;
@@ -397,10 +421,11 @@ export async function handleCompleteSlice(
     milestoneId: params.milestoneId,
     sliceId: params.sliceId,
   };
-  const summaryMd = renderSliceSummaryMarkdown(effectiveParams, completion.completedAt);
-
-  // Resolve and write summary to disk
-  const uatMd = renderUatMarkdown(effectiveParams, completion.completedAt);
+  // The files follow the carriers on the Slice row, which the operation wrote:
+  // a replay must not put back a UAT that gsd_summary_save corrected later.
+  const carriers = getSlice(params.milestoneId, params.sliceId);
+  const summaryMd = carriers?.full_summary_md || renderSliceSummaryMarkdown(effectiveParams, completion.completedAt);
+  const uatMd = carriers?.full_uat_md || renderUatMarkdown(effectiveParams, completion.completedAt);
   let projectionStale = false;
   let superseded = false;
   const slice = { milestoneId: params.milestoneId, sliceId: params.sliceId };
@@ -409,13 +434,7 @@ export async function handleCompleteSlice(
   }
 
   try {
-    if (!setSliceCompletionSummaryProjectionIfCurrent({
-      milestoneId: params.milestoneId,
-      sliceId: params.sliceId,
-      operationId: completion.operationId,
-      summaryMd,
-      uatMd,
-    })) {
+    if (!isCurrent()) {
       superseded = true;
       projectionStale = true;
     } else {
@@ -493,31 +512,11 @@ export async function handleCompleteSlice(
   }
 
   // Fire-and-forget graph rebuild — must NOT await, must NOT crash slice completion.
-  // Dynamic import of the package name (not a relative path) so it resolves
-  // correctly via package.json#exports in both development and production.
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   if (!superseded) {
-    (async () => {
-      try {
-        const graphMod = await import("@opengsd/mcp-server") as unknown as Partial<{
-          buildGraph: (dir: string) => Promise<{ nodes: unknown[]; edges: unknown[]; builtAt: string }>;
-          writeGraph: (gsdRoot: string, graph: unknown) => Promise<void>;
-          resolveGsdRoot: (basePath: string) => string;
-        }>;
-        if (
-          typeof graphMod.buildGraph !== "function"
-          || typeof graphMod.writeGraph !== "function"
-          || typeof graphMod.resolveGsdRoot !== "function"
-        ) {
-          throw new Error("graph helpers unavailable from @opengsd/mcp-server");
-        }
-        const g = await graphMod.buildGraph(artifactBasePath);
-        await graphMod.writeGraph(graphMod.resolveGsdRoot(artifactBasePath), g);
-      } catch (graphErr) {
-        // Graph rebuild is best-effort — log at warning level but never propagate
-        logWarning("tool", `complete-slice graph rebuild failed (non-fatal): ${(graphErr as Error).message ?? String(graphErr)}`);
-      }
-    })();
+    rebuildKnowledgeGraph(artifactBasePath).catch((graphErr) => {
+      // Graph rebuild is best-effort — log at warning level but never propagate
+      logWarning("tool", `complete-slice graph rebuild failed (non-fatal): ${(graphErr as Error).message ?? String(graphErr)}`);
+    });
   }
 
   return {

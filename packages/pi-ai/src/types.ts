@@ -303,6 +303,13 @@ export interface Usage {
 	cacheRead: number;
 	cacheWrite: number;
 	totalTokens: number;
+	/**
+	 * Live prompt-side context of the final per-call API response, set only by
+	 * adapters whose terminal usage is cumulative across an internal loop
+	 * (claude-code). Consumers that approximate live context should prefer this
+	 * when it is present and > 0, and fall back to the derived totals otherwise.
+	 */
+	liveContextTokens?: number;
 	cost: {
 		input: number;
 		output: number;
@@ -320,6 +327,25 @@ export interface UserMessage {
 	timestamp: number; // Unix timestamp in milliseconds
 }
 
+/** GSD pre-request dynamic-routing provenance recorded per assistant message (ADR-049). */
+export type ModelRoutingSource = "gsd-dynamic";
+
+/** Complexity tier of a GSD dynamic-routing decision. */
+export type ModelRoutingTier = "light" | "standard" | "heavy";
+
+/**
+ * GSD dynamic-routing snapshot in effect when an assistant message started
+ * (ADR-049). Values are copied at capture time; provider-side routing is
+ * represented by `responseModel` and is never duplicated here.
+ */
+export interface ModelRouting {
+	source: ModelRoutingSource;
+	/** Unit classification in effect when the assistant message started. */
+	tier: ModelRoutingTier;
+	/** True when dynamic routing selected a cheaper model than the configured primary. */
+	modelDowngraded: boolean;
+}
+
 export interface AssistantMessage {
 	role: "assistant";
 	content: (TextContent | ThinkingContent | ToolCall | ServerToolUse | WebSearchResult)[];
@@ -327,6 +353,7 @@ export interface AssistantMessage {
 	provider: Provider;
 	model: string;
 	responseModel?: string; // Concrete `chunk.model` when different from the requested `model` (e.g. OpenRouter `auto` -> `anthropic/...`)
+	modelRouting?: ModelRouting; // GSD dynamic-routing provenance in effect when this response started (ADR-049).
 	responseId?: string; // Provider-specific response/message identifier when the upstream API exposes one
 	diagnostics?: AssistantMessageDiagnostic[]; // Redacted provider/runtime diagnostics for failures and recoveries.
 	usage: Usage;
@@ -513,6 +540,15 @@ export interface AnthropicMessagesCompat {
 	 * Default: false.
 	 */
 	forceAdaptiveThinking?: boolean;
+	/**
+	 * Whether the model rejects the legacy request surface with 400s:
+	 * `thinking: {type: "disabled"}` (the API requires
+	 * `{type: "between_tools"}` to turn thinking off), `temperature`,
+	 * `top_p` / `top_k`, and forced `tool_choice` (`any` / named tool).
+	 * Claude Sonnet 5.5 sets this in generated metadata (#2500).
+	 * Default: false.
+	 */
+	strictRequestParams?: boolean;
 }
 
 /**

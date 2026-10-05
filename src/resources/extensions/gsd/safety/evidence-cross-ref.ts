@@ -7,6 +7,7 @@
  * Copyright (c) 2026 Jeremy McSpadden <jeremy@fluxlabs.net>
  */
 
+import { INCONCLUSIVE_EXIT_CODE } from "./evidence-collector.js";
 import type { BashEvidence, EvidenceEntry } from "./evidence-collector.js";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -67,10 +68,10 @@ export function crossReferenceEvidence(
     }
 
     // A shell-spawn/infra failure means the command never ran (e.g. on Windows
-    // `gsd_exec runtime=bash` resolves to a WSL with no /bin/bash). The LLM
-    // typically recovers by re-running via another runtime, and that genuine
-    // run may not even be in the match set. Such a failure is inconclusive, not
-    // a falsified pass — exclude it before judging the exit code.
+    // `gsd_exec runtime=bash` resolves to a WSL with no /bin/bash). A harness
+    // deadline (#2425) means the run's exit was never observed. Either way the
+    // outcome is inconclusive, not a falsified pass — exclude it before judging
+    // the exit code.
     const commandRuns = matches.filter((m) => !isInfraSpawnFailure(m));
     if (commandRuns.length === 0) {
       if (claimed.exitCode === 0) {
@@ -79,7 +80,7 @@ export function crossReferenceEvidence(
           claimed,
           actual: latestMatch(matches),
           reason:
-            `Matched execution failed to spawn (infrastructure error, not a command failure); ` +
+            `Matched execution never observed a real outcome (infrastructure error or harness deadline, not a command failure); ` +
             `treating as inconclusive`,
         });
       }
@@ -93,7 +94,7 @@ export function crossReferenceEvidence(
         severity: "error",
         claimed,
         actual: match,
-        reason: `Claimed exitCode=0 but actual exitCode=${match.exitCode}`,
+        reason: exitCodeMismatchReason(claimed.command, match),
       });
     }
   }
@@ -102,10 +103,10 @@ export function crossReferenceEvidence(
 }
 
 /**
- * Runtime-spawn / shell-infra failure signatures. When a bash-runtime call
- * fails to *spawn* (rather than the command running and exiting non-zero), the
- * recorded exitCode is an ordinary non-zero but the output carries one of these
- * markers. Such a call is not evidence that a verification failed.
+ * Runtime-spawn / harness-level inconclusive signatures. When a bash-runtime
+ * call fails to *spawn* (rather than the command running and exiting non-zero),
+ * the recorded outcome carries one of these markers. Such a call is not
+ * evidence that a verification failed.
  */
 const INFRA_SPAWN_FAILURE_SIGNATURES: readonly RegExp[] = [
   /execvpe\([^)]*\)\s+failed/i,   // WSL: execvpe(/bin/bash) failed: No such file or directory
@@ -113,15 +114,36 @@ const INFRA_SPAWN_FAILURE_SIGNATURES: readonly RegExp[] = [
   /command not found:\s*(?:bash|sh|zsh|dash|fish|ash|ksh|wsl)\b/i, // missing shell interpreter only
 ];
 
+/** The MCP workflow queue deadline rejection (#2425, workflow-tools.ts). */
+const WORKFLOW_DEADLINE_RE = /Workflow operation exceeded \d+ms deadline/;
+
+/**
+ * Markers of an exit the harness actually observed (mirrors the collector's
+ * resolveExitCode resolvers). A run with one of these must be judged on its
+ * recorded exit even if its output also mentions the deadline signature.
+ */
+const OBSERVED_EXIT_RE = /Command exited with code \d+|"exit_code"\s*:\s*-?\d+/;
+
 /**
  * True when a non-zero bash call looks like a shell-spawn/infra failure (the
- * command never started) rather than a real command failure. A successful run
- * (exitCode 0) is never an infra failure.
+ * command never started) or an unobserved outcome (#2425 sentinel) rather than
+ * a real command failure. A successful run (exitCode 0) is never an infra
+ * failure.
  */
 function isInfraSpawnFailure(call: BashEvidence): boolean {
   if (call.exitCode === 0) return false;
+  // Explicit inconclusive sentinel from the collector (#2425): the harness
+  // never observed a process exit, so there is no failure to judge.
+  if (call.exitCode === INCONCLUSIVE_EXIT_CODE) return true;
   const snippet = call.outputSnippet ?? "";
   if (snippet.length === 0) return false;
+  // Deadline text in the output is only inconclusive when no exit was
+  // observed (#2425): a run that exited on its own and merely printed the
+  // deadline signature (e.g. a test or grep over source) must be judged on
+  // its recorded exit. Covers pre-sentinel rows recorded as exit 1.
+  if (WORKFLOW_DEADLINE_RE.test(snippet)) {
+    return !OBSERVED_EXIT_RE.test(snippet);
+  }
   return INFRA_SPAWN_FAILURE_SIGNATURES.some((re) => re.test(snippet));
 }
 
@@ -206,19 +228,97 @@ function latestMatch(matches: readonly BashEvidence[]): BashEvidence {
   ));
 }
 
-/** True when `actual` is the same command with only shell wrapper noise. */
-function isWrapperEquivalentCommand(actual: string, claimed: string): boolean {
-  const claimIndex = actual.lastIndexOf(claimed);
-  if (claimIndex < 0) return false;
-
-  const prefix = actual.slice(0, claimIndex).trim();
-  if (prefix.length > 0 && !/^cd\s+.+\s+&&$/.test(prefix)) return false;
-
-  const suffix = actual.slice(claimIndex + claimed.length).trim();
-  return suffix.length === 0 || isBenignWrapperSuffix(suffix);
+/**
+ * Diagnostic for a claimed pass contradicted by the recorded execution.
+ *
+ * Provenance is decided by what the recorded execution actually is:
+ * - the claim itself (exact, or with only shell wrapper noise) → the exit
+ *   code genuinely belongs to the claimed command; original message.
+ * - a compound execution (multi-line script or `&&`/`||`/`;` chain) → the
+ *   recorded exit code is that execution's FINAL exit code, not the matched
+ *   subcommand's (#2326); state execution reference, full script, and
+ *   provenance explicitly.
+ * - anything else (single command whose text differs from the claim) → the
+ *   match is uncertain: name the recorded command; do not call it compound.
+ */
+function exitCodeMismatchReason(claimedCommand: string, match: BashEvidence): string {
+  const base = `Claimed exitCode=0 but actual exitCode=${match.exitCode}`;
+  const claimed = stripExecutionEvidenceLabel(claimedCommand.trim()).trim();
+  const recorded = stripExecutionEvidenceLabel(match.command).trim();
+  if (recorded === claimed || isWrapperEquivalentCommand(recorded, claimed)) {
+    return base;
+  }
+  if (isCompoundRecordedCommand(recorded)) {
+    return (
+      `${base} — execution ${match.toolCallId} is a compound script: ${match.exitCode} is the ` +
+      `FINAL exit code of the whole script, not the exit code of ` +
+      `"${claimed.slice(0, 80)}". Full persisted script:\n${match.command}\n` +
+      `Each passing closeout evidence item must come from an independently executed command.`
+    );
+  }
+  return (
+    `${base} — the claim does not exactly match the recorded command ` +
+    `(recorded: ${summarizeCommand(recorded)}); exit code ${match.exitCode} belongs to that ` +
+    `recorded command. Verification evidence must match the executed command exactly.`
+  );
 }
 
-function isBenignWrapperSuffix(suffix: string): boolean {
-  if (/^;\s*echo\s+["']?[A-Z_]*EXIT=\$\?["']?$/.test(suffix)) return true;
-  return /^(?:(?:\d?>>?|&>)\s*\S+|\d?>&\d)(?:\s+(?:(?:\d?>>?|&>)\s*\S+|\d?>&\d))*$/.test(suffix);
+/** Operator chains and multi-line scripts: the exit code belongs to the whole execution. */
+const COMMAND_CHAIN_RE = /&&|\|\||;/;
+
+function isCompoundRecordedCommand(recorded: string): boolean {
+  return recorded.includes("\n") || COMMAND_CHAIN_RE.test(recorded);
+}
+
+function summarizeCommand(recorded: string): string {
+  return recorded.length > 160 ? `${recorded.slice(0, 157)}...` : recorded;
+}
+
+/**
+ * Drop the `gsd_exec[ runtime]: purpose` label line the evidence collector
+ * prefixes to gsd_exec / gsd_uat_exec bodies (see
+ * formatExecutionEvidenceCommand), from BOTH the recorded command and the
+ * claim — a claim copied verbatim from the persisted evidence carries the
+ * label too.
+ */
+function stripExecutionEvidenceLabel(command: string): string {
+  return command.replace(/^gsd_(?:uat_)?exec(?:_search)?(?:\s+\S+)?\s*:.*\n/, "");
+}
+
+/**
+ * True when `actual` is the claimed command with only shell wrapper noise:
+ * an optional leading `cd <dir> && ` prefix — the claim must be the FULL
+ * remainder after it, since `cd x && claim && more` makes the recorded exit
+ * code belong to the whole chain — and/or a trailing benign exit-code echo /
+ * redirect suffix.
+ */
+function isWrapperEquivalentCommand(actual: string, claimed: string): boolean {
+  let current = actual.trim();
+  const cdPrefix = current.match(/^cd\s+.+?\s*&&\s*/);
+  if (cdPrefix) {
+    current = current.slice(cdPrefix[0].length).trim();
+  }
+  return withoutBenignWrapperSuffix(current) === claimed;
+}
+
+/**
+ * Peel trailing benign exit-code echo / redirect wrappers
+ * (`; echo EXIT=$?`, `> out.log`, `2>&1`, ...) so the underlying command can
+ * be compared to the claim.
+ */
+function withoutBenignWrapperSuffix(command: string): string {
+  let current = command.trim();
+  for (;;) {
+    const echo = current.match(/^(.+);\s*echo\s+["']?[A-Z_]*EXIT=\$\?["']?$/);
+    if (echo) {
+      current = echo[1].trim();
+      continue;
+    }
+    const redirect = current.match(/^(.+?)\s+((?:\d?>>?|&>)\s*\S+|\d?>&\d)$/);
+    if (redirect) {
+      current = redirect[1].trim();
+      continue;
+    }
+    return current;
+  }
 }
