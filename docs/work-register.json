@@ -1283,8 +1283,8 @@
 			"branches": ["fix/copilot-reasoning-effort"],
 			"commits": ["a1295e18db9aa15354a60b302ee5766dbcb1dbda", "d818ea482db2c4c4374e5b5d4aa67c99085e28a6", "06d0aa60e2b29728c2409815763ce0375039392e"],
 			"context": "Focused correction of Copilot effort declaration normalization and overlay synthesis, plus provider-scoped suppression of bundled Completions controls when supportsReasoningEffort is explicitly false. Preserves custom compatibility, Responses defaults, adaptive aliases, budget-based Claude thinking, insert-only registration, and user precedence. No runtime activation redesign or undocumented backend support claim.",
-			"validation": "2026-10-07: Current PR #2684/local head verified at 06d0aa60e2b29728c2409815763ce0375039392e after publishing the review fix. Red-before/green-after endpoint regression; 59 focused catalog/overlay/diagnostic tests and strict focused TypeScript passed. Current-head CI https://github.com/open-gsd/gsd-pi/actions/runs/37638581149: fast-gates, workflow-lint and Socket passed; heavy build still running at last check. One review thread verified resolved, no others present. Contribution snapshot remoteHeadMatchesLocal=true and clean source worktree. Authorized cleanup removed only worktrees/copilot-reasoning-effort/node_modules (real local directory, no tracked files); absence and clean Git status verified. Directory was 1.2G; filesystem available space increased by 1342872 KiB (approximately 1.28 GiB during cleanup). Future local checks require dependency reinstall. Historical validation for previous published head d818ea482db2c4c4374e5b5d4aa67c99085e28a6: upstream base 4afbe5236371fb8200c36ebe37d857e524d81008; 58 focused tests covering all 16 offline diagnostics, provider tests 72 passed/1 skipped, strict TypeScript, build:pi-ai, build:core, lint, diff check and fast gates passed. Full extension typecheck passed with process-local 4 GiB heap after default-heap OOM; local full merge parity limited by ENOSPC. Initial CI 37624702710 failed only ADR-012 allowlist (16716 tests passed); d818ea48 corrected the justified exception with 2 passing guardrail tests. Previous-head CI 37627531914 passed heavy build/test, fast-gates, workflow-lint, node22-smoke, ci-gate, GitGuardian and Socket; Windows skipped by policy. Previous-head CI does not validate current head. PR remains open and non-draft. No live backend acceptance test.",
-			"nextAction": "Inspect current-head upstream CI run 37638581149 and await maintainer review. Review correction 06d0aa60 is published, thread PRRT_kwDOSk2dRc6p7wpl is resolved, and authorized worktree-local node_modules cleanup is complete. Dependencies must be reinstalled before any further local test/build. No merge or runtime patch authorized."
+			"validation": "2026-10-07: Current PR #2684/local head verified at 06d0aa60e2b29728c2409815763ce0375039392e after publishing the review fix. Red-before/green-after endpoint regression; 59 focused catalog/overlay/diagnostic tests and strict focused TypeScript passed. Current-head CI https://github.com/open-gsd/gsd-pi/actions/runs/37638581149 finished green: 5 pass / 1 policy skip (Windows portability); PR state remains BLOCKED solely on pending maintainer review (reviewDecision empty). The same commit ships locally in fork release 1.21.1-fork.3 (GSD-W053), verified active in the managed runtime. One review thread verified resolved, no others present. Authorized cleanup removed only worktrees/copilot-reasoning-effort/node_modules (real local directory, no tracked files); absence and clean Git status verified. Directory was 1.2G; filesystem available space increased by 1342872 KiB (approximately 1.28 GiB during cleanup). Future local checks require dependency reinstall. Historical validation for previous published head d818ea482db2c4c4374e5b5d4aa67c99085e28a6: upstream base 4afbe5236371fb8200c36ebe37d857e524d81008; 58 focused tests covering all 16 offline diagnostics, provider tests 72 passed/1 skipped, strict TypeScript, build:pi-ai, build:core, lint, diff check and fast gates passed. Full extension typecheck passed with process-local 4 GiB heap after default-heap OOM; local full merge parity limited by ENOSPC. Initial CI 37624702710 failed only ADR-012 allowlist (16716 tests passed); d818ea48 corrected the justified exception with 2 passing guardrail tests. Previous-head CI 37627531914 passed heavy build/test, fast-gates, workflow-lint, node22-smoke, ci-gate, GitGuardian and Socket; Windows skipped by policy. Previous-head CI does not validate current head. PR remains open and non-draft. No live backend acceptance test.",
+			"nextAction": "Await maintainer review on PR #2684; current-head CI 37638581149 is green (5 pass / 1 policy skip) and the PR is BLOCKED only on review. Review correction 06d0aa60 is published and thread PRRT_kwDOSk2dRc6p7wpl is resolved. The fix ships locally in fork release 1.21.1-fork.3 (GSD-W053). No merge or runtime patch authorized beyond that."
 		},
 		{
 			"id": "GSD-W047",
@@ -1434,8 +1434,8 @@
 			"commits": [
 				"8d86092c8dd4d6af323bdf7635353b110100780e"
 			],
-			"context": "State reconciliation drift flagged orphaned SUMMARY artifact rows that legitimately remain after a slice reopen, where prior SUMMARY projections are immutable history by design. The fix exempts reopened-slice orphaned SUMMARY artifact rows from drift instead of reporting or repairing them. Surfaced while reconciling drift after real slice-reopen cycles in the Edelman Studio consumer project.",
-			"validation": "2026-10-07: PR #2674 open, non-draft; head 8d86092c8dd4d6af323bdf7635353b110100780e matches the local branch tip and origin; GitHub mergeStateStatus CLEAN; PR checks 10 pass / 1 policy skip (Windows portability).",
+			"context": "State reconciliation drift flagged orphaned SUMMARY artifact rows that legitimately remain after a slice reopen, where prior SUMMARY projections are immutable history by design. The fix exempts reopened-slice orphaned SUMMARY artifact rows from drift instead of reporting or repairing them. Surfaced while reconciling drift after real slice-reopen cycles in the Edelman Studio consumer project. An earlier inline development variant (querying workflow_domain_events directly inside artifact-db.ts) powered the managed runtime as an interim patch from 2026-10-06; it is superseded by this reviewed commit, which routes the reopen-history read through db/lifecycle-queries.ts, and is archived at plans/patches/archive/2026-10-07-slice-reopen-inline-variant/.",
+			"validation": "2026-10-07: PR #2674 open, non-draft; head 8d86092c8dd4d6af323bdf7635353b110100780e matches the local branch tip and origin; GitHub mergeStateStatus CLEAN; PR checks 10 pass / 1 policy skip (Windows portability). Superseded inline variant archived and the main fork checkout restored clean; the reviewed variant ships locally in fork release 1.21.1-fork.3 (GSD-W053).",
 			"nextAction": "Await maintainer review on PR #2674; address feedback if requested."
 		},
 		{
@@ -1461,9 +1461,8 @@
 				"4f0424281a3dc041ce413e8547f4d5f7fe6898a8",
 				"f541d27027fdfe9ce7c55de29a246e39e64889c6"
 			],
-			"context": "Fork release branch keeping the local managed runtime ahead of npm 1.21.0 while the corresponding upstream PRs are pending. 1.21.1-fork.1 (4f0424281, pushed to origin) rebases onto current upstream/main including #2578 and drops the retired stale-render content-drift patch, and carries the local-mirror fixes f6bb4efe (write-EIO crash storm, GSD-W048), f69a65c2/ff08a4a2 (status-only 400 transient classification, closed-unmerged PR #2276), and b5621a26 (await_job truncated output, GSD-W049). 1.21.1-fork.2 (f541d2702, local only at registration time) additionally cleans stray .d.ts files from dist/resources and carries the extension-loader .d.ts guard ee211fbc (GSD-W047).",
-			"validation": "2026-10-07: branch topology verified via git log upstream/main..fix/write-eio-crash-storm: release commits 4f0424281a3dc041ce413e8547f4d5f7fe6898a8 (fork.1, equal to the origin tip) and f541d27027fdfe9ce7c55de29a246e39e64889c6 (fork.2, one commit ahead locally, unpushed). Carried fix commits enumerated from the same range.",
-			"nextAction": "Publish 1.21.1-fork.2 to origin only with explicit push authorization. Retire carried fix commits as upstream PRs #2641, #2642, and #2643 merge and the npm release catches up."
+			"context": "Fork release branch keeping the local managed runtime ahead of npm 1.21.0 while the corresponding upstream PRs are pending. 1.21.1-fork.1 (4f0424281, pushed to origin) rebases onto current upstream/main including #2578 and drops the retired stale-render content-drift patch, and carries the local-mirror fixes f6bb4efe (write-EIO crash storm, GSD-W048), f69a65c2/ff08a4a2 (status-only 400 transient classification, closed-unmerged PR #2276, GSD-W056), and b5621a26 (await_job truncated output, GSD-W049). 1.21.1-fork.2 (f541d270, pushed to origin 2026-10-07) additionally cleans stray .d.ts files from dist/resources and carries the extension-loader .d.ts guard ee211fbc (GSD-W047). 1.21.1-fork.3 (in preparation 2026-10-07) merges upstream/main 4c064a07 and additionally carries the recover-id punctuation fix (GSD-W050), the await_job full-output marker follow-up (GSD-W049), the clearLock orphaned-Attempt settle (GSD-W051), the final reviewed slice-reopen drift exemption (GSD-W052, replacing the interim inline variant), and the full Copilot reasoning-effort stack including the recognized-live-endpoint guard (GSD-W046). 1.21.1-fork.3 (ba2380b6, pushed to origin 2026-10-07) is built, globally installed, and active: gsd --version reports 1.21.1-fork.3 and the fingerprint-gated initResources resync carried every fix into the managed resources.",			"validation": "2026-10-07: branch topology verified via git log upstream/main..fix/write-eio-crash-storm. fork.1 (4f0424281) and fork.2 (f541d27027) both pushed to origin (origin tip f541d27027). fork.3 release commit ba2380b6 prepared on top of the upstream/main merge e8651011 with cherry-picks verified content-identical to the reviewed PR branches for every carried file (git diff against the five fix branches returned empty). Runtime layer audit 2026-10-07: installed 1.21.1-fork.2 package dist/resources and managed ~/.gsd/agent/extensions/gsd were a patchwork (W046 base only in managed via interim sync, W051 and the W049 marker absent everywhere, W052 present as the superseded inline variant); fork.3 aligns all layers with the reviewed final versions. Post-install verification 2026-10-07: gsd --version = 1.21.1-fork.3; marker audit of the resynced managed resources confirms every carried fix active (reasoning-effort base + endpoint guard, write-EIO, await_job full-output marker in both await-tool and context-masker, recover-id punctuation, clearLock settle, final slice-reopen exemption, pi-ai supportsReasoningEffort, .d.ts loader guard). Focused compiled tests in the release tree: 179/179 crash-recovery + recover-id + drift suites pass, 100/100 copilot-catalog + overlay + reasoning-diagnostics + await-tool + context-masker suites pass. The pi-ai package suite shows 41 failures, all pre-existing live-provider E2E tests (Google/Gemini/Ollama/HuggingFace) that fail identically on the pristine pre-change tree; the new copilot-thinking-levels tests pass.",
+			"nextAction": "Retire carried fix commits as upstream PRs #2641, #2642, #2643, #2659, #2441, #2674, and #2684 merge and the npm release catches up. Until then the fork.3 runtime is the verified local state."
 		},
 		{
 			"id": "GSD-W054",
@@ -1498,6 +1497,146 @@
 			"context": "Part 2 of the #2099 MCP integration initiative (closed as completed 2026-10-01): umbrella issue #2666 plus six bounded children - #2667 canonical native Copilot project-context guard, #2668 sidebar freshness and queued refresh intent, #2669 production fallback-to-canonical-validation composition, #2670 smoke harness required snapshot-field validation, #2671 native VS Code and Copilot invocation evidence, #2672 representative real external MCP-host runs. A scoped continuation proposal, not a claim that the delivered foundation was incomplete; implementation is not approved.",
 			"validation": "2026-10-07: issues #2666 through #2672 verified open on upstream; authored after read-only research at upstream/main 8317811cf34e69c4add8eaa9deb28c17721b768e on 2026-10-06. Public-safe umbrella text and execution plan recorded in the workspace plans directory; no implementation branch exists.",
 			"nextAction": "Await maintainer triage and scope confirmation on #2666; do not create implementation branches before approval."
+		},
+		{
+			"id": "GSD-W055",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Register liveness identity on rejected unit-run claim",
+			"status": "merged",
+			"issues": [
+				2097
+			],
+			"pullRequests": [
+				2098
+			],
+			"branches": [
+				"pr/liveness-backstop-claim-identity-2097"
+			],
+			"commits": [
+				"eafa13d65a02bd485371bb48396e771859da5fe1",
+				"4bad97799a94c82be218af6bee1df235f0ee69c9",
+				"d279fcba2deb8402e5c846fed91ef1bd122f6186"
+			],
+			"context": "Auto-mode liveness backstop did not register its identity when a unit-run claim was rejected, so repeated rejections surfaced as a wedge without an actionable recovery. Registers the liveness identity on rejected unit-run claims, gives the wedge an actionable recovery (ADR-047 section 5), and stabilizes the unit-run-claim signature for lease-held rejections.",
+			"validation": "2026-10-07 register backfill: GitHub reports PR #2098 merged 2026-09-03T16:33:19Z closing issue #2097; merge commit f8ac9530755d8d6fd5b2b8772c36fe76eaa71364 verified contained in fetched upstream/main. Branch retains 3 unique commits listed above.",
+			"nextAction": "None; contribution merged upstream."
+		},
+		{
+			"id": "GSD-W056",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Classify status-only 400 Bad Request as transient network error",
+			"status": "closed-unmerged",
+			"issues": [
+				2275
+			],
+			"pullRequests": [
+				2276
+			],
+			"relatedRefs": [
+				"GSD-W053"
+			],
+			"branches": [
+				"fix/bare-400-statusline-transient"
+			],
+			"commits": [
+				"f69a65c2e248347d879a37d0b627492596cf339f",
+				"ff08a4a205a80700a709648e0fd96d90ad2266bc"
+			],
+			"context": "Status-only \"400 Bad Request\" provider responses (no retryable body) hard-paused auto-mode instead of being treated as transient network conditions; surfaced as wedge W-a8123253. The PR proposed classifying them as transient and tolerating a \"Provider error:\" prefix. Closed unmerged upstream; the fix remains carried in the fork runtime releases (GSD-W053).",
+			"validation": "2026-10-07 register backfill: GitHub reports PR #2276 closed unmerged (created 2026-09-11), linked to issue #2275. Branch retains 2 unique commits; both are carried into fork releases 1.21.1-fork.1 and later via fix/write-eio-crash-storm.",
+			"nextAction": "Keep carried in fork releases (GSD-W053); do not revive the upstream PR without fresh maintainer signal on #2275."
+		},
+		{
+			"id": "GSD-W057",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Clamp passing class verdict under non-succeeded milestone validation",
+			"status": "merged",
+			"issues": [],
+			"pullRequests": [
+				2308
+			],
+			"branches": [
+				"fix/milestone-validation-pass-verdict-clamp"
+			],
+			"commits": [
+				"7cb0d741556bd75f8344b9ca5e4fafab157380ba"
+			],
+			"context": "A passing class verdict could survive under a non-succeeded milestone validation, letting an aggregate read as pass when an earlier class had not succeeded. The fix clamps the passing class verdict so a non-succeeded milestone validation cannot present a passing per-class verdict.",
+			"validation": "2026-10-07 register backfill: GitHub reports PR #2308 merged 2026-09-14T02:18:21Z; merge commit 7cb0d741556bd75f8344b9ca5e4fafab157380ba verified contained in fetched upstream/main. Local branch fully absorbed (zero unique commits remain).",
+			"nextAction": "None; contribution merged upstream."
+		},
+		{
+			"id": "GSD-W058",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Correct gpt-5.6-luna/terra capability-tier misclassification in the model router",
+			"status": "merged",
+			"issues": [],
+			"pullRequests": [
+				2393
+			],
+			"branches": [
+				"fix/gpt-5.6-luna-terra-tier-misclassification"
+			],
+			"commits": [
+				"cc8779fe308376b617456e042190b04298ff9f10"
+			],
+			"context": "The model-router capability-tier map misclassified gpt-5.6-luna and gpt-5.6-terra as heavy, collapsing dynamic routing onto the most expensive tier regardless of task complexity. Corrects them to light/standard so the complexity classifier can actually downgrade. Found during the Edelman Studio 2026-09-20 credit-usage audit.",
+			"validation": "2026-10-07 register backfill: GitHub reports PR #2393 merged 2026-09-20T14:53:55Z; merge commit cc8779fe308376b617456e042190b04298ff9f10 verified contained in fetched upstream/main. Local branch fully absorbed.",
+			"nextAction": "None; contribution merged upstream."
+		},
+		{
+			"id": "GSD-W059",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Recover from a stale milestone lease in the orchestrator dispatch claim path",
+			"status": "merged",
+			"issues": [
+				2406
+			],
+			"pullRequests": [
+				2407
+			],
+			"branches": [
+				"fix/orchestrator-stale-lease-recovery"
+			],
+			"commits": [
+				"ca09ac8050c848fa583b7eebe40c6084791c49b0"
+			],
+			"context": "The orchestrator dispatch claim path could wedge on a stale milestone lease left by a dead worker. The fix recovers from the stale lease directly in the claim path instead of requiring manual settlement.",
+			"validation": "2026-10-07 register backfill: GitHub reports PR #2407 merged 2026-09-23T02:51:07Z closing issue #2406; merge commit ca09ac8050c848fa583b7eebe40c6084791c49b0 verified contained in fetched upstream/main. Local branch fully absorbed.",
+			"nextAction": "None; contribution merged upstream."
+		},
+		{
+			"id": "GSD-W060",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Recover edit tool calls that misname the edits field",
+			"status": "merged",
+			"issues": [
+				2408
+			],
+			"pullRequests": [
+				2409
+			],
+			"branches": [
+				"fix/edit-tool-field-alias-recovery"
+			],
+			"commits": [
+				"8d301870b40a7040b3ccb1ceb96633aa136be91b"
+			],
+			"context": "Edit tool calls that misnamed the edits field failed hard; the fix recovers them through field-alias handling instead of erroring out the turn.",
+			"validation": "2026-10-07 register backfill: GitHub reports PR #2409 merged 2026-09-23T12:24:51Z closing issue #2408; merge commit 8d301870b40a7040b3ccb1ceb96633aa136be91b verified contained in fetched upstream/main. Local branch fully absorbed.",
+			"nextAction": "None; contribution merged upstream."
 		}
 	],
 	"localExtensionPatches": [
