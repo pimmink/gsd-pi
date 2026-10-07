@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-09-11",
+	"evidenceAsOf": "2026-10-07",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -585,8 +585,8 @@
 				"f3fd49050cb644d5b825e9a8d9d847fed1d74a3b"
 			],
 			"context": "A repo-wide markdownlint-cli2 scan (git ls-files '*.md' passed as an explicit file list, not a glob, to avoid ENAMETOOLONG from deeply nested pnpm node_modules symlinks) found 29,678 issues across 919 of 1145 tracked markdown files. MD013 (line-length, 17,309 violations) and MD060 (table-column-style, 5,916 violations) together account for 78% of the total and were never actually enforced as project conventions (verified: neither rule has any pre-existing inline markdownlint-disable comment anywhere in a clean upstream/main checkout, correcting an earlier assumption that CONTRIBUTING.md already disabled these -- that pattern only existed in this fork-local work-register.md, not upstream). Added a root .markdownlint-cli2.jsonc disabling both rules repo-wide; zero content changes. New worktree created off current upstream/main (e28218e4) after an initial git worktree add path mistake (relative destination resolved against -C fork instead of caller cwd) was caught and corrected.",
-			"validation": "Scan before: 29678 issues in 919 files. Scan after adding the config (same file list, config auto-discovered by markdownlint-cli2): 6472 issues in 649 files -- confirms the 78% reduction empirically, not just estimated. JSONC syntax independently verified via a comment-stripped JSON.parse in addition to markdownlint-cli2 itself successfully parsing and applying it. Full pnpm install for a local verify:fast attempt failed (ENOTDIR: a symlinked node_modules from a sibling worktree conflicted with pnpm's own install step) and was not worth resolving given the change is a single non-executable config file touching no src/packages/scripts paths that ci-classify-changes.sh's heavy-gate patterns key on.",
-			"nextAction": "Merged into open-gsd/gsd-pi:main on 2026-08-28. Work complete."
+			"validation": "PR #1991 merged into open-gsd/gsd-pi:main on 2026-08-28 at merge commit 55d6c58d88968ef90ad7a880116d3f532b644119. It intentionally added only the root markdownlint configuration, reducing the scan from 29678 issues in 919 files to 6472 issues in 649 files. Issue #1992 remains open as the explicitly scoped follow-up for those remaining content-level violations; the merged PR did not close it because it did not complete that broader cleanup.",
+			"nextAction": "No action for the merged config slice. Keep #1992 open for maintainer triage and incremental, separately scoped markdown cleanup; do not treat PR #1991 as full resolution of the issue."
 		},
 		{
 			"id": "GSD-W021",
@@ -1010,12 +1010,15 @@
 				"6a3ed5953ea28ff69227d2f06e927ad387dded43",
 				"fa3873d6bb8732441b78c5910299e36add6b3249",
 				"0c88e7d23bdbffed6780ba26fd1cbbfcaf9bf135",
-					"d23ee84156242871b82d06f1f7077f0c3e418908",
-					"f1f963cd6976aa557d5541c38fceebee59234650"
+				"d23ee84156242871b82d06f1f7077f0c3e418908",
+				"f1f963cd6976aa557d5541c38fceebee59234650",
+				"b97c7f1520bbcc42f487748fcde13e4c35f4b440",
+				"498aaaf1e0866987989b260a19f82d9e6b4098a4",
+				"7bf0d8e58658b4cae109e7e51a6cc8137811f7db"
 			],
 			"context": "Contributor-developed method for optional, manually dispatched sharded pre-review verification. The proposal is intentionally framed as faster/reproducible clean-runner evidence for broad contributor changes, not a replacement for upstream ci.yml or a merge-parity gate. Draft PR #2177 now includes the concrete review implementation files: .github/workflows/pre-review-verification-sharded.yml, scripts/pre-review-verify.sh, and docs/dev/sharded-pre-review-verification.md.",
-				"validation": "2026-09-06: searched for overlapping sharded pre-review verification issues/PRs; no relevant existing issue/PR found. Issue #2176 opened as an enhancement proposal. Draft PR #2177 opened, then updated at commit 6a3ed5953ea28ff69227d2f06e927ad387dded43 to include the concrete workflow and dispatch helper in addition to the review doc. CI initially failed repository runner policy because the workflow used ubuntu-24.04; commit fa3873d6bb8732441b78c5910299e36add6b3249 switched all jobs to approved blacksmith-4vcpu-ubuntu-2404. CI then failed actionlint shellcheck SC2153 for GitHub Actions env-injected SOURCE_REPO; commit 0c88e7d23bdbffed6780ba26fd1cbbfcaf9bf135 added targeted shellcheck annotations. Workflow-lint and fast-gates passed on 0c88e7d2. Commit d23ee84156242871b82d06f1f7077f0c3e418908 clarified that richer contributor-side watch/resume/logs/triage/timing/fallback pieces are deliberately omitted from the first upstream draft. Commit f1f963cd6976aa557d5541c38fceebee59234650 links the complete public contributor-harness component inventory and each component's purpose, while preserving the narrow review scope. Public issue comments 5558843480 and 5558853046 clarify the review boundary and that the omitted pieces already exist in the separate public harness. At PR head f1f963cd6976aa557d5541c38fceebee59234650, Agent Workflow Guard, fast-gates, workflow-lint, GitGuardian, and Socket checks are green; build remains pending. Local validation: bash -n scripts/pre-review-verify.sh, helper --help, actionlint -config-file .config/actionlint.yaml .github/workflows/pre-review-verification-sharded.yml, node --test scripts/__tests__/github-workflows-runner-contract.test.mjs (6/6), git diff --check, and VS Code diagnostics for the new files all passed. Cost evidence is conservative: measured sharded proof reduced wall-clock from about 19m11s to about 12m04s but used about 27.1 summed runner-minutes versus about 19.2 unsharded; public fork-local GitHub usage API reported billable.UBUNTU.total_ms=0 for measured runs.",
-			"nextAction": "Await maintainer response on issue #2176 and draft PR #2177. Treat PR #2177 as clarification/review-only until maintainers request an implementation workflow."
+				"validation": "2026-09-06: searched for overlapping sharded pre-review verification issues/PRs; no relevant existing issue/PR found. Issue #2176 opened as an enhancement proposal. Draft PR #2177 opened, then updated at commit 6a3ed5953ea28ff69227d2f06e927ad387dded43 to include the concrete workflow and dispatch helper in addition to the review doc. CI initially failed repository runner policy because the workflow used ubuntu-24.04; commit fa3873d6bb8732441b78c5910299e36add6b3249 switched all jobs to approved blacksmith-4vcpu-ubuntu-2404. CI then failed actionlint shellcheck SC2153 for GitHub Actions env-injected SOURCE_REPO; commit 0c88e7d23bdbffed6780ba26fd1cbbfcaf9bf135 added targeted shellcheck annotations. Workflow-lint and fast-gates passed on 0c88e7d2. Commit d23ee84156242871b82d06f1f7077f0c3e418908 clarified that richer contributor-side watch/resume/logs/triage/timing/fallback pieces are deliberately omitted from the first upstream draft. Commit f1f963cd6976aa557d5541c38fceebee59234650 links the complete public contributor-harness component inventory and each component's purpose, while preserving the narrow review scope. Public issue comments 5558843480 and 5558853046 clarify the review boundary and that the omitted pieces already exist in the separate public harness. At PR head f1f963cd6976aa557d5541c38fceebee59234650, Agent Workflow Guard, fast-gates, workflow-lint, GitGuardian, and Socket checks are green; build remains pending. Local validation: bash -n scripts/pre-review-verify.sh, helper --help, actionlint -config-file .config/actionlint.yaml .github/workflows/pre-review-verification-sharded.yml, node --test scripts/__tests__/github-workflows-runner-contract.test.mjs (6/6), git diff --check, and VS Code diagnostics for the new files all passed. Cost evidence is conservative: measured sharded proof reduced wall-clock from about 19m11s to about 12m04s but used about 27.1 summed runner-minutes versus about 19.2 unsharded; public fork-local GitHub usage API reported billable.UBUNTU.total_ms=0 for measured runs. 2026-10-05: review-hardening commit 7bf0d8e58658b4cae109e7e51a6cc8137811f7db pushed to the same branch, closing the cache-poisoning and jq-injection review findings. 2026-10-07: PR #2177 verified open, non-draft, mergeStateStatus CLEAN, head 7bf0d8e58658b4cae109e7e51a6cc8137811f7db with 10 passing checks.",
+			"nextAction": "Await upstream review and CI on ready-for-review PR #2177; retain existing upstream ci.yml as the only merge authority."
 		},
 		{
 			"id": "GSD-W037",
@@ -1157,7 +1160,7 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Validate canonical evidence in the MCP host smoke probe",
-			"status": "pr-open",
+			"status": "merged",
 			"issues": [
 				2099
 			],
@@ -1183,8 +1186,318 @@
 				"94193db0"
 			],
 			"context": "The MCP smoke probe is a separate evidence boundary for #2099. Its progress assertion predates readMetadata, its snapshot assertion predates truncation fields, and its authority/parity checks do not validate the properties they claim. This work fixes the probe and its behavioral regression coverage without changing consumer policy or host integrations.",
-			"validation": "2026-09-12: commits 9a8146a7c, f2f8137e, ef95f152, and 94193db0 are pushed to origin/fix/mcp-host-smoke-validation. Copilot review findings were addressed: bounded stderr, exact typed text blocks, safe import guard, malformed canonical errors, strict nested payloads, strict timestamps, object collection items, and independent DB-vs-projection fixture evidence. Focused tests passed 6/6, direct @opengsd/mcp-server build passed, packaged MCP stdio smoke passed 5/5, git diff checks passed, and verify:fast passed with 267 tests and ci-fast-gates all checks passed. The prior online build failure was traced to runner Ubuntu package-download network failures, not W042 source. Upstream PR #2273 is open; PR comment https://github.com/open-gsd/gsd-pi/pull/2273#issuecomment-5645273131 and #2099 comment https://github.com/open-gsd/gsd-pi/issues/2099#issuecomment-5645273902 record both fixes. No native VS Code, third-party host, or upstream CI evidence has been collected.",
-			"nextAction": "Watch PR #2273 CI and maintainer review; address feedback if requested. Keep host compatibility as separate evidence."
+			"validation": "2026-09-15: GitHub reports PR #2273 closed as merged on 2026-09-12T21:55:29Z by cursor[bot], with head SHA 94193db07318c00747f6ed5379d90dfd33aba036 matching the local fix/mcp-host-smoke-validation worktree HEAD before cleanup. Local git also reported that HEAD is contained in fetched upstream/main at 0166eac49251ddfc61fd774166a93c899fd2dcd6. Earlier validation from 2026-09-12 remains: commits 9a8146a7c, f2f8137e, ef95f152, and 94193db0 were pushed; focused tests passed 6/6, direct @opengsd/mcp-server build passed, packaged MCP stdio smoke passed 5/5, git diff checks passed, and verify:fast passed with 267 tests and ci-fast-gates all checks passed. No native VS Code or third-party host evidence was collected.",
+			"nextAction": "None; contribution merged upstream and local worktree removed."
+		},
+		{
+			"id": "GSD-W043",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Show dynamic-routing tier in the live GSD AUTO strip",
+			"status": "idea",
+			"issues": [
+				2395
+			],
+			"pullRequests": [],
+			"relatedRefs": [
+				"#2078",
+				"#2207",
+				"#2208",
+				"#2374"
+			],
+			"planRefs": [
+				"PLAN-2026-09-20-AUTO-ROUTING-TIER"
+			],
+			"branches": [],
+			"commits": [],
+			"context": "Follow-up to the delivered live dispatched-model strip in #2207/#2262: expose the authoritative light/standard/heavy dynamic-routing tier without changing routing behavior or duplicating the historical attribution contract.",
+			"validation": "2026-09-20: upstream issue #2395 created after read-only review of #2078, #2207, #2208, #2374 and the current AUTO/dashboard/widget seams. Public Markdown preflight passed.",
+			"nextAction": "Await maintainer triage; implementation should remain a focused additive progress-payload and renderer change with lifecycle and width-contract tests."
+		},
+		{
+			"id": "GSD-W044",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Show live model, thinking, state, and elapsed time for subagents",
+			"status": "idea",
+			"issues": [
+				2396
+			],
+			"pullRequests": [],
+			"relatedRefs": [
+				"#2078",
+				"#2207",
+				"#2208",
+				"#2245",
+				"#2374"
+			],
+			"planRefs": [
+				"PLAN-2026-09-20-SUBAGENT-OBSERVABILITY"
+			],
+			"branches": [],
+			"commits": [],
+			"context": "Focused live subagent observability slice: surface known requested/effective model identity, thinking level, explicit child lifecycle state, and per-child elapsed time while preserving existing transcript behavior and compatibility.",
+			"validation": "2026-09-20: upstream issue #2396 created after read-only review of #2245, #2374 and the current subagent lifecycle seams. Public Markdown preflight passed; the unrelated high-effort review response was discarded as invalid evidence.",
+			"nextAction": "Await maintainer triage; implementation should use authoritative child lifecycle/timestamp data and execution-based renderer, persistence, and width tests."
+		},
+		{
+			"id": "GSD-W045",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Add a first-class interactive TUI for configuring, previewing, and understanding dynamic model routing",
+			"status": "idea",
+			"issues": [
+				2397
+			],
+			"pullRequests": [],
+			"relatedRefs": [
+				"#2078",
+				"#2207",
+				"#2208",
+				"#2245",
+				"#2374",
+				"#2395"
+			],
+			"planRefs": [
+				"PLAN-2026-09-20-ROUTING-TUI"
+			],
+			"branches": [],
+			"commits": [],
+			"context": "Umbrella feature for a first-class /gsd routing overlay over the existing production router: effective/source-aware configuration, registry-backed tier picker, atomic draft/save, read-only production preview, adaptive history, rating, and safe reset. The issue requires a defaults-contract slice before writable editing and explicitly avoids a second routing implementation.",
+			"validation": "2026-09-20: upstream issue #2397 created after bounded preflight, architecture scouting, default-contract source inspection, upstream issue/PR overlap search, and an independent critical review. Public Markdown preflight passed; source checkout remained clean.",
+			"nextAction": "Await maintainer triage and scope approval; do not create an implementation branch until the defaults-contract/read-model slice is accepted."
+		},
+		{
+			"id": "GSD-W046",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Align Copilot reasoning capability metadata, selectable levels, and request payloads",
+			"status": "pr-open",
+			"issues": [2683],
+			"pullRequests": [2684],
+			"relatedRefs": ["#504", "#2088", "#2089", "#2092", "#2090", "#2093", "#2185", "#2186", "#2645", "#2646"],
+			"branches": ["fix/copilot-reasoning-effort"],
+			"commits": ["a1295e18db9aa15354a60b302ee5766dbcb1dbda", "d818ea482db2c4c4374e5b5d4aa67c99085e28a6", "06d0aa60e2b29728c2409815763ce0375039392e"],
+			"context": "Focused correction of Copilot effort declaration normalization and overlay synthesis, plus provider-scoped suppression of bundled Completions controls when supportsReasoningEffort is explicitly false. Preserves custom compatibility, Responses defaults, adaptive aliases, budget-based Claude thinking, insert-only registration, and user precedence. No runtime activation redesign or undocumented backend support claim.",
+			"validation": "2026-10-07: Current PR #2684/local head verified at 06d0aa60e2b29728c2409815763ce0375039392e after publishing the review fix. Red-before/green-after endpoint regression; 59 focused catalog/overlay/diagnostic tests and strict focused TypeScript passed. Current-head CI https://github.com/open-gsd/gsd-pi/actions/runs/37638581149: fast-gates, workflow-lint and Socket passed; heavy build still running at last check. One review thread verified resolved, no others present. Contribution snapshot remoteHeadMatchesLocal=true and clean source worktree. Authorized cleanup removed only worktrees/copilot-reasoning-effort/node_modules (real local directory, no tracked files); absence and clean Git status verified. Directory was 1.2G; filesystem available space increased by 1342872 KiB (approximately 1.28 GiB during cleanup). Future local checks require dependency reinstall. Historical validation for previous published head d818ea482db2c4c4374e5b5d4aa67c99085e28a6: upstream base 4afbe5236371fb8200c36ebe37d857e524d81008; 58 focused tests covering all 16 offline diagnostics, provider tests 72 passed/1 skipped, strict TypeScript, build:pi-ai, build:core, lint, diff check and fast gates passed. Full extension typecheck passed with process-local 4 GiB heap after default-heap OOM; local full merge parity limited by ENOSPC. Initial CI 37624702710 failed only ADR-012 allowlist (16716 tests passed); d818ea48 corrected the justified exception with 2 passing guardrail tests. Previous-head CI 37627531914 passed heavy build/test, fast-gates, workflow-lint, node22-smoke, ci-gate, GitGuardian and Socket; Windows skipped by policy. Previous-head CI does not validate current head. PR remains open and non-draft. No live backend acceptance test.",
+			"nextAction": "Inspect current-head upstream CI run 37638581149 and await maintainer review. Review correction 06d0aa60 is published, thread PRRT_kwDOSk2dRc6p7wpl is resolved, and authorized worktree-local node_modules cleanup is complete. Dependencies must be reinstalled before any further local test/build. No merge or runtime patch authorized."
+		},
+		{
+			"id": "GSD-W047",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Skip .d.ts declaration files in extension discovery",
+			"status": "pr-open",
+			"issues": [
+				2638
+			],
+			"pullRequests": [
+				2641
+			],
+			"relatedRefs": [
+				"GSD-W053"
+			],
+			"branches": [
+				"fix/extension-loader-skip-declaration-files"
+			],
+			"commits": [
+				"e1e6dda5aac664c641d5fbcaee85dbd43896e4b0",
+				"a9ac081c4b0f3bb3418b3c4aebe2de6a9cf9a64b"
+			],
+			"context": "Extension discovery loaded .d.ts declaration files as candidate modules and logged spurious \"does not export a valid factory function\" errors. Reproduced locally when stray .d.ts files sat next to the managed runtime's compiled resources (the same condition fork release 1.21.1-fork.2 cleans up). e1e6dda5 skips declaration files in discovery; a9ac081c adds regression coverage for all three .d.ts discovery guards.",
+			"validation": "2026-10-07: PR #2641 open, non-draft, closes #2638; head a9ac081c4b0f3bb3418b3c4aebe2de6a9cf9a64b matches the local branch tip and origin; GitHub mergeStateStatus CLEAN; PR checks 8 pass / 1 policy skip (Windows portability). Fix ships with its own focused discovery-guard tests.",
+			"nextAction": "Await maintainer review on PR #2641; address feedback if requested."
+		},
+		{
+			"id": "GSD-W048",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Treat macOS write EIO on a closed stdout pipe as recoverable",
+			"status": "pr-open",
+			"issues": [
+				2639
+			],
+			"pullRequests": [
+				2642
+			],
+			"relatedRefs": [
+				"GSD-W053"
+			],
+			"branches": [
+				"fix/gsd-write-eio-recoverable"
+			],
+			"commits": [
+				"1224cbefde3e978eab6633df3d42776f58a3f1b6",
+				"bb934690a3d4491b6a4d93080a933ccbb71fbd66"
+			],
+			"context": "macOS \"write EIO\" on a closed stdout pipe escaped the pipe-closed guard and crash-looped the session (the crash-storm wedge repeatedly observed on this machine). 1224cbef treats EIO as a recoverable pipe-closed error; bb934690 scopes that recovery to the stdout write boundary. The fix first shipped to the local runtime through fork release 1.21.1-fork.1 (GSD-W053).",
+			"validation": "2026-10-07: PR #2642 open, non-draft, closes #2639; head bb934690a3d4491b6a4d93080a933ccbb71fbd66 matches the local branch tip and origin; GitHub mergeStateStatus CLEAN; PR checks 8 pass / 1 policy skip (Windows portability).",
+			"nextAction": "Await maintainer review on PR #2642; address feedback if requested."
+		},
+		{
+			"id": "GSD-W049",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "await_job serves full persisted output for truncated follow-ups",
+			"status": "pr-open",
+			"issues": [
+				2640
+			],
+			"pullRequests": [
+				2643
+			],
+			"relatedRefs": [
+				"GSD-W053"
+			],
+			"branches": [
+				"fix/async-jobs-await-truncated-output"
+			],
+			"commits": [
+				"76bb67e79f128fb1e9fd7131fbbf9c17808fb87b",
+				"cd5427d218e9221a7cae227d155fd654871836ec"
+			],
+			"context": "A follow-up await_job on a truncated background job result reported \"nothing new to report\" instead of serving the full persisted output. 76bb67e7 makes await_job serve the full output for truncated follow-ups; cd5427d2 exempts the recovered full output from payload display truncation. Shipped to the local runtime through fork release 1.21.1-fork.1 (GSD-W053).",
+			"validation": "2026-10-07: PR #2643 open, non-draft, closes #2640; head cd5427d218e9221a7cae227d155fd654871836ec matches the local branch tip and origin; GitHub mergeStateStatus CLEAN; PR checks 8 pass / 1 policy skip (Windows portability).",
+			"nextAction": "Await maintainer review on PR #2643; address feedback if requested."
+		},
+		{
+			"id": "GSD-W050",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Strip trailing punctuation from pasted /gsd recover ids",
+			"status": "pr-open",
+			"issues": [
+				2658
+			],
+			"pullRequests": [
+				2659
+			],
+			"branches": [
+				"fix/gsd-recover-trailing-punctuation"
+			],
+			"commits": [
+				"14edd136393073306cd2ef40bc529c23275b1815"
+			],
+			"context": "/gsd recover rejected a copy-pasted recoveryActionId carrying trailing sentence punctuation (for example the period of the surrounding sentence), forcing manual re-entry in the middle of a recovery flow. The fix strips trailing punctuation from pasted recover ids.",
+			"validation": "2026-10-07: PR #2659 open, non-draft, closes #2658; head 14edd136393073306cd2ef40bc529c23275b1815 matches the local branch tip and origin; GitHub mergeStateStatus CLEAN; PR checks 10 pass / 1 policy skip (Windows portability).",
+			"nextAction": "Await maintainer review on PR #2659; address feedback if requested."
+		},
+		{
+			"id": "GSD-W051",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Settle orphaned running Attempts in clearLock, not just clearStaleWorkerLock",
+			"status": "pr-open",
+			"issues": [],
+			"pullRequests": [
+				2441
+			],
+			"branches": [
+				"fix/clearlock-settle-orphaned-attempts"
+			],
+			"commits": [
+				"3e027a04f0f7c15d9899b381f8b4d94783b70756",
+				"f9b339e1e5710e9875c934a925158e28bd92f3d6",
+				"34717a749fbd575a1d0657bd9f40fc61a5c689c5"
+			],
+			"context": "clearLock() (called by bootstrapAutoSession on every /gsd auto invocation) released a dead worker's milestone lease but never settled its orphaned running Attempt rows, unlike clearStaleWorkerLock(); the next auto invocation could acquire the lease but failed to open a coordination dispatch (\"Task Attempt claim must activate exactly one matching coordination dispatch\"), requiring manual gsd_task_settle every time. Reproduced twice against a real project (Edelman Studio auto-mode recovery wedges). 3e027a04 adds the settle call before force-releasing the lease; f9b339e1 covers the legacy-lock PID path; 34717a74 keeps the live-PID guard and cleans up every matching dead worker row after review.",
+			"validation": "2026-10-07: PR #2441 open, non-draft (created 2026-09-28); head 34717a749fbd575a1d0657bd9f40fc61a5c689c5 matches the local branch tip and origin; GitHub mergeStateStatus CLEAN; PR checks 8 pass / 1 policy skip. PR-body evidence: regression test fails on pre-fix code (attempt_state stays running, settle_outcome stays null) and passes with the fix (settled / interrupted), verified via git stash bisection; crash-recovery suites crash-recovery.test.ts, crash-recovery-via-db.test.ts and parallel-crash-recovery.test.ts pass 51/51.",
+			"nextAction": "Await maintainer review on PR #2441; address feedback if requested."
+		},
+		{
+			"id": "GSD-W052",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Exempt reopened-slice orphaned SUMMARY artifact rows from drift",
+			"status": "pr-open",
+			"issues": [],
+			"pullRequests": [
+				2674
+			],
+			"relatedRefs": [
+				"#1771",
+				"#1983"
+			],
+			"branches": [
+				"fix/slice-reopen-orphaned-summary-artifact"
+			],
+			"commits": [
+				"8d86092c8dd4d6af323bdf7635353b110100780e"
+			],
+			"context": "State reconciliation drift flagged orphaned SUMMARY artifact rows that legitimately remain after a slice reopen, where prior SUMMARY projections are immutable history by design. The fix exempts reopened-slice orphaned SUMMARY artifact rows from drift instead of reporting or repairing them. Surfaced while reconciling drift after real slice-reopen cycles in the Edelman Studio consumer project.",
+			"validation": "2026-10-07: PR #2674 open, non-draft; head 8d86092c8dd4d6af323bdf7635353b110100780e matches the local branch tip and origin; GitHub mergeStateStatus CLEAN; PR checks 10 pass / 1 policy skip (Windows portability).",
+			"nextAction": "Await maintainer review on PR #2674; address feedback if requested."
+		},
+		{
+			"id": "GSD-W053",
+			"type": "chore",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Fork runtime releases 1.21.1-fork.1 and 1.21.1-fork.2 ahead of npm 1.21.0",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"relatedRefs": [
+				"GSD-W047",
+				"GSD-W048",
+				"GSD-W049",
+				"#2276",
+				"#2578"
+			],
+			"branches": [
+				"fix/write-eio-crash-storm"
+			],
+			"commits": [
+				"4f0424281a3dc041ce413e8547f4d5f7fe6898a8",
+				"f541d27027fdfe9ce7c55de29a246e39e64889c6"
+			],
+			"context": "Fork release branch keeping the local managed runtime ahead of npm 1.21.0 while the corresponding upstream PRs are pending. 1.21.1-fork.1 (4f0424281, pushed to origin) rebases onto current upstream/main including #2578 and drops the retired stale-render content-drift patch, and carries the local-mirror fixes f6bb4efe (write-EIO crash storm, GSD-W048), f69a65c2/ff08a4a2 (status-only 400 transient classification, closed-unmerged PR #2276), and b5621a26 (await_job truncated output, GSD-W049). 1.21.1-fork.2 (f541d2702, local only at registration time) additionally cleans stray .d.ts files from dist/resources and carries the extension-loader .d.ts guard ee211fbc (GSD-W047).",
+			"validation": "2026-10-07: branch topology verified via git log upstream/main..fix/write-eio-crash-storm: release commits 4f0424281a3dc041ce413e8547f4d5f7fe6898a8 (fork.1, equal to the origin tip) and f541d27027fdfe9ce7c55de29a246e39e64889c6 (fork.2, one commit ahead locally, unpushed). Carried fix commits enumerated from the same range.",
+			"nextAction": "Publish 1.21.1-fork.2 to origin only with explicit push authorization. Retire carried fix commits as upstream PRs #2641, #2642, and #2643 merge and the npm release catches up."
+		},
+		{
+			"id": "GSD-W054",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "MCP integration Part 2 - canonical project context and real-host adoption umbrella",
+			"status": "idea",
+			"issues": [
+				2666,
+				2667,
+				2668,
+				2669,
+				2670,
+				2671,
+				2672
+			],
+			"pullRequests": [],
+			"relatedRefs": [
+				"#2099",
+				"GSD-W033",
+				"GSD-W035",
+				"GSD-W037",
+				"GSD-W039",
+				"GSD-W042"
+			],
+			"planRefs": [
+				"PLAN-2026-10-06-2099-PART-2-PROJECT-CONTEXT"
+			],
+			"branches": [],
+			"commits": [],
+			"context": "Part 2 of the #2099 MCP integration initiative (closed as completed 2026-10-01): umbrella issue #2666 plus six bounded children - #2667 canonical native Copilot project-context guard, #2668 sidebar freshness and queued refresh intent, #2669 production fallback-to-canonical-validation composition, #2670 smoke harness required snapshot-field validation, #2671 native VS Code and Copilot invocation evidence, #2672 representative real external MCP-host runs. A scoped continuation proposal, not a claim that the delivered foundation was incomplete; implementation is not approved.",
+			"validation": "2026-10-07: issues #2666 through #2672 verified open on upstream; authored after read-only research at upstream/main 8317811cf34e69c4add8eaa9deb28c17721b768e on 2026-10-06. Public-safe umbrella text and execution plan recorded in the workspace plans directory; no implementation branch exists.",
+			"nextAction": "Await maintainer triage and scope confirmation on #2666; do not create implementation branches before approval."
 		}
 	],
 	"localExtensionPatches": [
