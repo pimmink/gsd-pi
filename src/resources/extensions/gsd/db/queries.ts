@@ -48,25 +48,6 @@ import {
 } from "../lifecycle-shadow-observation.js";
 
 
-function parseStringArrayColumn(raw: unknown): string[] {
-  if (Array.isArray(raw)) return raw.filter((entry): entry is string => typeof entry === "string");
-  if (typeof raw !== "string") return [];
-  const trimmed = raw.trim();
-  if (!trimmed) return [];
-  try {
-    const parsed = JSON.parse(trimmed);
-    if (Array.isArray(parsed)) return parsed.filter((entry): entry is string => typeof entry === "string");
-    if (typeof parsed === "string") return [parsed];
-  } catch {
-    return trimmed.split(",");
-  }
-  return [];
-}
-
-function normalizeRepoPath(file: string): string {
-  return file.trim().replace(/\\/g, "/").replace(/^\.\/+/, "");
-}
-
 export interface HierarchyCompletionCounts {
   milestones: number;
   milestonesTotal: number;
@@ -764,26 +745,6 @@ export function getSliceTasks(milestoneId: string, sliceId: string): TaskRow[] {
   return rows.map(rowToTask);
 }
 
-export function getCompletedMilestoneTaskFileHints(milestoneId: string): string[] {
-  if (!getDbOrNull()!) return [];
-  const rows = getDbOrNull()!.prepare(
-    `SELECT files, key_files
-     FROM tasks
-     WHERE milestone_id = :mid AND status IN ('complete', 'done')`,
-  ).all({ ":mid": milestoneId }) as Array<Record<string, unknown>>;
-
-  const hints = new Set<string>();
-  for (const row of rows) {
-    for (const raw of [row["files"], row["key_files"]]) {
-      for (const file of parseStringArrayColumn(raw)) {
-        const normalized = normalizeRepoPath(file);
-        if (normalized) hints.add(normalized);
-      }
-    }
-  }
-  return [...hints];
-}
-
 /**
  * Find the most recent resolved-but-unapplied escalation override in a slice.
  * `resolveOperationId` is the operation that recorded the user's response.
@@ -1004,6 +965,25 @@ export function getMilestoneSlices(milestoneId: string): SliceRow[] {
   if (!getDbOrNull()!) return [];
   const rows = getDbOrNull()!.prepare("SELECT * FROM slices WHERE milestone_id = :mid ORDER BY sequence, id").all({ ":mid": milestoneId });
   return rows.map(rowToSlice);
+}
+
+/** The ids of the Milestones that have a CONTEXT artifact row (a saved context). */
+export function getContextArtifactMilestoneIds(): Set<string> {
+  if (!getDbOrNull()) return new Set();
+  const rows = getDbOrNull()!.prepare(
+    "SELECT DISTINCT milestone_id FROM artifacts" +
+    " WHERE artifact_type = 'CONTEXT' AND slice_id IS NULL AND task_id IS NULL AND milestone_id IS NOT NULL",
+  ).all();
+  return new Set(rows.map((row) => String(row["milestone_id"])));
+}
+
+/** The number of Slices of every Milestone that has them. */
+export function getSliceCountsByMilestoneId(): Map<string, number> {
+  if (!getDbOrNull()) return new Map();
+  const rows = getDbOrNull()!.prepare(
+    "SELECT milestone_id, COUNT(*) AS count FROM slices GROUP BY milestone_id",
+  ).all();
+  return new Map(rows.map((row) => [String(row["milestone_id"]), Number(row["count"])]));
 }
 
 export interface ParallelMonitorSliceProgress {

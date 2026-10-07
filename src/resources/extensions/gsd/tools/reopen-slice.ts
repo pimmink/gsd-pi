@@ -23,15 +23,14 @@
 import {
   getSliceRunUatAssessment,
   getSliceTasks,
-  getDb,
 } from "../gsd-db.js";
+import { getMilestoneCanonicalLifecycleStatus } from "../db/lifecycle-queries.js";
 import {
   isCurrentSliceReopenOperation,
   reopenSlice,
   SliceLifecycleValidationError,
 } from "../slice-lifecycle-domain-operation.js";
 import { repairSliceShadowsForReopen } from "../lifecycle-shadow-repair-domain-operation.js";
-import { isMilestoneLifecycleAdopted } from "../db/milestone-closeout-readiness.js";
 import { readDomainOperationFence } from "../db/writers/lifecycle-commands.js";
 import type { ExecutionInvocation } from "../execution-invocation.js";
 import { invalidateStateCache } from "../state.js";
@@ -89,17 +88,7 @@ export function _setReopenSliceCleanupInterleaveForTest(hook: (() => void) | nul
  */
 function milestoneCanonicalTerminal(milestoneId: string): boolean {
   try {
-    const row = getDb().prepare(`
-      SELECT lifecycle.lifecycle_status AS status
-      FROM milestones milestone
-      LEFT JOIN workflow_item_lifecycles lifecycle
-        ON lifecycle.project_id = (SELECT project_id FROM project_authority WHERE singleton = 1)
-       AND lifecycle.item_kind = 'milestone'
-       AND lifecycle.milestone_id = milestone.id
-       AND lifecycle.slice_id IS NULL
-      WHERE milestone.id = :milestone_id
-    `).get({ ":milestone_id": milestoneId }) as Record<string, unknown> | undefined;
-    const status = row?.["status"];
+    const status = getMilestoneCanonicalLifecycleStatus(milestoneId);
     return status === "completed" || status === "cancelled";
   } catch {
     return false;
@@ -127,10 +116,9 @@ export async function handleReopenSlice(
   const hadUatVerdict = getSliceRunUatAssessment(params.milestoneId, params.sliceId) !== null;
   // Converge drifted descendants before the reopen's terminal-parity checks
   // (#2440). Evidence-gated: unverifiable drift fails here, listed, instead of
-  // aborting inside the Domain Operation. Legacy (non-adopted) hierarchies —
-  // including the #1205 desync escape — have no canonical authority to repair
-  // against and keep their cascade path.
-  if (isMilestoneLifecycleAdopted(params.milestoneId) && !milestoneCanonicalTerminal(params.milestoneId)) {
+  // aborting inside the Domain Operation. A canonically terminal milestone
+  // keeps refusing without a repair ahead of that refusal.
+  if (!milestoneCanonicalTerminal(params.milestoneId)) {
     // A replayed invocation skips the repair — its stored receipt must be
     // returned as-is, not preceded by fresh mutations against newer state.
     if (!readDomainOperationFence(invocation.idempotencyKey).replay) {

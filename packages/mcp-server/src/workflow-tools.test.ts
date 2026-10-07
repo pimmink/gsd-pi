@@ -153,7 +153,6 @@ function seedContextModeFixture(base: string): void {
   insertMilestone({ id: "M001", title: "Context Mode", status: "active", depends_on: [] });
   upsertMilestonePlanning("M001", {
     title: "Context Mode",
-    status: "active",
     vision: "Verify the bundled context-mode contract",
     successCriteria: ["Prompt, tool, and persisted evidence surfaces agree"],
     keyRisks: [],
@@ -1898,6 +1897,7 @@ export const executeCompleteMilestone = (params, projectDir, invocation) =>
 export const executeValidateMilestone = captureMilestoneValidation;
 export const executeReassessRoadmap = noop;
 export const executeSaveGateResult = noop;
+export const executeHookVerdictSave = noop;
 export const executeSummarySave = noop;
 export const executeUatResultSave = noop;
 export const executeSliceReopen = (params, projectDir, invocation) =>
@@ -2390,6 +2390,7 @@ export const executeMilestoneReopen = noop;
 export const executeValidateMilestone = noop;
 export const executeReassessRoadmap = noop;
 export const executeSaveGateResult = noop;
+export const executeHookVerdictSave = noop;
 export const executeSummarySave = noop;
 export const executeUatResultSave = noop;
 export const executePlanMilestone = noop;
