@@ -47,13 +47,13 @@ const HERMES_CLIENT_PATH = "integrations/hermes/open_gsd_hermes/gsd_client.py";
 const STABLE_SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
 
 /**
- * Prerelease publishes (dev AND next channels) reuse the stable
- * @opengsd/engine-* packages already on npm — the prerelease workflow does not
- * build or publish per-platform engines. Strip any prerelease suffix back to
- * the base X.Y.Z so optionalDependencies pin to a version that actually exists.
+ * Prerelease publishes (dev AND next channels) and local numeric fork releases
+ * reuse the stable @opengsd/engine-* packages already on npm; these release
+ * paths do not publish per-platform engines. Strip only supported suffixes
+ * back to X.Y.Z, leaving other channels pinned to their own engine release.
  */
 function resolveEngineOptionalDependencyVersion(rootVersion) {
-  const prereleaseMatch = rootVersion.match(/^(\d+\.\d+\.\d+)-(?:dev|next)\.[0-9a-f]+$/i);
+  const prereleaseMatch = rootVersion.match(/^(\d+\.\d+\.\d+)-(?:(?:dev|next)\.[0-9a-f]+|fork\.\d+)$/i);
   if (prereleaseMatch) {
     return prereleaseMatch[1];
   }

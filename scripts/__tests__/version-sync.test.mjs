@@ -70,6 +70,14 @@ test("resolveEngineOptionalDependencyVersion keeps prerelease publishes on stabl
   assert.equal(resolveEngineOptionalDependencyVersion("1.0.2-rc.1"), "1.0.2-rc.1");
 });
 
+test("local numeric fork releases reuse stable engine packages without stripping unsupported channels", () => {
+  assert.equal(resolveEngineOptionalDependencyVersion("1.21.1-fork.5"), "1.21.1");
+  assert.equal(resolveEngineOptionalDependencyVersion("1.21.1-fork.12"), "1.21.1");
+  for (const version of ["1.21.1-fork.", "1.21.1-fork.next", "1.21.1-rc.1", "1.21.1-fork.5.extra"]) {
+    assert.equal(resolveEngineOptionalDependencyVersion(version), version);
+  }
+});
+
 test("version sync keeps daemon and excludes retired cloud products", () => {
   assert.ok(RELEASE_WORKSPACE_PACKAGE_DIRS.includes("packages/daemon"));
   assert.ok(!RELEASE_WORKSPACE_PACKAGE_DIRS.includes("packages/cloud-mcp-gateway"));
