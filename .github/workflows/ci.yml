@@ -42,7 +42,7 @@ jobs:
   fast-gates:
     name: fast-gates
     timeout-minutes: 15
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ${{ github.repository_owner == 'pimmink' && 'ubuntu-latest' || 'blacksmith-4vcpu-ubuntu-2404' }}
     outputs:
       heavy-code-changed: ${{ steps.classify.outputs.heavy-code-changed }}
       web-changed: ${{ steps.classify.outputs.web-changed }}
@@ -113,7 +113,7 @@ jobs:
     timeout-minutes: 45
     needs: [fast-gates]
     if: needs.fast-gates.outputs.heavy-code-changed == 'true'
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ${{ github.repository_owner == 'pimmink' && 'ubuntu-latest' || 'blacksmith-4vcpu-ubuntu-2404' }}
     env:
       # native/.cargo/config.toml sets `-C target-cpu=native` for local dev speed,
       # which bakes host-specific CPU instructions into build artifacts, including
@@ -301,7 +301,7 @@ jobs:
       needs.fast-gates.outputs.heavy-code-changed == 'true' &&
       (needs.fast-gates.outputs.portability-changed == 'true' ||
        needs.fast-gates.outputs.windows-e2e-changed == 'true')
-    runs-on: blacksmith-4vcpu-windows-2025
+    runs-on: ${{ github.repository_owner == 'pimmink' && 'windows-latest' || 'blacksmith-4vcpu-windows-2025' }}
 
     steps:
       - name: Checkout repository without GITHUB_TOKEN
@@ -424,7 +424,7 @@ jobs:
     timeout-minutes: 15
     needs: [fast-gates, build]
     if: needs.fast-gates.outputs.heavy-code-changed == 'true'
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ${{ github.repository_owner == 'pimmink' && 'ubuntu-latest' || 'blacksmith-4vcpu-ubuntu-2404' }}
     steps:
       - name: Checkout repository without GITHUB_TOKEN
         shell: bash
@@ -486,7 +486,7 @@ jobs:
   workflow-lint:
     name: workflow-lint
     timeout-minutes: 5
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ${{ github.repository_owner == 'pimmink' && 'ubuntu-latest' || 'blacksmith-4vcpu-ubuntu-2404' }}
     steps:
       - name: Checkout repository without GITHUB_TOKEN
         shell: bash
