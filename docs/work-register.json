@@ -6,7 +6,7 @@
 		"fork": "pimmink/gsd-pi",
 		"defaultBase": "upstream/main"
 	},
-	"evidenceAsOf": "2026-10-07",
+	"evidenceAsOf": "2026-10-08",
 	"statusVocabulary": [
 		"idea",
 		"investigating",
@@ -1365,11 +1365,12 @@
 			],
 			"commits": [
 				"1224cbefde3e978eab6633df3d42776f58a3f1b6",
-				"bb934690a3d4491b6a4d93080a933ccbb71fbd66"
+				"bb934690a3d4491b6a4d93080a933ccbb71fbd66",
+				"6ffebfd3"
 			],
 			"context": "macOS \"write EIO\" on a closed stdout pipe escaped the pipe-closed guard and crash-looped the session (the crash-storm wedge repeatedly observed on this machine). 1224cbef treats EIO as a recoverable pipe-closed error; bb934690 scopes that recovery to the stdout write boundary. The fix first shipped to the local runtime through fork release 1.21.1-fork.1 (GSD-W053).",
-			"validation": "2026-10-07: PR #2642 open, non-draft, closes #2639; head bb934690a3d4491b6a4d93080a933ccbb71fbd66 matches the local branch tip and origin; GitHub mergeStateStatus CLEAN; PR checks 8 pass / 1 policy skip (Windows portability).",
-			"nextAction": "Await maintainer review on PR #2642; address feedback if requested."
+			"validation": "2026-10-08: PR #2642 remains open/non-draft; current local/origin branch head 6ffebfd3 is the reviewed head. No local build/test run per closeout scope; register evidence is bounded to branch/PR metadata.",
+			"nextAction": "Startup-query follow-up6ffebfd3 published on existing PR#2642; typed review LOOKS_GOOD. Integrated compiled EIO/registry/CLI suite69/69 PASS on9e32d10a. PR body enriched with GFM and explicit test limits. Monitor review/CI; no duplicate issue or app deliverable claim."
 		},
 		{
 			"id": "GSD-W049",
@@ -1495,11 +1496,14 @@
 				"4f0424281a3dc041ce413e8547f4d5f7fe6898a8",
 				"f541d27027fdfe9ce7c55de29a246e39e64889c6",
 				"34947ad73db7bca58dd6df8a1bf52f34c67e8e1b",
-				"9f4d21dd0be6f2fbc1b3d3b9a913ddbce0e1b8f8"
+				"9f4d21dd0be6f2fbc1b3d3b9a913ddbce0e1b8f8",
+				"d0279ba0",
+				"06cc6733",
+				"9e32d10a"
 			],
-			"context": "Fork release branch keeping the local managed runtime ahead of npm 1.21.0 while the corresponding upstream PRs are pending. 1.21.1-fork.1 (4f0424281, pushed to origin) rebases onto current upstream/main including #2578 and drops the retired stale-render content-drift patch, and carries the local-mirror fixes f6bb4efe (write-EIO crash storm, GSD-W048), f69a65c2/ff08a4a2 (status-only 400 transient classification, closed-unmerged PR #2276, GSD-W056), and b5621a26 (await_job truncated output, GSD-W049). 1.21.1-fork.2 (f541d270, pushed to origin 2026-10-07) additionally cleans stray .d.ts files from dist/resources and carries the extension-loader .d.ts guard ee211fbc (GSD-W047). 1.21.1-fork.3 (in preparation 2026-10-07) merges upstream/main 4c064a07 and additionally carries the recover-id punctuation fix (GSD-W050), the await_job full-output marker follow-up (GSD-W049), the clearLock orphaned-Attempt settle (GSD-W051), the final reviewed slice-reopen drift exemption (GSD-W052, replacing the interim inline variant), and the full Copilot reasoning-effort stack including the recognized-live-endpoint guard (GSD-W046). 1.21.1-fork.4 (80418a17, 2026-10-07) adds the a4ad88c6 temporal-tie review fix for GSD-W052 on top and is the installed, active runtime: gsd --version reports 1.21.1-fork.4 and the fingerprint-gated initResources resync carried every fix into the managed resources (marker audit green, including latestSliceReopenAt in both lifecycle-queries and artifact-db; fresh-session sanity OK). fix/integrate-cmux-and-upstream-fork5 (branched from maintained origin/fix/write-eio-crash-storm at 80418a17, i.e. installed+managed 1.21.1-fork.4) was prepared 2026-10-08 in a fresh, isolated git worktree (worktrees/integrate-cmux-fork5) to merge freshly fetched upstream/main (20b29e73, release v1.21.1 -- 4 commits ahead of fork.4, all npm-release-process commits already content-equivalent) and cherry-pick the completed GSD-W061 cmux fix (d2ce3a05) on top, bumping package.json to 1.21.1-fork.5.",
-			"validation": "2026-10-07: branch topology verified via git log upstream/main..fix/write-eio-crash-storm. fork.1 (4f0424281) and fork.2 (f541d27027) both pushed to origin (origin tip f541d27027). fork.3 release commit ba2380b6 prepared on top of the upstream/main merge e8651011 with cherry-picks verified content-identical to the reviewed PR branches for every carried file (git diff against the five fix branches returned empty). Runtime layer audit 2026-10-07: installed 1.21.1-fork.2 package dist/resources and managed ~/.gsd/agent/extensions/gsd were a patchwork (W046 base only in managed via interim sync, W051 and the W049 marker absent everywhere, W052 present as the superseded inline variant); fork.3 aligns all layers with the reviewed final versions. Post-install verification 2026-10-07: gsd --version = 1.21.1-fork.3; marker audit of the resynced managed resources confirms every carried fix active (reasoning-effort base + endpoint guard, write-EIO, await_job full-output marker in both await-tool and context-masker, recover-id punctuation, clearLock settle, final slice-reopen exemption, pi-ai supportsReasoningEffort, .d.ts loader guard). Focused compiled tests in the release tree: 179/179 crash-recovery + recover-id + drift suites pass, 100/100 copilot-catalog + overlay + reasoning-diagnostics + await-tool + context-masker suites pass. The pi-ai package suite shows 41 failures, all pre-existing live-provider E2E tests (Google/Gemini/Ollama/HuggingFace) that fail identically on the pristine pre-change tree; the new copilot-thinking-levels tests pass. 2026-10-08: upstream/main merge (34947ad7) had exactly one conflict (package.json version string, resolved to 1.21.1-fork.5); every other upstream-vs-fork file merged automatically. The GSD-W061 cmux cherry-pick (9f4d21dd) applied with zero conflicts. Patch-equivalence proof: git diff d2ce3a05 HEAD -- src/resources/extensions/cmux/ and the matching cmux.test.ts diff against origin/fix/debug-recovery-cmux-20261008 both returned empty -- byte-identical content, not just a semantic re-application. Presence of every carried custom fix re-verified post-merge by direct grep: recover-id trailing-punctuation strip, clearLock settleRunningAttemptsForWorker, slice-reopen latestSliceReopenAt temporal-tie exemption (lifecycle-queries.ts + artifact-db.ts), copilot reasoning-effort/live-endpoint guard (copilot-model-catalog.ts), and the async-jobs FULL_OUTPUT_MARKER. Fresh pnpm install (6m39s, one benign postinstall warning unrelated to this change) + pnpm run build:core (both clean) in the new worktree, then targeted test proof: cmux extension + gsd cmux/terminal-cmux suites 19/19 pass (incl. the #2050 surface-id-parsing regression block); crash-recovery/recover/slice-reopen-drift/reconciliation suites 205/205 pass; gsd-recover suite 66/66 pass (incl. the trailing-punctuation strip test); async-jobs await-tool suite 15/15 pass (incl. the full-output-survives-truncation marker test). 305/305 total, 0 failures. pnpm run typecheck:extensions (tsc --noEmit) exits clean with zero errors. Original stale checkout (fork/, fix/gsd-recover-trailing-punctuation @ 14edd136, 18 behind/1 ahead) was never switched, reset, or cleaned -- left exactly as found, including its untracked .model-catalog-workflow-Bk3Xia/ directory. No install/publish/release step was run; this is a source-only integration commit series on a disposable worktree.",
-			"nextAction": "Push fix/integrate-cmux-and-upstream-fork5 to origin on explicit authorization, then cut it as the new maintained fork release point (supersedes fix/write-eio-crash-storm @ 80418a17 for this purpose) once: (1) the remaining full release gate runs clean -- full pnpm test:unit (not just the targeted subset above), pnpm run test:packages, and a fresh install+gsd --version sanity check in a throwaway global-package simulation; (2) GSD-W061's PR #2695 status is reconciled (merge if accepted upstream and rebase this integration onto the merged commit instead of the local cherry-pick, or keep the cherry-pick if still open); (3) Pim authorizes promoting this worktree's branch over the currently installed/managed 1.21.1-fork.4. Until then fork.4 remains the installed, active runtime -- this is a verified-ready, not-yet-installed candidate."
+			"context": "Fork release candidate 1.21.1-fork.5 integrates the four reviewed source fixes: W048 write-EIO (6ffebfd3), W061 cmux (d2ce3a05), W063 atomicity (26e...), and W064 C1 (1f64...). Fork release 1.21.1-fork.4 remains the installed/global label; fork.5 installation is deferred because canonical completion attempts were interrupted or blocked by ENOSPC/inherited environment and the final background attempt was cancelled (D205). The release candidate is not marked complete.",
+			"validation": "2026-10-08: filesystem/version inspection only; source branch and candidate metadata preserved. Independent C1 review reported good extension tests; integrated reliability evidence recorded 69/69, atomic 44x3, and package MCP 522 positive. Native child-enumeration analysis remains future work. No false completed-release claim; installation/activation remains pending.",
+			"nextAction": "Keep fork.5 installation and activation deferred until a bounded clean-install attempt is authorized and space/environment are available; preserve fork.4 source and existing dirty semantic changes. Parent owns further cleanup and must not delete the 2.4GB source."
 		},
 		{
 			"id": "GSD-W054",
@@ -1689,11 +1693,9 @@
 			"branches": [
 				"fix/debug-recovery-cmux-20261008"
 			],
-			"commits": [
-				"d2ce3a05"
-			],
+			"commits": ["d2ce3a05"],
 			"context": "User-reported symptom: parallel subagent dispatch with cmux.splits enabled opens 3 empty cmux shell surfaces instead of attaching the subagent process. Root cause (matches closed-but-unfixed issue #2050): CmuxClient.parseCreatedSurfaceId/extractSurfaceIds in src/resources/extensions/cmux/index.ts still parse the OLD cmux CLI output contract (bare surface id with no whitespace; flat surface_id/surface JSON keys). The CURRENT cmux CLI prints `OK surface:<id> workspace:<id>` from `new-split` and nests ids under `surfaces[].ref` (e.g. `surface:1000040021`) in `list-pane-surfaces --json`. Both parsers therefore return null/empty for every real cmux response, createSplit/createSplitFrom silently returns null, and runSingleAgentInCmuxSplit falls back to running the subagent in-process while the freshly split, now-abandoned cmux pane is left as a bare shell. A worktree (worktrees/debug-recovery-cmux-20261008) already had an in-progress, correctly upstream/main-based fix with regression tests when this concern was registered; this register entry formalizes and tracks that existing work rather than starting a duplicate branch.",
-			"validation": "2026-10-08: confirmed branch fix/debug-recovery-cmux-20261008 is based on and up to date with freshly fetched upstream/main (20b29e73); working tree has uncommitted fix + new describe block in src/resources/extensions/gsd/tests/cmux.test.ts covering (1) OK surface:<id> parsing, (2) bare 'ok'/empty -> null (no false-positive id), (3) surfaces[].ref JSON shape extraction, (4) createSplitFrom diff-fallback when new-split prints no parseable id. Issue #2050 (same root cause, same two obsolete-contract symptoms: list-surfaces/send-surface vs list-pane-surfaces/send --surface) was closed COMPLETED 2026-09-23 with no linked PR and no merged fix found on upstream/main - reopening as this tracked concern rather than trusting the closed status. 2026-10-08: full fix committed locally (d2ce3a05) on fix/debug-recovery-cmux-20261008. Fresh worktree required pnpm install + full build:core (packages/native, pi-ai, pi-agent-core, gsd-agent-core, pi-coding-agent, agent-modes, rpc-client, mcp-server, daemon were all missing dist/ in the worktree) before tests could run at all - a separate known gap (see GSD-W040). Root cause confirmed TWO-FOLD: (1) real bug - CmuxClient.parseCreatedSurfaceId/extractSurfaceIds in src/resources/extensions/cmux/index.ts parsed the obsolete cmux CLI contract; (2) the pre-existing regression test file itself had a template-literal bug (unescaped literal newline instead of \\\\n in the generated fake-CLI script body at two of three appendFileSync call sites) that corrupted the generated shim script and made the new tests fail even with the already-correct index.ts fix in place - fixed as part of this pass. After both fixes: targeted suite (cmux.test.ts + terminal-cmux.test.ts + subagent/launch.test.ts) = 38/38 passed. tsc --noEmit reports zero cmux-related errors. A separate, pre-existing 7-test failure in subagent/tests/child-liveness.test.js (\"subagent tool was not registered\") reproduces identically on upstream/main HEAD with no changes applied - confirmed unrelated to this fix, not touched.",
+			"validation": "2026-10-08: PR #2695 remains open; local/origin head d2ce3a05 recorded. Integrated into fork.5 candidate; no local build/test run in this closeout.",
 			"nextAction": "PR #2695 opened 2026-10-08: https://github.com/open-gsd/gsd-pi/pull/2695; branch pushed to origin at d2ce3a05. GitHub MCP read and PR-write both failed HTTP 401; Pim explicitly authorized gh/git fallback. Fresh MCP wrapper now resolves the existing gh credential at launch, and an isolated authenticated read passes. Monitor PR; integrate the patch into the maintained fork line via a clean worktree (GSD-W053), not an ad-hoc runtime patch. Keep automatic splits disabled until a tested fork release is loaded."
 		},
 		{
@@ -1710,6 +1712,65 @@
 			"context": "Parent subagent resume attempt for succeeded run 60a4e9a8-8a64-4a99-84e8-a7b661a831ea failed with 'Resume requires exactly one child session or an agent selector. Available resumable agents: none'. Investigated as a possible upstream selector-prefix bug (prior debug session referenced a nonexistent 'W075' claiming a canonical-selector fix was already applied). No such item or fix exists anywhere in the governance register, worktrees, or fork branches (checked all 61 register items, 10 active worktrees, origin/upstream/w014/w018 remotes). The headless.ts prefix-matching code (resolveResumeSession, startsWith-based) is unrelated: it resolves CLI `--resume <prefix>` arguments for session files on disk, not the subagent tool's in-process 'resume' action, and was never the code path involved.",
 			"validation": "2026-10-08: traced the actual mechanism in src/resources/extensions/subagent/index.ts (action:'resume', ~line 1114) and launch.ts (resolveSubagentSessionArgs/createSubagentLaunchPlan). A child's sessionFile is only ever populated when the dispatch's effective contextMode is 'fork' (index.ts:655/869 only set currentResult.sessionFile when launch.session.mode === 'fork'). The failing run's persisted record has contextMode:'fresh' (the tool default) and mode:'single', so the one child never had a sessionFile, and action:'resume' filters record.children by `child.sessionFile` truthiness (index.ts:1138) -- with zero matches it always reports 'Available resumable agents: none', regardless of how many children exist or whether an agent selector is passed. This matches documented behavior (docs/user-docs/subagents.md:66-68: fork 'branches from the current parent session'; resume depends on a persisted child session file) but the resulting tool error message gives no hint that the run needs to have been launched with context:'fork' to ever be resumable -- a caller who launched with the default 'fresh' context (the common case) cannot resume no matter what selector they pass. This is a documented-constraint / UX-clarity gap, not a selector-resolution defect. No code bug found; no fix applied.",
 			"nextAction": "Optional: improve the resume error message to state that only context:'fork' runs are resumable (e.g. append ', (resume requires the run to have used context: \"fork\")' when sessionChildren.length === 0 but record.children.length > 0), and/or add a short note to docs/user-docs/subagents.md's Recovery Behavior section making this prerequisite explicit. Low priority, no user-facing regression."
+		},
+		{
+			"id": "GSD-W063",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Atomic MCP PID registry writes prevent concurrent partial JSON reads",
+			"status": "pr-open",
+			"issues": [2696],
+			"pullRequests": [2698],
+			"branches": [
+				"fix/mcp-pid-registry-atomic-write-20261008"
+			],
+			"commits": ["06cc6733e753767f81e6e68bc572c77453f4d4df"],
+			"context": "Full package gate on candidate9f4d21dd reports runMcpServerCli failure at approximately20.6sec in packages/mcp-server/src/cli-runner.test.ts. A focused Luna recon used a TS-loader layout rather than the intended compiled layout and could not establish a production defect; child readiness/registry failures need correctly compiled reproduction. Runtime installation remains blocked.",
+			"validation": "2026-10-08: PR #2698 remains open; local/origin head 26e recorded. Integrated into fork.5 candidate; atomic reliability evidence 44x3 recorded; no local build/test run in this closeout.",
+			"nextAction": "Monitor scoped PR#2698 (Fixes#2696, related infrastructure to#2666 only). Patch integrated into maintained candidate9e32d10a. Include PR link in umbrella related-infrastructure note; finish C1#2667 separately, then final-source full gates before proper local fork release. MCP stdio trust/access failure documented; user-authorized gh/git fallback used, no trust-gate bypass."
+		},
+		{
+			"id": "GSD-W064",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "C1 guard canonical native Copilot project-context results before chat",
+			"status": "pr-open",
+			"issues": [2667],
+			"pullRequests": [2699],
+			"branches": [
+				"fix/mcp-c1-canonical-copilot-guard-20261008"
+			],
+			"commits": ["9e32d10a"],
+			"planRefs": [
+				"PLAN-2026-10-06-2099-PART-2-PROJECT-CONTEXT"
+			],
+			"context": "Existing first step C1 of GSD-W054 / PLAN-2026-10-06-2099-PART-2-PROJECT-CONTEXT and umbrella#2666. Operator explicitly authorized own-fork implementation and scoped PR after current reliability blockers. No duplicate umbrella/feature roadmap. C2-C6/F1-F4 not automatically activated; maintainer approval is not inferred from contributor work-intent comment.",
+			"validation": "2026-10-08: PR #2699 remains open; local/origin head 1f64 recorded. Integrated into fork.5 candidate; independent C1 review reported good extension tests; no local build/test run in this closeout.",
+			"nextAction": "Monitor draft C1 PR#2699 pending upstream scope/assignment review; finish final-source gates and proper local release separately via GSD-W053. C2-C6/F1-F4 stay unactivated; no umbrella closure or fabricated maintainer approval."
+		},
+		{
+			"id": "GSD-W065",
+			"type": "bugfix",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "macOS native descendant enumeration divides PID element count twice",
+			"status": "in-progress",
+			"issues": [
+				2700
+			],
+			"pullRequests": [],
+			"branches": [
+				"fix/native-descendant-count-20261008"
+			],
+			"commits": [],
+			"relatedRefs": [
+				"GSD-W053"
+			],
+			"context": "Separate native correctness defect discovered in W053 release gate; own controlled live child absent3/3probes. Apple proc_listchildpids already returns count, Rust divides again. Existing skipped regression cannot count as zero-skip proof. Not MCP umbrella/C1-C6 delivery.",
+			"validation": "Registered before editing; Apple xnu libproc.c authoritative return contract and local SDK header read; Context7 libc query returned no matching API snippets (not substituted for Apple source). Focused independent Luna diagnosis pending.",
+			"nextAction": "Bound count to initialized buffer, enable robust controlled child/grandchild regression, prove red/green and independent review; publish focused PR then integrate final-source gates."
 		}
 	],
 	"localExtensionPatches": [
