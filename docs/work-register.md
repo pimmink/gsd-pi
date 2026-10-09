@@ -3,7 +3,7 @@
 # Contributor Work Register
 
 Human-readable projection of [`work-register.json`](./work-register.json), which is the
-canonical source. GitHub and local Git evidence was refreshed on **2026-10-07**.
+canonical source. GitHub and local Git evidence was refreshed on **2026-10-09**.
 
 - **Upstream / PR required**: intended for contribution to `open-gsd/gsd-pi`.
 - **Fork-local / No PR planned**: tooling, recovery, or workflow used only by this fork;
@@ -56,7 +56,12 @@ installed fork.2 package and managed resources were a patchwork of interim syncs
 (GSD-W053) realigns all layers with the reviewed branch versions. A third pass (quick task
 290) triaged every unresolved Copilot review thread across the open PRs: six were already
 addressed by later commits and were answered with evidence and resolved; #2674's
-temporal-tie finding was valid and got a real fix (`a4ad88c6`) that also ships in fork.4.
+temporal-tie finding was valid and got a real fix (`a4ad88c6`) that also ships in fork.4. A
+fourth pass records native PR #2736 from source `cdd019eb` (8/8 native ps tests and the
+scoped dev build passed) and refreshes GSD-W053 with clean integrated fork5 source
+`bc85de761a176a88258839e78cabad7da9d2192c`, model PR #2735 source `173645ec`, pending
+source CI `37887637767`, and Windows diagnostic `37887924383`. Fork4 remains installed;
+release completion and Windows pass are intentionally not claimed.
 
 ## Active work
 
