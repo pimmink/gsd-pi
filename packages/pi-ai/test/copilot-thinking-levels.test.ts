@@ -6,10 +6,11 @@ import {
 } from "../src/models.js";
 
 describe("Copilot Completions reasoning controls", () => {
-	it.each(["kimi-k3", "gemini-3.6-flash"] as const)(
+	it.each(["kimi-k3", "gemini-3.6-flash", "claude-fable-5"] as const)(
 		"does not advertise ignored effort controls for bundled %s",
 		(id) => {
 			const model = getModel("github-copilot", id);
+			expect(model.api).toBe("openai-completions");
 			expect(getSupportedThinkingLevels(model)).toEqual(["off"]);
 			expect(clampThinkingLevel(model, "xhigh")).toBe("off");
 		},
@@ -19,6 +20,7 @@ describe("Copilot Completions reasoning controls", () => {
 		"advertises Responses reasoning levels for bundled %s",
 		(id) => {
 			const model = getModel("github-copilot", id);
+			expect(model.api).toBe("openai-responses");
 			expect(getSupportedThinkingLevels(model)).toEqual([
 				"minimal",
 				"low",
@@ -32,7 +34,7 @@ describe("Copilot Completions reasoning controls", () => {
 	);
 
 	it("keeps explicit custom compatibility and other providers unchanged", () => {
-		const model = getModel("github-copilot", "gpt-6-astra");
+		const model = getModel("github-copilot", "claude-fable-5");
 		expect(
 			getSupportedThinkingLevels({
 				...model,
