@@ -3,10 +3,15 @@
 
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { join } from "node:path";
 import { test } from "node:test";
 
 const projectRoot = process.cwd();
+const require = createRequire(import.meta.url);
+const { resolveEngineOptionalDependencyVersion } = require(
+	join(projectRoot, "scripts/lib/version-sync.cjs"),
+) as { resolveEngineOptionalDependencyVersion: (version: string) => string };
 
 function readPackageJson(path: string): {
 	name?: string;
@@ -37,11 +42,13 @@ test("published npm package names use the @opengsd scope", () => {
 			engineSpec,
 			`root package must install the ${expectedName} native optional dependency`,
 		);
+		assert.ok(nativePackage.version, `${expectedName} must declare its version`);
+		const engineVersion = resolveEngineOptionalDependencyVersion(nativePackage.version);
 		const acceptsRange = engineSpec.startsWith(">=");
-		const acceptsExactPin = engineSpec === nativePackage.version;
+		const acceptsExactPin = engineSpec === engineVersion;
 		assert.ok(
 			acceptsRange || acceptsExactPin,
-			`${expectedName} optional dependency should be a range (>=…) or pinned to native version ${nativePackage.version}, got ${engineSpec}`,
+			`${expectedName} optional dependency should be a range (>=…) or pinned to resolved engine version ${engineVersion}, got ${engineSpec}`,
 		);
 	}
 });
