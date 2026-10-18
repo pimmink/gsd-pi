@@ -69,7 +69,7 @@ test("offline reasoning diagnostics preserve working transports and guard ignore
   await t.test("Sol effort follows its declared catalog transport", async () => {
     // Catalog transport migration belongs to the provider lane. Both states must
     // honor their own compatibility instead of invoking a mismatched adapter.
-    const model = getModel("github-copilot", "gpt-6.1-sol");
+    const model: Model<Api> = getModel("github-copilot", "gpt-6.1-sol");
     if (model.api === "openai-responses") {
       assertModelApi(model, "openai-responses");
       assert.ok(getSupportedThinkingLevels(model).includes("max"));
@@ -137,7 +137,7 @@ test("offline reasoning diagnostics preserve working transports and guard ignore
     assertModelApi(overlay, "anthropic-messages");
     for (const effort of ["minimal", "low", "xhigh"] as const) {
       const expected = await capture(streamSimpleAnthropic, staticModel, effort);
-      const actual = await capture(streamSimpleAnthropic, overlay, effort);
+      const actual: Record<string, unknown> = await capture(streamSimpleAnthropic, overlay, effort);
       assert.deepEqual(actual.thinking, expected.thinking);
       assert.deepEqual(actual.output_config, expected.output_config);
     }

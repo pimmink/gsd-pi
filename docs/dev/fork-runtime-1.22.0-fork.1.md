@@ -31,6 +31,8 @@ Current targeted proof includes 59 provider/generator tests, 57 compiled catalog
 
 The core build and provider rebuild are distinct from a web production build. Any Next.js production build and distributable archive assembly for this release are assigned to the online lane, not the local workstation. Existing trusted source-ref/SHA checks and normal test gates must remain intact when producing the archive.
 
+The first exact-source online attempt stopped at the extension typecheck before any package was built. Its diagnostic fixture needed an explicit `Model<Api>` transport union and a typed captured payload record; those repairs preserve the fixture's transport assertion and payload checks. The complete extension typecheck passes after the annotations. A changed source commit requires a new online verification attempt; the failed attempt is retained, not retried unchanged or counted as distribution proof.
+
 ## Installation boundary
 
 Do not install from a dirty or untracked source closure. Retain the previous runtime until a source-bound archive is available and verified. After installation, compare the CLI version and package provenance, then initialize managed resources through the supported fresh-process path and compare fix-specific files with the installed package. Existing processes need restarting; configuration alone does not activate a new runtime.
