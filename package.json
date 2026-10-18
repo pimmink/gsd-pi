@@ -1,6 +1,6 @@
 {
   "name": "@opengsd/gsd-pi",
-  "version": "1.22.0",
+  "version": "1.22.0-fork.1",
   "description": "GSD Pi local-first coding agent",
   "license": "MIT",
   "repository": {
@@ -19,6 +19,7 @@
     "gsd-pi": "scripts/install.js"
   },
   "files": [
+    "fork-release-manifest.json",
     "dist",
     "packages/*/dist/**",
     "packages/*/bin/**",

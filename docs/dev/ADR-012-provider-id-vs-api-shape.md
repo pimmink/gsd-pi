@@ -54,6 +54,8 @@ A small set of call sites legitimately keys on `provider`. These are **not** gat
 - **Session-start catalog refresh coordinator** (`copilot-catalog-session-refresh.ts`). GSD-W018's opt-in automatic refresh reuses the same GitHub Copilot auth-token resolution as the manual `/gsd copilot-models` command, for the same transport-specific reason.
 - **Session-start cheaper-alternative notification gate** (`bootstrap/register-hooks.ts`). GSD-W017's post-refresh notification only ever evaluates the active model when it is on the `github-copilot` transport, since the cheaper-alternative comparison itself is scoped to that account's live catalog and economics.
 
+- **Selectable reasoning controls** (`packages/pi-ai/src/models.ts`). GitHub Copilot's explicit effort ladder is transport-specific capability metadata, not a wire/API-shape test; other Completions transports retain their existing control behavior.
+
 These sites are enumerated in the allowlist at `src/tests/provider-equality-allowlist.test.ts`.
 
 ### Guardrail

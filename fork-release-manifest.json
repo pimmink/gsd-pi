@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "version": "1.22.0-fork.1",
+  "upstreamRepository": "open-gsd/gsd-pi",
+  "upstreamBase": "e92df12eda1639ab252f377bf6aba10af139b542",
+  "previousRuntimeVersion": "1.21.1-fork.5",
+  "previousIntegrationSource": "b82fc9d63238f14d6cdc10c60ca9c8e3eb0d4f47",
+  "candidatePatchesAudited": 45,
+  "retainedIntentCommits": [
+    "ccad185b04fa",
+    "4b28db60bf41",
+    "a8d17fac04e7",
+    "c83f2557",
+    "b6d65f26",
+    "4e9106c6",
+    "2f5ba38327",
+    "f92e6505ee"
+  ],
+  "retainedIntents": [
+    "Fail-closed Copilot Completions selectable effort metadata without altering other transports",
+    "Live endpoint capability normalization and faithful overlay serialization",
+    "Copilot-only generator reasoning-family rules with positive and negative provider guards",
+    "ADR-012 transport-specific capability exception with regression coverage",
+    "Numeric personal-fork releases reuse stable native engine dependencies",
+    "GitHub-hosted runner fallback for the personal fork only"
+  ],
+  "upstreamReplacementsNotReplayed": [
+    "Status-only 400 and Provider error prefix recovery",
+    "Guarded output-stream EIO recovery; fatal filesystem EIO remains fatal",
+    "Complete async job output recovery",
+    "Declaration-file exclusion from extension discovery",
+    "Slice reopen drift and lifecycle atomicity improvements",
+    "cmux pane activation and live subagent activity streaming",
+    "Provider adapter and generated catalog changes already present upstream"
+  ],
+  "nativeEngineVersion": "1.22.0",
+  "catalogSnapshotsRegenerated": false,
+  "activationProof": "Installation must separately verify the archive source SHA, CLI version and managed-resource fingerprints; this source manifest alone is not activation proof."
+}

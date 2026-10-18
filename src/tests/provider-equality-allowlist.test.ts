@@ -79,6 +79,8 @@ const ALLOWED_FILES: Record<string, string> = {
     "claude-code-specific message rendering",
 
   // GitHub Copilot transport-specific request/auth transforms.
+  "packages/pi-ai/src/models.ts":
+    "transport-specific selectable effort metadata; preserves other providers' reasoning controls (ADR-012)",
   "packages/pi-ai/src/utils/oauth/github-copilot.ts":
     "github-copilot OAuth-specific model shaping",
   "packages/pi-ai/src/providers/anthropic.ts":
