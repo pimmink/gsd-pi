@@ -36,8 +36,14 @@ export function isHumanPauseBlockerKind(kind: AutoPauseBlockerKind): boolean {
 // Keep this aligned with the canonical lifecycle-bearing auto-dispatch units:
 // other current-unit labels do not prove one of these workflow rows.
 const TASK_PAUSE_UNIT_TYPES = new Set(["execute-task", "replan-task"]);
-const SLICE_PAUSE_UNIT_TYPES = new Set(["complete-slice", "plan-slice"]);
-const MILESTONE_PAUSE_UNIT_TYPES = new Set(["complete-milestone", "research-milestone"]);
+const SLICE_PAUSE_UNIT_TYPES = new Set([
+  "complete-slice", "discuss-slice", "plan-slice", "research-slice", "refine-slice", "replan-slice",
+  "run-uat", "reassess-roadmap", "rewrite-docs",
+]);
+const MILESTONE_PAUSE_UNIT_TYPES = new Set([
+  "complete-milestone", "research-milestone", "plan-milestone", "discuss-milestone",
+  "validate-milestone", "rewrite-docs",
+]);
 const SLICE_ID_RE = /^S\d{2,3}$/;
 const TASK_ID_RE = /^T\d{2,3}$/;
 

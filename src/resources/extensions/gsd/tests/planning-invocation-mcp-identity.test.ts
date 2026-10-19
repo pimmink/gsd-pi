@@ -227,6 +227,54 @@ test("native and packaged MCP identities allow independent planning writes in th
   }
 });
 
+test("native planning hashes raw adapter identity before persisting operation fields", async () => {
+  const base = makeBase();
+  try {
+    const server = makeServer();
+    registerWorkflowTools(server as Parameters<typeof registerWorkflowTools>[0]);
+    const canonical = tool(server, "gsd_plan_milestone");
+    const identity = "raw-native-planning-tool-call";
+    const extra: RequestExtra = { requestId: 1, [NATIVE_MCP_TOOL_CALL_ID]: identity };
+
+    const first = await canonical.handler(params(base), extra);
+    assert.notEqual(first.isError, true, JSON.stringify(first));
+    assert.deepEqual(await canonical.handler(params(base), extra), first);
+    const receipts = _getAdapter()!.prepare(`
+      SELECT * FROM workflow_operations WHERE operation_type = 'workflow.milestone.plan'
+    `).all();
+    assert.equal(receipts.length, 1);
+    assert.equal(receipts[0]!["source_transport"], "pi-tool");
+    assert.equal(
+      receipts[0]!["idempotency_key"],
+      `mcp-native:gsd_plan_milestone:sha256:${createHash("sha256").update(identity).digest("hex")}`,
+    );
+    assert.equal(JSON.stringify(receipts).includes(identity), false);
+  } finally {
+    cleanup(base);
+  }
+});
+
+test("invalid native identities reject without falling back to packaged metadata", async () => {
+  const base = makeBase();
+  try {
+    const server = makeServer();
+    registerWorkflowTools(server as Parameters<typeof registerWorkflowTools>[0]);
+    const canonical = tool(server, "gsd_plan_milestone");
+    for (const identity of [null, 42, "", "   "]) {
+      const result = await canonical.handler(params(base), {
+        requestId: 1,
+        [NATIVE_MCP_TOOL_CALL_ID]: identity as unknown as string,
+        _meta: { "io.opengsd/idempotency-key": "valid-packaged-key" },
+      });
+      assert.equal(result.isError, true);
+      assert.match(JSON.stringify(result), /nonblank native tool-call identity/i);
+      assert.deepEqual(operations(), [cutoverOperation()]);
+    }
+  } finally {
+    cleanup(base);
+  }
+});
+
 test("MCP planning without explicit private request identity fails before mutation", async () => {
   const base = makeBase();
   try {

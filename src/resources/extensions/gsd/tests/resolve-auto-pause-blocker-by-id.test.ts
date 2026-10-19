@@ -188,7 +188,18 @@ test("binds task, slice, and milestone pauses to only their exact lifecycle iden
   const cases = [
     { name: "task", unit: { type: "execute-task", id: "M001/S01/T01" }, lifecycleId: "lc-m001-s01-t01" },
     { name: "slice", unit: { type: "plan-slice", id: "M001/S01" }, lifecycleId: "lc-m001-s01" },
+    { name: "slice UAT", unit: { type: "run-uat", id: "M001/S01" }, lifecycleId: "lc-m001-s01" },
+    { name: "slice discussion", unit: { type: "discuss-slice", id: "M001/S01" }, lifecycleId: "lc-m001-s01" },
+    { name: "slice research", unit: { type: "research-slice", id: "M001/S01" }, lifecycleId: "lc-m001-s01" },
+    { name: "slice refinement", unit: { type: "refine-slice", id: "M001/S01" }, lifecycleId: "lc-m001-s01" },
+    { name: "slice replanning", unit: { type: "replan-slice", id: "M001/S01" }, lifecycleId: "lc-m001-s01" },
+    { name: "roadmap reassessment", unit: { type: "reassess-roadmap", id: "M001/S01" }, lifecycleId: "lc-m001-s01" },
+    { name: "slice rewrite", unit: { type: "rewrite-docs", id: "M001/S01" }, lifecycleId: "lc-m001-s01" },
     { name: "milestone", unit: { type: "research-milestone", id: "M001" }, lifecycleId: "lc-m001" },
+    { name: "milestone planning", unit: { type: "plan-milestone", id: "M001" }, lifecycleId: "lc-m001" },
+    { name: "milestone discussion", unit: { type: "discuss-milestone", id: "M001" }, lifecycleId: "lc-m001" },
+    { name: "milestone validation", unit: { type: "validate-milestone", id: "M001" }, lifecycleId: "lc-m001" },
+    { name: "milestone rewrite", unit: { type: "rewrite-docs", id: "M001" }, lifecycleId: "lc-m001" },
   ];
 
   for (const item of cases) {
@@ -200,6 +211,7 @@ test("binds task, slice, and milestone pauses to only their exact lifecycle iden
         category: "unknown",
       });
       const blocker = blockerRows()[0]!;
+      assert.ok(blocker, `${item.unit.type} must open a human-owned blocker`);
       assert.equal(blocker["lifecycle_id"], item.lifecycleId);
       const result = resolveAutoPauseBlockerById(
         resolutionInput(String(blocker["blocker_id"]), `resolve exact ${item.name}`),
@@ -209,6 +221,49 @@ test("binds task, slice, and milestone pauses to only their exact lifecycle iden
     });
   }
 });
+
+for (const item of [
+  { type: "run-uat", previousType: "plan-slice", id: "M001/S01" },
+  { type: "discuss-slice", previousType: "plan-slice", id: "M001/S01" },
+  { type: "research-slice", previousType: "plan-slice", id: "M001/S01" },
+  { type: "refine-slice", previousType: "plan-slice", id: "M001/S01" },
+  { type: "replan-slice", previousType: "plan-slice", id: "M001/S01" },
+  { type: "reassess-roadmap", previousType: "plan-slice", id: "M001/S01" },
+  { type: "rewrite-docs", previousType: "plan-slice", id: "M001/S01" },
+  { type: "plan-milestone", previousType: "research-milestone", id: "M001" },
+  { type: "discuss-milestone", previousType: "research-milestone", id: "M001" },
+  { type: "validate-milestone", previousType: "research-milestone", id: "M001" },
+  { type: "rewrite-docs", previousType: "research-milestone", id: "M001" },
+]) {
+  test(`resolves an existing ${item.type} ${item.id} human pause without authorizing execution`, async (t) => {
+    const base = makeProject(t);
+    activateSession(base, { type: item.previousType, id: item.id });
+    await pauseAuto(undefined, undefined, "subjective_uat", {
+      message: "Waiting for human validation",
+      category: "unknown",
+    });
+    const blockerId = String(blockerRows()[0]!["blocker_id"]);
+    const db = _getAdapter()!;
+    db.prepare(`UPDATE auto_pauses SET unit_type = ? WHERE blocker_id = ?`).run(item.type, blockerId);
+    const executionState = () => ({
+      attempts: db.prepare(`SELECT * FROM workflow_execution_attempts`).all(),
+      recoveryActions: db.prepare(`SELECT * FROM workflow_recovery_actions`).all(),
+      dispatches: db.prepare(`SELECT * FROM unit_dispatches`).all(),
+      lifecycles: db.prepare(`SELECT * FROM workflow_item_lifecycles`).all(),
+      active: autoSession.active,
+      unit: autoSession.currentUnit,
+    });
+    const before = executionState();
+    const input = resolutionInput(blockerId, "Human validation completed");
+
+    const resolved = resolveAutoPauseBlockerById(input);
+    assert.equal(resolved.resolved, true);
+    assert.equal(blockerRows()[0]!["blocker_status"], "resolved");
+    assert.equal(openPauseRows().length, 0);
+    assert.deepEqual(executionState(), before, "resolution remains clear-only");
+    assert.deepEqual(resolveAutoPauseBlockerById(input), resolved, "successful retries replay");
+  });
+}
 
 test("refuses malformed, parent-only, and mismatched pause lifecycle identities without durable mutation", async (t) => {
   const cases: Array<{
@@ -259,6 +314,18 @@ test("refuses malformed, parent-only, and mismatched pause lifecycle identities 
       name: "slice unit type has task-shaped id",
       corrupt(db) {
         db.prepare(`UPDATE auto_pauses SET unit_type = 'plan-slice' WHERE closed_at IS NULL`).run();
+      },
+    },
+    {
+      name: "parallel research does not select a milestone parent",
+      corrupt(db) {
+        db.prepare(`UPDATE auto_pauses SET unit_type = 'research-slice', unit_id = 'M001/parallel-research' WHERE closed_at IS NULL`).run();
+      },
+    },
+    {
+      name: "slice rewrite does not select a missing slice through its milestone parent",
+      corrupt(db) {
+        db.prepare(`UPDATE auto_pauses SET unit_type = 'rewrite-docs', unit_id = 'M001/S99' WHERE closed_at IS NULL`).run();
       },
     },
   ];

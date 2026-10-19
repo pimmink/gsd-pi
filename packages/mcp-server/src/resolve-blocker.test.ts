@@ -9,6 +9,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test, type TestContext } from "node:test";
 import { fileURLToPath } from "node:url";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
 import {
   hostWriteGateAdapter,
@@ -569,6 +571,76 @@ test("GSD-mode adapter propagates tool-call identity for resolve replay and payl
     /^resolve-auto-pause-blocker:v1:sha256:[a-f0-9]{64}$/,
   );
   assert.doesNotMatch(String(operation["idempotency_key"]), /adapter-resolve-replay/);
+});
+
+test("native MCP transport preserves adapter resolution identity across restart and isolates packaged calls", async (t) => {
+  const selected = await seedProjectWithOpenAutoPause(t);
+  const { startMcpServer } = await import("../../../src/mcp-server.js");
+  const clients: Client[] = [];
+  t.after(async () => {
+    for (const client of clients) await client.close();
+  });
+  const connectNative = async () => {
+    const tools = await createWorkflowMcpAdapterToolDefs(new SessionManager());
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+    await startMcpServer({ tools, transport: serverTransport });
+    const client = new Client({ name: "native-adapter-test", version: "0.0.0" });
+    clients.push(client);
+    await client.connect(clientTransport);
+    return client;
+  };
+  const args = {
+    projectDir: selected.projectDir,
+    pauseBlockerId: selected.blockerId,
+    rationale: "Operator repaired the pause",
+    expectedRevision: selected.revision,
+    expectedAuthorityEpoch: selected.authorityEpoch,
+  };
+  const identity = "native-transport-private-retry";
+  const request = {
+    name: "gsd_resolve_blocker",
+    arguments: args,
+    _meta: { "io.opengsd/idempotency-key": identity },
+  };
+  const client = await connectNative();
+  const first = await client.callTool(request);
+  assert.notEqual(first.isError, true, JSON.stringify(first));
+  assert.deepEqual(await client.callTool(request), first);
+  await client.close();
+  closeDatabase();
+  const restarted = await connectNative();
+  assert.deepEqual(await restarted.callTool(request), first, "a new server replays the committed receipt");
+  const conflict = await restarted.callTool({
+    ...request, arguments: { ...args, rationale: "Changed request must not replay" },
+  });
+  assert.equal(conflict.isError, true);
+  assert.match(JSON.stringify(conflict.content), /idempotency conflict/i);
+
+  const { server } = await createMcpServer(new SessionManager(), { includeWorkflowTools: false });
+  const [packagedTransport, packagedServerTransport] = InMemoryTransport.createLinkedPair();
+  await server.connect(packagedServerTransport);
+  const packaged = new Client({ name: "packaged-adapter-test", version: "0.0.0" });
+  clients.push(packaged);
+  await packaged.connect(packagedTransport);
+  const nativeIdentity = `mcp-explicit:v1:sha256:${createHash("sha256").update(identity).digest("hex")}`;
+  const refused = await packaged.callTool({
+    ...request,
+    _meta: {
+      "io.opengsd/idempotency-key": nativeIdentity,
+      "native-mcp-tool-call-id": nativeIdentity,
+      sourceTransport: "pi-tool",
+    },
+  });
+  assert.equal(refused.isError, true, "packaged metadata cannot select the native receipt");
+  assert.match(JSON.stringify(refused.content), /stale project revision|blocker-not-open/);
+  assert.doesNotMatch(JSON.stringify(refused.content), /idempotency conflict/i);
+  openDatabase(join(selected.projectDir, ".gsd", "gsd.db"));
+  const receipts = _getAdapter()!.prepare(`
+    SELECT * FROM workflow_operations WHERE operation_type = 'pause.blocker.resolve.by-id'
+  `).all();
+  assert.equal(receipts.length, 1, "retries, conflicts and packaged calls write no additional receipt");
+  assert.equal(receipts[0]!["source_transport"], "pi-tool");
+  assert.equal(JSON.stringify(receipts).includes(identity), false);
 });
 
 for (const nativeFirst of [true, false]) {
