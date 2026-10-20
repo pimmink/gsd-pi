@@ -1,4 +1,4 @@
-# TEMPLATE ONLY: replace 609acebf850e03529ebc3b11c99be739aa99cb88 with the reviewed 40-character fork commit.
+# TEMPLATE ONLY: replace 08a96c8c006e001d0cf021602a60908dd5a6d35f with the reviewed 40-character fork commit.
 # Install as EXISTING .github/workflows/ci.yml on a fork-only CI-control branch.
 # workflow-control github.sha is NOT the tested source revision.
 name: Fork auto-recovery focused CI
@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SOURCE_SHA: '609acebf850e03529ebc3b11c99be739aa99cb88'
+  SOURCE_SHA: '08a96c8c006e001d0cf021602a60908dd5a6d35f'
   EXPECTED_TEST_FILE_COUNT: '24'
   GSD_NATIVE_PREFER_LOCAL: '1'
   RUSTFLAGS: '-C target-cpu=x86-64'
@@ -196,7 +196,7 @@ jobs:
           }
           const files = process.env.TEST_FILES.trim().split('\n');
           const result = { sourceSha: process.env.SOURCE_SHA, controlSha: process.env.GITHUB_SHA,
-            shard, shards: 4, inventoryFiles: files, plannedFilesPerShard: 4,
+            shard, shards: 4, inventoryFiles: files, plannedFilesPerShard: files.length / 4,
             nodeVersion: process.version, counts };
           writeFileSync(`.fork-ci-results/shard-${shard}.json`, JSON.stringify(result, null, 2) + '\n');
           console.log(JSON.stringify(result));
@@ -248,7 +248,7 @@ jobs:
             assert.equal(result.controlSha, process.env.GITHUB_SHA);
             assert.equal(result.shard, shard);
             assert.equal(result.shards, 4);
-            assert.equal(result.plannedFilesPerShard, 4);
+            assert.equal(result.plannedFilesPerShard, files.length / 4);
             assert.match(result.nodeVersion, /^v22\./);
             assert.deepEqual(result.inventoryFiles, files);
             assert.ok(result.counts.tests > 0);
