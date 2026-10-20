@@ -15,6 +15,7 @@ concurrency:
 
 env:
   SOURCE_SHA: '0c8111febff42b766a63d5b3a19f1299693d0048'
+  EXPECTED_TEST_FILE_COUNT: '24'
   GSD_NATIVE_PREFER_LOCAL: '1'
   RUSTFLAGS: '-C target-cpu=x86-64'
   ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
@@ -69,7 +70,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           printf 'Tested source: pimmink/gsd-pi@%s\nWorkflow-control SHA: %s\n' "$SOURCE_SHA" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
           mapfile -t files < <(printf '%s\n' "$TEST_FILES" | grep -v '^$')
-          test "${#files[@]}" -eq 16
+          test "${#files[@]}" -eq "$EXPECTED_TEST_FILE_COUNT"
           for file in "${files[@]}"; do test -s "$file"; done
           test -s src/resources/extensions/gsd/tests/resolve-ts.mjs
           test -s native/scripts/build.js
@@ -168,7 +169,7 @@ jobs:
           set -euo pipefail
           mkdir -p .fork-ci-results
           mapfile -t files < <(printf '%s\n' "$TEST_FILES" | grep -v '^$')
-          test "${#files[@]}" -eq 16
+          test "${#files[@]}" -eq "$EXPECTED_TEST_FILE_COUNT"
           for file in "${files[@]}"; do test -s "$file"; done
           # One shared ordered inventory, one disjoint Node shard per job.
           # No name filtering, fallback loader, mocked native addon or skip flags.
@@ -238,8 +239,8 @@ jobs:
           import assert from 'node:assert/strict';
           import { appendFileSync, readFileSync } from 'node:fs';
           const files = process.env.TEST_FILES.trim().split('\n');
-          assert.equal(files.length, 16);
-          assert.equal(new Set(files).size, 16);
+          assert.equal(files.length, Number(process.env.EXPECTED_TEST_FILE_COUNT));
+          assert.equal(new Set(files).size, Number(process.env.EXPECTED_TEST_FILE_COUNT));
           const totals = { tests: 0, pass: 0, fail: 0, cancelled: 0, skipped: 0, todo: 0 };
           for (let shard = 1; shard <= 4; shard++) {
             const result = JSON.parse(readFileSync(`.fork-ci-results/shard-${shard}.json`, 'utf8'));
@@ -256,7 +257,7 @@ jobs:
               totals[key] += result.counts[key];
             }
           }
-          const summary = `## Focused auto-recovery evidence\n\nTested source: pimmink/gsd-pi@${process.env.SOURCE_SHA}\n\nWorkflow-control SHA (not tested source): ${process.env.GITHUB_SHA}\n\nInventory: 16 files; 4 disjoint Node file shards (4 files each).\n\nTAP totals: ${JSON.stringify(totals)}\n\nThis is focused regression coverage, not full-suite or code-percentage coverage.\n`;
+          const summary = `## Focused auto-recovery evidence\n\nTested source: pimmink/gsd-pi@${process.env.SOURCE_SHA}\n\nWorkflow-control SHA (not tested source): ${process.env.GITHUB_SHA}\n\nInventory: ${files.length} files; 4 disjoint Node file shards (${files.length / 4} files each).\n\nTAP totals: ${JSON.stringify(totals)}\n\nThis is focused regression coverage, not full-suite or code-percentage coverage.\n`;
           appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
           console.log(summary);
           assert.equal(process.env.PREREQUISITES_RESULT, 'success');
