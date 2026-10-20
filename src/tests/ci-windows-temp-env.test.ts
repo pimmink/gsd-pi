@@ -22,12 +22,26 @@ function findWorkflowPath(): string {
 
 const workflow = readFileSync(findWorkflowPath(), "utf8");
 
+test("only pimmink uses hosted runners instead of the upstream Blacksmith pool", () => {
+	const linuxRunner =
+		"runs-on: ${{ github.repository_owner == 'pimmink' && 'ubuntu-latest' || 'blacksmith-4vcpu-ubuntu-2404' }}";
+	const windowsRunner =
+		"runs-on: ${{ github.repository_owner == 'pimmink' && 'windows-latest' || 'blacksmith-4vcpu-windows-2025' }}";
+	assert.equal(workflow.split(linuxRunner).length - 1, 4);
+	assert.equal(workflow.split(windowsRunner).length - 1, 1);
+	assert.doesNotMatch(workflow, /runs-on:\s*blacksmith-/);
+});
+
 function windowsPackageTestStep(): string {
 	const job = workflow.match(
 		/ {2}windows-portability:\n(?<body>[\s\S]*?)(?=\n {2}[a-zA-Z0-9_-]+:|\n?$)/,
 	)?.groups?.body;
 	assert.ok(job, "windows-portability job must exist");
-	assert.match(job, /runs-on:\s*blacksmith-4vcpu-windows-2025/);
+	assert.ok(
+		job.includes(
+			"runs-on: ${{ github.repository_owner == 'pimmink' && 'windows-latest' || 'blacksmith-4vcpu-windows-2025' }}",
+		),
+	);
 
 	const step = job.match(
 		/ {6}- name: Run package tests\n(?<body>[\s\S]*?)(?=\n {6}- name:|\n?$)/,

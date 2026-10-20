@@ -7,6 +7,89 @@ import { describe, expect, test } from "vitest";
 import { isModelsCatalog } from "../src/model-catalog.ts";
 import { calculateCost } from "../src/models.ts";
 import { MODELS } from "../src/models.generated.ts";
+import { loadGeneratorThinkingMetadata, providerThinkingFixture } from "./fixtures/provider-thinking-metadata.ts";
+
+describe("offline generator provider scope", () => {
+	const applyMetadata = loadGeneratorThinkingMetadata();
+
+	test.each([
+		"gpt-6-luna", "gpt-6-sol", "gpt-6.1-sol", "gpt-6-astra",
+		"openai/gpt-6-luna", "OpenAI/GPT-6.1-SOL",
+	])("retains Copilot selectable effort for %s", (id) => {
+		const model = providerThinkingFixture("github-copilot", id);
+		applyMetadata(model);
+		expect(model.thinkingLevelMap).toMatchObject({ off: null, minimal: "low", xhigh: "xhigh", max: "max" });
+	});
+
+	test.each(["gpt-6-sol-preview", "openai/gpt-6.2-sol", "gpt-6-terra", "gpt-6-luna-2026-10-01"])(
+		"does not invent Copilot max for unconfirmed variant %s", (id) => {
+			const model = providerThinkingFixture("github-copilot", id);
+			applyMetadata(model);
+			expect(model.thinkingLevelMap).toMatchObject({ off: null, minimal: "low", xhigh: "xhigh" });
+			expect(model.thinkingLevelMap?.max).toBeUndefined();
+		},
+	);
+
+	test.each(["grok-4.5", "grok-4.6", "grok-4.7", "xai/grok-4.6", "xai/GROK-4.7-preview"])(
+		"rejects unsupported Copilot Grok off for %s", (id) => {
+			const model = providerThinkingFixture("github-copilot", id);
+			applyMetadata(model);
+			expect(model.thinkingLevelMap).toMatchObject({ off: null, minimal: "low" });
+			expect(model.thinkingLevelMap?.xhigh).toBeUndefined();
+			expect(model.thinkingLevelMap?.max).toBeUndefined();
+		},
+	);
+
+	test.each(["openai", "openai-codex", "openrouter", "xai", "custom-copilot", "github-copilot-proxy"])(
+		"does not leak Copilot capability overrides to %s", (provider) => {
+			for (const id of ["gpt-6-luna", "gpt-6.1-sol", "openai/gpt-6-astra", "gpt-6-sol-preview", "grok-4.5", "xai/grok-4.7-preview"]) {
+				const model = providerThinkingFixture(provider, id);
+				applyMetadata(model);
+				expect(model.thinkingLevelMap, `${provider}/${id}`).toBeUndefined();
+			}
+		},
+	);
+
+	test.each(["gpt-60-sol", "not-gpt-6-sol", "gpt-6ish", "grok-4.50", "grok-4.70-preview", "grok-4.8", "grok-3"])(
+		"does not match Copilot family lookalike %s", (id) => {
+			const model = providerThinkingFixture("github-copilot", id);
+			applyMetadata(model);
+			expect(model.thinkingLevelMap).toBeUndefined();
+		},
+	);
+
+	test.each(["openai-completions", "openai-responses", "azure-openai-responses"] as const)(
+		"rejects Copilot off without changing the upstream %s adapter", (api) => {
+			for (const id of ["gpt-6-luna", "grok-4.5"]) {
+				const model = providerThinkingFixture("github-copilot", id, api);
+				applyMetadata(model);
+				expect(model.thinkingLevelMap).toMatchObject({ off: null, minimal: "low" });
+				expect(model.api).toBe(api);
+				const other = providerThinkingFixture("custom", id, api);
+				applyMetadata(other);
+				expect(other.thinkingLevelMap).toBeUndefined();
+			}
+		},
+	);
+
+	test("merges retained rules without removing existing upstream metadata", () => {
+		const model = providerThinkingFixture("github-copilot", "gpt-6.1-sol");
+		model.thinkingLevelMap = { low: "provider-low", high: null };
+		applyMetadata(model);
+		expect(model.thinkingLevelMap).toMatchObject({
+			low: "provider-low", high: null, off: null, minimal: "low", xhigh: "xhigh", max: "max",
+		});
+		expect(model.api).toBe("openai-responses");
+		expect(model.contextWindow).toBe(128000);
+		expect(model.cost.input).toBe(0);
+	});
+
+	test("preserves upstream OpenAI GPT-5.6 behavior", () => {
+		const model = providerThinkingFixture("openai", "gpt-5.6-sol");
+		applyMetadata(model);
+		expect(model.thinkingLevelMap).toMatchObject({ off: "none", xhigh: "xhigh", max: "max" });
+	});
+});
 
 describe("models.generated.ts", () => {
 	test("models.generated.json mirrors the complete generated catalog", () => {

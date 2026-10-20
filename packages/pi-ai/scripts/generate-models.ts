@@ -187,6 +187,26 @@ function isGpt56Variant(modelId: string): boolean {
 	return modelId === "gpt-5.6-sol" || modelId === "gpt-5.6-terra" || modelId === "gpt-5.6-luna";
 }
 
+// These are Copilot capability overrides, not capabilities of every provider
+// serving a similarly named model. Accept vendor prefixes and dated variants.
+function isCopilotGpt6Model(model: Model<any>): boolean {
+	const id = model.id.split("/").pop()?.toLowerCase() ?? "";
+	return model.provider === "github-copilot" && /^gpt-6(?:[.-]|$)/.test(id);
+}
+
+function isCopilotGpt6MaxVariant(model: Model<any>): boolean {
+	const id = model.id.split("/").pop()?.toLowerCase() ?? "";
+	return (
+		isCopilotGpt6Model(model) &&
+		["gpt-6-luna", "gpt-6-sol", "gpt-6.1-sol", "gpt-6-astra"].includes(id)
+	);
+}
+
+function isCopilotGrokReasoningModel(model: Model<any>): boolean {
+	const id = model.id.split("/").pop()?.toLowerCase() ?? "";
+	return model.provider === "github-copilot" && /^grok-4\.(?:5|6|7)(?:-|$)/.test(id);
+}
+
 function isGoogleThinkingApi(model: Model<any>): boolean {
 	return model.api === "google-generative-ai" || model.api === "google-vertex";
 }
@@ -293,12 +313,17 @@ function isGemma4Model(modelId: string): boolean {
 
 function applyThinkingLevelMetadata(model: Model<any>): void {
 	if (
-		(model.api === "openai-responses" || model.api === "azure-openai-responses") &&
-		model.id.startsWith("gpt-5")
+		((model.api === "openai-responses" || model.api === "azure-openai-responses") &&
+			model.id.startsWith("gpt-5")) ||
+		isCopilotGpt6Model(model) ||
+		isCopilotGrokReasoningModel(model)
 	) {
 		mergeThinkingLevelMap(model, { off: null });
 	}
-	if (model.provider === "github-copilot" && model.id.startsWith("gpt-5")) {
+	if (
+		model.provider === "github-copilot" &&
+		(model.id.startsWith("gpt-5") || isCopilotGpt6Model(model) || isCopilotGrokReasoningModel(model))
+	) {
 		mergeThinkingLevelMap(model, { minimal: "low" });
 	}
 	if (
@@ -308,10 +333,10 @@ function applyThinkingLevelMetadata(model: Model<any>): void {
 	) {
 		mergeThinkingLevelMap(model, { off: "none" });
 	}
-	if (supportsOpenAiXhigh(model.id)) {
+	if (supportsOpenAiXhigh(model.id) || isCopilotGpt6Model(model)) {
 		mergeThinkingLevelMap(model, { xhigh: "xhigh" });
 	}
-	if (isGpt56Variant(model.id)) {
+	if (isGpt56Variant(model.id) || isCopilotGpt6MaxVariant(model)) {
 		mergeThinkingLevelMap(model, { max: "max" });
 	}
 	if (model.id.includes("opus-4-6") || model.id.includes("opus-4.6")) {

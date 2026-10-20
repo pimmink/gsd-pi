@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "version": "1.22.0-fork.2",
+  "upstreamRepository": "open-gsd/gsd-pi",
+  "upstreamBase": "c6e8f8990b9fdf1c8af0c9d176c3eb5f3344a114",
+  "previousRuntimeVersion": "1.22.0-fork.1",
+  "previousIntegrationSource": "e01e57a32ce6d51e6e3bf3775cdef8cb9d83c199",
+  "retainedIntentGroupsAudited": 6,
+  "retainedIntentCommits": [
+    "ccad185b04fa",
+    "4b28db60bf41",
+    "a8d17fac04e7",
+    "c83f2557",
+    "b6d65f26",
+    "4e9106c6",
+    "2f5ba38327",
+    "f92e6505ee"
+  ],
+  "retainedIntents": [
+    "Fail-closed Copilot Completions selectable effort metadata without altering other transports",
+    "Live endpoint capability normalization and faithful overlay serialization",
+    "Copilot-only generator reasoning-family rules with positive and negative provider guards",
+    "ADR-012 transport-specific capability exception with regression coverage",
+    "Numeric personal-fork releases reuse stable native engine dependencies",
+    "GitHub-hosted runner fallback for the personal fork only"
+  ],
+  "upstreamReplacementsNotReplayed": [
+    "Provider readiness probe isolation and cache clocks from merged upstream",
+    "Stronger upstream engine identity tests retained with additional numeric-fork cases",
+    "MiniMax model generator behavior retained from upstream",
+    "Merged native blocker commands and MCP resolve-blocker test registration",
+    "Existing upstream transport, lifecycle and output recovery improvements"
+  ],
+  "excludedUnmergedPullRequests": [2920],
+  "nativeEngineVersion": "1.22.0",
+  "catalogSnapshotsRegenerated": false,
+  "activationProof": "Source-only manifest. Online package provenance, archive checksum, staged installation and fresh-process package/managed fingerprints must be verified separately before activation is claimed."
+}
