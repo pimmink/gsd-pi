@@ -1,563 +1,266 @@
-# CI workflow — builds, tests, and gates merges to main
-name: CI
+# TEMPLATE ONLY: replace 0c8111febff42b766a63d5b3a19f1299693d0048 with the reviewed 40-character fork commit.
+# Install as EXISTING .github/workflows/ci.yml on a fork-only CI-control branch.
+# workflow-control github.sha is NOT the tested source revision.
+name: Fork auto-recovery focused CI
 
 on:
-  push:
-    branches: [main, dev, test, 'hotfix/**']
-    paths-ignore:
-      - '.github/workflows/ai-triage.yml'
-      - '.github/workflows/build-native.yml'
-      - '.github/workflows/cleanup-dev-versions.yml'
-      - 'LICENSE'
-  pull_request:
-    branches: [main, dev, test]
-    paths-ignore:
-      - '.github/workflows/ai-triage.yml'
-      - '.github/workflows/build-native.yml'
-      - '.github/workflows/cleanup-dev-versions.yml'
-      - 'LICENSE'
-  # Merge queue entries report ci-gate from this event. merge_group does not
-  # support path filters, so it is declared bare rather than mirroring the
-  # paths-ignore lists above.
-  merge_group:
   workflow_dispatch:
 
 permissions:
   contents: read
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
 concurrency:
-  # Group per-PR (pull_request.number is globally unique — head_ref is only the
-  # source branch name, which collides across forks/PRs that share it) so pushing
-  # to a PR cancels its own stale run, and fall back to the unique run_id on
-  # branch pushes so an in-flight main/dev CI is never cancelled by a later push.
-  group: ci-${{ github.event.pull_request.number || github.run_id }}
+  group: fork-auto-recovery-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SOURCE_SHA: '0c8111febff42b766a63d5b3a19f1299693d0048'
+  GSD_NATIVE_PREFER_LOCAL: '1'
+  RUSTFLAGS: '-C target-cpu=x86-64'
+  ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+  GSD_SKIP_RTK_INSTALL: '1'
+  GSD_SKIP_DEP_REPAIR: '1'
+  # Explicit focused inventory, NOT full-suite coverage. Every file is required.
+  TEST_FILES: |
+    src/resources/extensions/gsd/tests/auto-recovery-authorization.test.ts
+    src/resources/extensions/gsd/tests/auto-recovery-options.test.ts
+    src/resources/extensions/gsd/tests/commands-blocker.test.ts
+    src/resources/extensions/gsd/tests/pause-blocker-domain-operation.test.ts
+    src/resources/extensions/gsd/tests/resolve-auto-pause-blocker-by-id.test.ts
+    src/resources/extensions/gsd/tests/mcp-blocker-boundary-pr2865.integration.test.ts
+    src/resources/extensions/gsd/tests/db-access-guardrails.test.ts
+    src/resources/extensions/gsd/tests/sqlite-readonly.test.ts
+    src/resources/extensions/gsd/tests/auto-session-encapsulation.test.ts
+    src/resources/extensions/gsd/tests/auto-recovery.test.ts
+    src/resources/extensions/gsd/tests/consent-question.test.ts
+    src/resources/extensions/gsd/tests/unit-ownership.test.ts
+    src/resources/extensions/gsd/tests/dispatch-preview-read-only.test.ts
+    src/resources/extensions/gsd/tests/doctor-read-only.test.ts
+    src/resources/extensions/gsd/tests/single-writer-invariant.test.ts
+    src/resources/extensions/gsd/tests/single-writer-v3-tool-surface.test.ts
+    src/resources/extensions/gsd/tests/commands-dispatcher-validation-block.test.ts
+    src/resources/extensions/gsd/tests/commands-dispatcher-workspace-git.test.ts
+    src/resources/extensions/gsd/tests/commands-dispatcher-unmerged-milestone.test.ts
+    src/resources/extensions/gsd/tests/dispatcher-stuck-planning.test.ts
+    src/resources/extensions/gsd/tests/native-git-bridge-exec-fallback.test.ts
+    src/resources/extensions/gsd/tests/native-has-changes-cache.test.ts
+    src/resources/extensions/gsd/tests/native-merge-regular.test.ts
+    src/resources/extensions/gsd/tests/native-git-infra-errors.test.ts
+
 jobs:
-  # Single checkout + classify + fast scans (~2–5 min). Replaces detect-changes,
-  # docs-check, and lint jobs so build can start as soon as this finishes.
-  fast-gates:
-    name: fast-gates
-    timeout-minutes: 15
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    outputs:
-      heavy-code-changed: ${{ steps.classify.outputs.heavy-code-changed }}
-      web-changed: ${{ steps.classify.outputs.web-changed }}
-      portability-changed: ${{ steps.classify.outputs.portability-changed }}
-      windows-e2e-changed: ${{ steps.classify.outputs.windows-e2e-changed }}
-      docker-changed: ${{ steps.classify.outputs.docker-changed }}
-    steps:
-      - name: Checkout repository without GITHUB_TOKEN
-        shell: bash
-        env:
-          FETCH_DEPTH: '0'
-        run: |
-          set -euo pipefail
-          git init "$GITHUB_WORKSPACE"
-          cd "$GITHUB_WORKSPACE"
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-          git -c protocol.version=2 fetch --no-tags --prune origin \
-            '+refs/heads/*:refs/remotes/origin/*' \
-            '+refs/tags/*:refs/tags/*' \
-            "+${GITHUB_SHA}:refs/checkout-ref"
-          git checkout --force --detach "$GITHUB_SHA"
-
-      - name: Prepare diff base for scans
-        env:
-          BASE_REF: ${{ github.base_ref }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: bash scripts/ci-fetch-diff-base.sh
-
-      - name: Classify changed files
-        id: classify
-        env:
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PUSH_BEFORE_SHA: ${{ github.event.before }}
-          EVENT_NAME: ${{ github.event_name }}
-          HEAD_SHA: ${{ github.sha }}
-        run: bash scripts/ci-classify-changes.sh
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
-        with:
-          version: 10.12.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: '24'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        env:
-          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
-          GSD_SKIP_RTK_INSTALL: '1'
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Run fast gates
-        env:
-          BASE_REF: ${{ github.base_ref }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: bash scripts/ci-fast-gates.sh
-
-  build:
-    name: build
-    # Raised from 25: this job compiles the native engine addon from source
-    # (a cold Rust build) before running the native-backed test suites.
+  prerequisites:
+    if: github.repository == 'pimmink/gsd-pi'
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
-    needs: [fast-gates]
-    if: needs.fast-gates.outputs.heavy-code-changed == 'true'
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    env:
-      # native/.cargo/config.toml sets `-C target-cpu=native` for local dev speed,
-      # which bakes host-specific CPU instructions into build artifacts, including
-      # the proc-macro .so files (e.g. napi_derive) that rustc dlopens during macro
-      # expansion. On the heterogeneous CI runner fleet those artifacts can be
-      # executed on a CPU that lacks the instructions they were built for, crashing
-      # rustc with `interrupted by SIGILL` (as seen expanding gsd_ast). Override
-      # RUSTFLAGS to a portable baseline for CI, exactly as that config file's own
-      # "CI/release builds should override via RUSTFLAGS for portability" note directs.
-      RUSTFLAGS: '-C target-cpu=x86-64'
-
     steps:
-      - name: Checkout repository without GITHUB_TOKEN
+      - name: Checkout exact tested source (not workflow-control SHA)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: pimmink/gsd-pi
+          ref: ${{ env.SOURCE_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Verify source and required inventory before installing
         shell: bash
-        env:
-          FETCH_DEPTH: '1'
         run: |
           set -euo pipefail
-          git init "$GITHUB_WORKSPACE"
-          cd "$GITHUB_WORKSPACE"
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-          git -c protocol.version=2 fetch --no-tags --prune --depth="$FETCH_DEPTH" origin \
-            "+${GITHUB_SHA}:refs/checkout-ref"
-          git checkout --force --detach "$GITHUB_SHA"
-
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          printf 'Tested source: pimmink/gsd-pi@%s\nWorkflow-control SHA: %s\n' "$SOURCE_SHA" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          mapfile -t files < <(printf '%s\n' "$TEST_FILES" | grep -v '^$')
+          test "${#files[@]}" -eq 16
+          for file in "${files[@]}"; do test -s "$file"; done
+          test -s src/resources/extensions/gsd/tests/resolve-ts.mjs
+          test -s native/scripts/build.js
+          test -s scripts/ci-pack-build-artifacts.sh
       - name: Setup pnpm
         uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         with:
           version: 10.12.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
+      - name: Setup Node 22 (latest patch includes registerHooks)
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '24'
-          cache: 'pnpm'
-
+          node-version: '22'
       - uses: ./.github/actions/setup-linux-native-build-deps
-
-      - name: Install dependencies
-        env:
-          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
-          GSD_SKIP_RTK_INSTALL: '1'
-          GSD_SKIP_DEP_REPAIR: '1'
+      - name: Install frozen dependencies
         run: pnpm install --frozen-lockfile
-
-      # The native engine (@opengsd/engine-*) is published only at release time,
-      # so the pinned npm binary lags the Rust source in native/crates/engine.
-      # When native code changes (e.g. new N-API exports), the tests below must
-      # run against the addon built from THIS commit, not the stale published
-      # binary. Build it from source and load it via GSD_NATIVE_PREFER_LOCAL=1
-      # on the test steps. The built .node is packed into ci-build-artifacts so
-      # node22-smoke reuses it without re-compiling.
-      - name: Setup Rust toolchain (native addon for tests)
-        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-
-      - name: Cache Rust build (native addon)
-        uses: Swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16 # v2
-        with:
-          shared-key: native-linux-x64-gnu
-          workspaces: native -> target
-
-      - name: Build native addon from source (test parity)
-        # Dev profile: faster to compile and the profile the @gsd/native package
-        # tests already use. GSD_NATIVE_PREFER_LOCAL loads gsd_engine.dev.node.
-        run: pnpm run build:native:test
-
-      - name: Build core
+      - name: Build actual native fixture addon (upstream CI command)
+        run: node native/scripts/build.js --dev --test-fault-injection
+      - name: Build root core prerequisites (no web host / Next build)
         run: pnpm run build:core
-
-      - uses: ./.github/actions/cache-nextjs
-
-      # validate-pack requires dist/web/standalone/server.js in the tarball (package.json files).
-      - name: Build web host
-        run: pnpm run build:web-host
-
-      - name: Pack build artifacts
-        run: bash scripts/ci-pack-build-artifacts.sh
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: ci-build-artifacts
-          path: ci-build-artifacts.tar.gz
-          retention-days: 1
-
       - name: Typecheck extensions
         run: pnpm run typecheck:extensions
-
-      - name: Validate package is installable
-        run: pnpm run validate-pack
-
-      - name: Verify workspace coverage (every linkable package has tests)
-        run: pnpm run verify:workspace-coverage
-
-      - name: Verify extension coverage (parity with verify:merge)
-        run: pnpm run verify:extension-coverage
-
-      - name: Compile test artifacts
-        run: pnpm run test:compile
-
-      # The compiled-test native loader (dist-test/packages/native/dist/native.js)
-      # resolves its addon dir relative to its own location, i.e. dist-test/native/addon.
-      # Mirror the from-source addon there so GSD_NATIVE_PREFER_LOCAL=1 finds it for
-      # the compiled unit/package suites (build:native only writes repo-root native/addon).
-      - name: Mirror native addon into dist-test (compiled-test loader path)
+      - name: Require source-built native binding and package build outputs
+        shell: bash
         run: |
-          mkdir -p dist-test/native/addon
-          cp native/addon/*.node dist-test/native/addon/
-          ls -la dist-test/native/addon/
-
-      - name: Run performance baseline gate
-        env:
-          GSD_NATIVE_PREFER_LOCAL: '1'
-        run: pnpm run test:unit:compiled:perf
-
-      - name: Run unit tests
-        env:
-          GSD_NATIVE_PREFER_LOCAL: '1'
-        run: pnpm run test:unit:compiled
-
-      - name: Run package tests
-        env:
-          GSD_NATIVE_PREFER_LOCAL: '1'
-          GSD_SKIP_NATIVE_PACKAGE_TESTS: ${{ needs.fast-gates.outputs.portability-changed == 'true' && '0' || '1' }}
-        run: pnpm run test:packages:compiled
-
-      - name: Run pi-ai vitest suite
-        run: pnpm --filter @gsd/pi-ai test
-
-      - name: Run daemon package tests
-        run: pnpm run test:daemon
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install chromium
-
-      - name: Run integration tests
-        env:
-          GSD_NATIVE_PREFER_LOCAL: '1'
-        run: pnpm run test:integration
-
-      - name: Run e2e suite (against built binary)
-        env:
-          GSD_NATIVE_PREFER_LOCAL: '1'
-        run: |
-          chmod +x dist/loader.js
-          GSD_SMOKE_BINARY="$(pwd)/dist/loader.js"
-          export GSD_SMOKE_BINARY
-          pnpm run test:e2e
-
-      # Removal Gate G8 (ADR-046 Migration step 8): the four closeout e2e
-      # scenarios leave every cutover bridge counter at zero, the fake-LLM
-      # acceptance bed's bridge traffic stays declared and finite, and the
-      # deleted branch symbols stay deleted. The live-model bed is not part
-      # of CI; it rides to the owner.
-      - name: G8 legacy-counter gate (closeout e2e + acceptance bed)
-        env:
-          GSD_NATIVE_PREFER_LOCAL: '1'
-          GSD_SMOKE_BINARY: ${{ github.workspace }}/dist/loader.js
-        run: pnpm run gate:g8-legacy-counters
-
-      - name: Run docker e2e suite
-        if: needs.fast-gates.outputs.docker-changed == 'true'
-        run: pnpm run test:e2e:docker
-
-      - name: Upload e2e artifacts on failure
-        if: failure()
-        uses: actions/upload-artifact@v7
+          set -euo pipefail
+          test -s native/addon/gsd_engine.dev.node
+          node --input-type=commonjs <<'NODE'
+          const assert = require('node:assert/strict');
+          const native = require('./native/addon/gsd_engine.dev.node');
+          for (const key of ['SqliteFileIdentityLock', 'ProjectionRootIdentityLock']) {
+            assert.equal(typeof native[key], 'function', `missing native export ${key}`);
+          }
+          console.log('Source-built native fixture addon loaded on', process.version);
+          NODE
+          bash scripts/ci-pack-build-artifacts.sh
+          printf '%s\n' "$SOURCE_SHA" > fork-ci-source-sha.txt
+      - name: Upload source-bound prerequisites
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: e2e-artifacts
-          path: test-results/e2e
-          if-no-files-found: ignore
-          retention-days: 7
+          name: auto-recovery-prerequisites
+          path: |
+            ci-build-artifacts.tar.gz
+            fork-ci-source-sha.txt
+          if-no-files-found: error
+          retention-days: 2
 
-  windows-portability:
-    name: windows-portability
-    # Raised from 25: this job now compiles the native engine addon from source
-    # (a cold Rust build) before running the native-backed portability tests.
-    timeout-minutes: 45
+  focused-tests:
+    needs: prerequisites
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [1, 2, 3, 4]
     env:
-      # Same heterogeneous-runner guard as the build job: without a portable
-      # target-cpu baseline, rustc artifacts built on one fleet member crash
-      # rustc on another with STATUS_ILLEGAL_INSTRUCTION (observed expanding
-      # gsd_ast on #2066's run and once on main).
-      RUSTFLAGS: '-C target-cpu=x86-64'
-    needs: [fast-gates, build]
-    if: >-
-      needs.fast-gates.outputs.heavy-code-changed == 'true' &&
-      (needs.fast-gates.outputs.portability-changed == 'true' ||
-       needs.fast-gates.outputs.windows-e2e-changed == 'true')
-    runs-on: blacksmith-4vcpu-windows-2025
-
+      SHARD: ${{ matrix.shard }}
     steps:
-      - name: Checkout repository without GITHUB_TOKEN
+      - name: Checkout identical tested source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: pimmink/gsd-pi
+          ref: ${{ env.SOURCE_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Verify exact source
         shell: bash
-        env:
-          FETCH_DEPTH: '1'
         run: |
           set -euo pipefail
-          git init "$GITHUB_WORKSPACE"
-          cd "$GITHUB_WORKSPACE"
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          # The source-revision hash fixtures compare working-tree bytes across
-          # checkouts; runner-default autocrlf would convert them on Windows.
-          git config --global core.autocrlf false
-
-          git -c protocol.version=2 fetch --no-tags --prune --depth="$FETCH_DEPTH" origin \
-            "+${GITHUB_SHA}:refs/checkout-ref"
-          git checkout --force --detach "$GITHUB_SHA"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          printf 'Shard %s/4 tests pimmink/gsd-pi@%s; control=%s\n' "$SHARD" "$SOURCE_SHA" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         with:
           version: 10.12.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '24'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        env:
-          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
-          GSD_SKIP_RTK_INSTALL: '1'
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - uses: ./.github/actions/restore-ci-build-artifacts
-
-      # Build the native engine addon from THIS commit's Rust source so the
-      # Windows-native file-identity/directory-sync code paths are exercised
-      # against real N-API exports, not the stale published engine binary.
-      - name: Setup Rust toolchain (native addon for tests)
-        if: needs.fast-gates.outputs.portability-changed == 'true'
-        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-
-      - name: Cache Rust build (native addon)
-        if: needs.fast-gates.outputs.portability-changed == 'true'
-        uses: Swatinem/rust-cache@f0d9c3887740aee45f6153b24b3a6b815192ec16 # v2
+          node-version: '22'
+      - uses: ./.github/actions/setup-linux-native-build-deps
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          shared-key: native-win32-x64-msvc
-          workspaces: native -> target
-
-      - name: Build native addon from source (test parity)
-        if: needs.fast-gates.outputs.portability-changed == 'true'
-        # Dev profile: faster to compile and the profile the @gsd/native package
-        # tests already use. GSD_NATIVE_PREFER_LOCAL loads gsd_engine.dev.node.
-        run: pnpm run build:native:test
-
-      - name: Build package JS prerequisites for Windows runtime imports
-        if: needs.fast-gates.outputs.portability-changed == 'true'
-        # Test transpilation does not populate workspace dist/ entrypoints.
-        # These TS-only builds are required before @gsd/native/file-identity
-        # imports can run; a Rust addon alone is not the package's JS surface.
-        run: |
-          pnpm run build:pi
-          pnpm --filter @opengsd/rpc-client run build
-          pnpm --filter @opengsd/mcp-server run build
-
-      - name: Typecheck extensions
-        if: needs.fast-gates.outputs.portability-changed == 'true'
-        env:
-          # The extensions type graph OOMs Node's default heap on the Windows
-          # runner (observed on #2677: Ineffective mark-compacts ~33s into tsc).
-          NODE_OPTIONS: '--max-old-space-size=6144'
-        run: pnpm run typecheck:extensions
-
-      - name: Run package tests
-        if: needs.fast-gates.outputs.portability-changed == 'true'
-        env:
-          GSD_NATIVE_PREFER_LOCAL: '1'
-          TEMP: ${{ runner.temp }}
-          TMP: ${{ runner.temp }}
-          TMPDIR: ${{ runner.temp }}
-        run: pnpm run test:packages
-
-      - name: Run Windows portability tests
-        if: needs.fast-gates.outputs.portability-changed == 'true'
-        env:
-          GSD_NATIVE_PREFER_LOCAL: '1'
-        run: >-
-          node --import ./src/resources/extensions/gsd/tests/resolve-ts.mjs
-          --experimental-strip-types --test
-          src/tests/windows-portability.test.ts
-          src/resources/extensions/gsd/tests/validate-directory.test.ts
-          src/tests/integration/web-mode-windows-hide.test.ts
-
-      - name: Run Windows e2e smoke suite (non-blocking)
-        id: windows-smoke-e2e
-        if: needs.fast-gates.outputs.windows-e2e-changed == 'true'
-        timeout-minutes: 10
+          name: auto-recovery-prerequisites
+          path: .fork-ci-prerequisites
+      - name: Restore and verify native prerequisites
         shell: bash
-        continue-on-error: true
-        run: |
-          GSD_SMOKE_BINARY="$(pwd)/dist/loader.js"
-          export GSD_SMOKE_BINARY
-          pnpm run test:e2e:windows-smoke
-
-      - name: Flag Windows e2e smoke failure
-        # continue-on-error keeps this non-blocking, but a silent failure means a
-        # broken Windows loader stays green forever. Surface it as an annotation.
-        if: steps.windows-smoke-e2e.outcome == 'failure'
-        shell: bash
-        run: |
-          echo "::warning title=Windows e2e smoke failed::The non-blocking Windows e2e smoke suite failed. See the e2e-artifacts-windows artifact."
-
-      - name: Upload Windows e2e artifacts on failure
-        if: steps.windows-smoke-e2e.outcome == 'failure'
-        uses: actions/upload-artifact@v7
-        with:
-          name: e2e-artifacts-windows
-          path: test-results/e2e
-          if-no-files-found: ignore
-          retention-days: 7
-
-  # Validate the strictest declared workspace engines floor (currently ">=22.19.0").
-  # The main build/test lanes run on Node 24, so without this lane the supported
-  # minor (22.x) is never exercised. Cheap: reuse the build artifacts and just run
-  # the smoke suite against the built binary on Node 22.
-  node22-smoke:
-    name: node22-smoke
-    timeout-minutes: 15
-    needs: [fast-gates, build]
-    if: needs.fast-gates.outputs.heavy-code-changed == 'true'
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    steps:
-      - name: Checkout repository without GITHUB_TOKEN
-        shell: bash
-        env:
-          FETCH_DEPTH: '1'
         run: |
           set -euo pipefail
-          git init "$GITHUB_WORKSPACE"
-          cd "$GITHUB_WORKSPACE"
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-          git -c protocol.version=2 fetch --no-tags --prune --depth="$FETCH_DEPTH" origin \
-            "+${GITHUB_SHA}:refs/checkout-ref"
-          git checkout --force --detach "$GITHUB_SHA"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
-        with:
-          version: 10.12.1
-
-      - name: Setup Node.js 22 (engines floor)
-        uses: actions/setup-node@v7
-        with:
-          node-version: '22.19.0'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        env:
-          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
-          GSD_SKIP_RTK_INSTALL: '1'
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - uses: ./.github/actions/restore-ci-build-artifacts
-
-      - name: Run smoke suite on Node 22
+          test "$(< .fork-ci-prerequisites/fork-ci-source-sha.txt)" = "$SOURCE_SHA"
+          tar xzf .fork-ci-prerequisites/ci-build-artifacts.tar.gz
+          test -s native/addon/gsd_engine.dev.node
+          node --input-type=commonjs -e "require('./native/addon/gsd_engine.dev.node'); console.log('Native fixture addon loaded:', process.version)"
+      - name: Run real Node file shard with repository loader
         shell: bash
-        env:
-          # Load the from-source native addon restored from ci-build-artifacts
-          # (native/addon/*.node), not the stale published engine binary.
-          GSD_NATIVE_PREFER_LOCAL: '1'
         run: |
-          chmod +x dist/loader.js
-          GSD_SMOKE_BINARY="$(pwd)/dist/loader.js"
-          export GSD_SMOKE_BINARY
-          pnpm run test:smoke
+          set -euo pipefail
+          mkdir -p .fork-ci-results
+          mapfile -t files < <(printf '%s\n' "$TEST_FILES" | grep -v '^$')
+          test "${#files[@]}" -eq 16
+          for file in "${files[@]}"; do test -s "$file"; done
+          # One shared ordered inventory, one disjoint Node shard per job.
+          # No name filtering, fallback loader, mocked native addon or skip flags.
+          node --import ./src/resources/extensions/gsd/tests/resolve-ts.mjs \
+            --experimental-strip-types --test --test-timeout=180000 \
+            --test-concurrency=1 --test-shard="$SHARD/4" --test-reporter=tap \
+            "${files[@]}" | tee ".fork-ci-results/shard-$SHARD.tap"
+      - name: Record counts and reject empty/skipped/cancelled/TODO coverage
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .fork-ci-results
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const shard = Number(process.env.SHARD);
+          const tap = readFileSync(`.fork-ci-results/shard-${shard}.tap`, 'utf8');
+          const counts = {};
+          for (const key of ['tests', 'pass', 'fail', 'cancelled', 'skipped', 'todo']) {
+            const matches = [...tap.matchAll(new RegExp(`^# ${key} (\\d+)\\s*$`, 'gm'))];
+            assert.ok(matches.length, `missing TAP total: ${key}`);
+            counts[key] = Number(matches.at(-1)[1]);
+          }
+          const files = process.env.TEST_FILES.trim().split('\n');
+          const result = { sourceSha: process.env.SOURCE_SHA, controlSha: process.env.GITHUB_SHA,
+            shard, shards: 4, inventoryFiles: files, plannedFilesPerShard: 4,
+            nodeVersion: process.version, counts };
+          writeFileSync(`.fork-ci-results/shard-${shard}.json`, JSON.stringify(result, null, 2) + '\n');
+          console.log(JSON.stringify(result));
+          assert.ok(counts.tests > 0, 'empty test shard');
+          for (const key of ['fail', 'cancelled', 'skipped', 'todo']) assert.equal(counts[key], 0, key);
+          assert.equal(counts.pass, counts.tests, 'all counted tests must pass');
+          NODE
+      - name: Upload per-shard evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: auto-recovery-results-${{ matrix.shard }}
+          path: .fork-ci-results/
+          include-hidden-files: true # Scoped directory contains only generated TAP/JSON.
+          if-no-files-found: error
+          retention-days: 2
 
-      - name: Verify SQLite close behavior on Node 22
-        run: >-
-          node --import ./src/resources/extensions/gsd/tests/resolve-ts.mjs
-          --experimental-strip-types --test
-          src/resources/extensions/gsd/tests/db-provider.test.ts
-
-  # Single aggregate gate. Make THIS the only required status check in branch
-  # protection. Because it always runs, branch protection always has a concrete
-  # pass/fail signal — a conditionally-skipped `build`/`windows-portability` job
-  # can no longer read as a neutral "required check never reported" state.
-  workflow-lint:
-    name: workflow-lint
+  focused-gate:
+    if: always() && github.repository == 'pimmink/gsd-pi'
+    needs: [prerequisites, focused-tests]
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    env:
+      PREREQUISITES_RESULT: ${{ needs.prerequisites.result }}
+      TESTS_RESULT: ${{ needs.focused-tests.result }}
     steps:
-      - name: Checkout repository without GITHUB_TOKEN
-        shell: bash
-        env:
-          FETCH_DEPTH: '0'
-        run: |
-          set -euo pipefail
-          git init "$GITHUB_WORKSPACE"
-          cd "$GITHUB_WORKSPACE"
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git -c protocol.version=2 fetch --no-tags --prune origin \
-            "+${GITHUB_SHA}:refs/checkout-ref"
-          git checkout --force --detach "$GITHUB_SHA"
-
-      - name: Run actionlint
-        run: |
-          set -euo pipefail
-          # Pinned: actionlint is the static-analysis gate for GitHub Actions
-          # workflows; runner-label exceptions live in actionlint.yaml.
-          ACTIONLINT_VERSION=v1.7.7
-          curl -sSfL "https://github.com/rhysd/actionlint/releases/download/${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION#v}_linux_amd64.tar.gz" \
-            | tar -xz -C /usr/local/bin actionlint
-          actionlint -config-file .config/actionlint.yaml
-
-  ci-gate:
-    name: ci-gate
-    if: always()
-    needs: [fast-gates, build, windows-portability, node22-smoke, workflow-lint]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Assert no upstream job failed or was cancelled
-        env:
-          FAST_GATES: ${{ needs.fast-gates.result }}
-          BUILD: ${{ needs.build.result }}
-          WINDOWS: ${{ needs.windows-portability.result }}
-          NODE22: ${{ needs.node22-smoke.result }}
-          WORKFLOW_LINT: ${{ needs.workflow-lint.result }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: auto-recovery-results-*
+          merge-multiple: true
+          path: .fork-ci-results
+      - name: Require all four source-bound shards and report focused coverage totals
         shell: bash
         run: |
           set -euo pipefail
-          echo "fast-gates=$FAST_GATES build=$BUILD windows-portability=$WINDOWS node22-smoke=$NODE22 workflow-lint=$WORKFLOW_LINT"
-          # 'skipped' is an acceptable result (job legitimately not needed).
-          # Only 'failure' / 'cancelled' must block the merge.
-          status=0
-          for result in "$FAST_GATES" "$BUILD" "$WINDOWS" "$NODE22" "$WORKFLOW_LINT"; do
-            case "$result" in
-              success|skipped) ;;
-              *) status=1 ;;
-            esac
-          done
-          if [ "$status" -ne 0 ]; then
-            echo "::error title=CI gate failed::One or more required CI jobs failed or were cancelled."
-            exit 1
-          fi
-          echo "All required CI jobs passed (or were legitimately skipped)."
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { appendFileSync, readFileSync } from 'node:fs';
+          const files = process.env.TEST_FILES.trim().split('\n');
+          assert.equal(files.length, 16);
+          assert.equal(new Set(files).size, 16);
+          const totals = { tests: 0, pass: 0, fail: 0, cancelled: 0, skipped: 0, todo: 0 };
+          for (let shard = 1; shard <= 4; shard++) {
+            const result = JSON.parse(readFileSync(`.fork-ci-results/shard-${shard}.json`, 'utf8'));
+            assert.equal(result.sourceSha, process.env.SOURCE_SHA);
+            assert.equal(result.controlSha, process.env.GITHUB_SHA);
+            assert.equal(result.shard, shard);
+            assert.equal(result.shards, 4);
+            assert.equal(result.plannedFilesPerShard, 4);
+            assert.match(result.nodeVersion, /^v22\./);
+            assert.deepEqual(result.inventoryFiles, files);
+            assert.ok(result.counts.tests > 0);
+            for (const key of Object.keys(totals)) {
+              assert.ok(Number.isSafeInteger(result.counts[key]) && result.counts[key] >= 0, key);
+              totals[key] += result.counts[key];
+            }
+          }
+          const summary = `## Focused auto-recovery evidence\n\nTested source: pimmink/gsd-pi@${process.env.SOURCE_SHA}\n\nWorkflow-control SHA (not tested source): ${process.env.GITHUB_SHA}\n\nInventory: 16 files; 4 disjoint Node file shards (4 files each).\n\nTAP totals: ${JSON.stringify(totals)}\n\nThis is focused regression coverage, not full-suite or code-percentage coverage.\n`;
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
+          console.log(summary);
+          assert.equal(process.env.PREREQUISITES_RESULT, 'success');
+          assert.equal(process.env.TESTS_RESULT, 'success');
+          for (const key of ['fail', 'cancelled', 'skipped', 'todo']) assert.equal(totals[key], 0, key);
+          assert.equal(totals.pass, totals.tests);
+          NODE
