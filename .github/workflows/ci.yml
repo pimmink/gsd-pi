@@ -1,4 +1,4 @@
-# TEMPLATE ONLY: replace 0c8111febff42b766a63d5b3a19f1299693d0048 with the reviewed 40-character fork commit.
+# TEMPLATE ONLY: replace 00646327e2893bb7090e3dfe012fadfb90ed1ebc with the reviewed 40-character fork commit.
 # Install as EXISTING .github/workflows/ci.yml on a fork-only CI-control branch.
 # workflow-control github.sha is NOT the tested source revision.
 name: Fork auto-recovery focused CI
@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SOURCE_SHA: '0c8111febff42b766a63d5b3a19f1299693d0048'
+  SOURCE_SHA: '00646327e2893bb7090e3dfe012fadfb90ed1ebc'
   EXPECTED_TEST_FILE_COUNT: '24'
   GSD_NATIVE_PREFER_LOCAL: '1'
   RUSTFLAGS: '-C target-cpu=x86-64'
