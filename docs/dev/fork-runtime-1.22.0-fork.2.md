@@ -12,6 +12,8 @@ Upstream MiniMax generation and newer engine identity tests are retained. Readin
 
 ## Verification and package provenance
 
+The first online run passed 17,468 unit tests but failed the cleanup hook of the upstream state-directory copy-permission test. Its copied fixture retained read-only permissions after the source permissions were restored. The fixture now restores both directories only after the real production copy/source-cleanup path runs; production behavior and assertions are unchanged. Node's `rmSync({ force: true })` ignores missing paths, not permission failures. The existing test and its cleanup provide the regression check; the changed source must pass a fresh online gate before packaging or installation.
+
 Builds, native compilation, extension typechecking, the complete unit suite, lifecycle shadow gate, web build and release packaging run online against the frozen source SHA. The release archive must contain `dist/fork-release.json` and this release manifest; its separately recorded checksum must match the verified workflow artifact. The workflow control SHA is not the tested source SHA.
 
 The generated `web/next-env.d.ts` root-parameter import is retained so the online web build and packaging guard can verify that tracked source remains unchanged. No local production build or dependency regeneration is required.
