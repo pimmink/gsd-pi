@@ -520,8 +520,13 @@ test("a state-directory move whose source cleanup fails still succeeds with the 
   chmodSync(join(from, "locked"), 0o500);
   try {
     assert.doesNotThrow(() => moveStateDirectory(from, to));
+    assert.equal(existsSync(join(from, "locked", "entry")), true, "source cleanup must have failed");
   } finally {
-    chmodSync(join(from, "locked"), 0o700);
+    // Node 24 also preserves the read-only directory mode in the copy.
+    for (const directory of [from, to]) {
+      const locked = join(directory, "locked");
+      if (existsSync(locked)) chmodSync(locked, 0o700);
+    }
   }
   assert.equal(readFileSync(join(to, "gsd.db"), "utf8"), "db");
   assert.equal(readFileSync(join(to, "locked", "entry"), "utf8"), "x");
