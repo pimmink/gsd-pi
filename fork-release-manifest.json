@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "version": "1.22.0-fork.2",
+  "version": "1.22.0-fork.3",
   "upstreamRepository": "open-gsd/gsd-pi",
-  "upstreamBase": "c6e8f8990b9fdf1c8af0c9d176c3eb5f3344a114",
-  "previousRuntimeVersion": "1.22.0-fork.1",
-  "previousIntegrationSource": "e01e57a32ce6d51e6e3bf3775cdef8cb9d83c199",
+  "upstreamBase": "2bc28833b3da58f5a5958d02a2b7e0cf202b60ac",
+  "previousRuntimeVersion": "1.22.0-fork.2",
+  "previousIntegrationSource": "3c2ee92d45fc34337a1cd8c561bf3d284128fd77",
   "retainedIntentGroupsAudited": 6,
   "retainedIntentCommits": [
     "ccad185b04fa",
