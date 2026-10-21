@@ -1,6 +1,6 @@
 {
   "name": "@opengsd/mcp-server",
-  "version": "1.22.0-fork.3",
+  "version": "1.22.0-fork.4",
   "description": "MCP server exposing GSD orchestration tools for compatible clients",
   "license": "MIT",
   "gsd": {

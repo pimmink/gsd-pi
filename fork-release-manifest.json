@@ -1,11 +1,14 @@
 {
   "schemaVersion": 1,
-  "version": "1.22.0-fork.3",
+  "version": "1.22.0-fork.4",
   "upstreamRepository": "open-gsd/gsd-pi",
-  "upstreamBase": "2bc28833b3da58f5a5958d02a2b7e0cf202b60ac",
-  "previousRuntimeVersion": "1.22.0-fork.2",
-  "previousIntegrationSource": "3c2ee92d45fc34337a1cd8c561bf3d284128fd77",
-  "retainedIntentGroupsAudited": 6,
+  "upstreamBase": "7652990959594bbec2b19751236d8aba1ca8ad5c",
+  "previousRuntimeVersion": "1.22.0-fork.3",
+  "previousIntegrationSource": "c8db76350",
+  "retainedIntentGroupsAudited": 9,
+  "reviewedUnmergedPullRequestsRetained": [2684, 2735, 2858, 2951],
+  "supersededImplementation": { "pullRequest": 2948, "upstreamReplacement": 2962 },
+  "mergedUpstreamRefresh": [2962, 2963, 2965, 2970, 2971, 2972, 2975],
   "retainedIntentCommits": [
     "ccad185b04fa",
     "4b28db60bf41",
@@ -22,14 +25,19 @@
     "Copilot-only generator reasoning-family rules with positive and negative provider guards",
     "ADR-012 transport-specific capability exception with regression coverage",
     "Numeric personal-fork releases reuse stable native engine dependencies",
-    "GitHub-hosted runner fallback for the personal fork only"
+    "GitHub-hosted runner fallback for the personal fork only",
+    "Verified seven-model Copilot serving limits, Responses routing and effort maps; fork provider guards remain stronger than unqualified family matching",
+    "Graphify preserves caller read/write scope and bounded non-sensitive source evidence",
+    "Recovery guidance preserves persisted prose as diagnostic-only input and distinguishes bare recover from one repaired Task continuation"
   ],
   "upstreamReplacementsNotReplayed": [
     "Provider readiness probe isolation and cache clocks from merged upstream",
     "Stronger upstream engine identity tests retained with additional numeric-fork cases",
     "MiniMax model generator behavior retained from upstream",
     "Merged native blocker commands and MCP resolve-blocker test registration",
-    "Existing upstream transport, lifecycle and output recovery improvements"
+    "Existing upstream transport, lifecycle and output recovery improvements",
+    "Use upstream #2962 inspect context and clear-only guidance exactly once; retain the fork repeated-inspection revision assertion",
+    "Use upstream #2971 GPT-6 normalizer after ingestion and alias synthesis, before thinking metadata"
   ],
   "excludedUnmergedPullRequests": [2920],
   "nativeEngineVersion": "1.22.0",
