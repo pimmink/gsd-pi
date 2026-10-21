@@ -1,0 +1,66 @@
+{
+  "U": {
+    "number": 2953,
+    "id": "5960980552",
+    "url": "https://github.com/open-gsd/gsd-pi/issues/2953",
+    "title": "[RFC/Umbrella]: Evaluate optional source-bound code context for GSD agents and MCP",
+    "bodySha256": "8622d9e05c59e1d974a4decc6e00e2788103ec5b2af181346fd7c5246090e75b",
+    "state": "open"
+  },
+  "C01": {
+    "number": 2954,
+    "id": "5961059433",
+    "url": "https://github.com/open-gsd/gsd-pi/issues/2954",
+    "title": "[Docs]: Clarify native, memory, workflow and external graph contracts",
+    "bodySha256": "b674a62440e54a0418e15cf83e29cd52f84412ed6429bb990f1551e51ded1bb0",
+    "state": "open"
+  },
+  "C02": {
+    "number": 2955,
+    "id": "5961059737",
+    "url": "https://github.com/open-gsd/gsd-pi/issues/2955",
+    "title": "[Design/Feature]: Define the bounded optional code-context contract and approved seam",
+    "bodySha256": "cc582f7595f68a755bc6d5dc4bde73243074545f68bc04921cc82e053d61a0b0",
+    "state": "open"
+  },
+  "C03": {
+    "number": 2956,
+    "id": "5961060102",
+    "url": "https://github.com/open-gsd/gsd-pi/issues/2956",
+    "title": "[Feature]: Evaluate Graphify feasibility and the approved opt-in reference route",
+    "bodySha256": "05f17051c5e139ab85a9eebaccec4e58f1b022009e0dd952b02a0d3dc8f949d7",
+    "state": "open"
+  },
+  "C04": {
+    "number": 2957,
+    "id": "5961073179",
+    "url": "https://github.com/open-gsd/gsd-pi/issues/2957",
+    "title": "[Feature]: Expose approved code-context reads through the selected MCP route",
+    "bodySha256": "d65d74434d689046f37c4928f4e0d1b7575e2f447ed617d4fe699004bfa1cbfa",
+    "state": "open"
+  },
+  "C05": {
+    "number": 2958,
+    "id": "5961073598",
+    "url": "https://github.com/open-gsd/gsd-pi/issues/2958",
+    "title": "[Proposal]: Compose task-scoped code context only after a demonstrated pilot gap",
+    "bodySha256": "7fd4fd8eb0649d8afd5c19f715471567a5c4866e5b652a27a898a4f9ede20e42",
+    "state": "open"
+  },
+  "C06": {
+    "number": 2959,
+    "id": "5961073981",
+    "url": "https://github.com/open-gsd/gsd-pi/issues/2959",
+    "title": "[Proposal]: Add only demonstrated code-context diagnostic gaps",
+    "bodySha256": "03981a2e665e9fcd48ff053caaa9254ffc2e5214c5a3013898f58955d0d63c24",
+    "state": "open"
+  },
+  "C07": {
+    "number": 2960,
+    "id": "5961074452",
+    "url": "https://github.com/open-gsd/gsd-pi/issues/2960",
+    "title": "[Validation]: Verify provider, package and selected-host code-context adoption",
+    "bodySha256": "1f4fb692ef51d5f40fdd43457534c7475c4cf26849fa03557709486f1fffedeb",
+    "state": "open"
+  }
+}

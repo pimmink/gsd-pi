@@ -1,0 +1,146 @@
+{
+  "version": 2,
+  "verified": true,
+  "verifiedAt": "2026-10-21T13:30:38.084157+00:00",
+  "sourceRevision": "ee286ce386f79acc240e7fbbe10ece892cedc534",
+  "issues": [
+    {
+      "alias": "U",
+      "number": 2953,
+      "id": "5960980552",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2953",
+      "title": "[RFC/Umbrella]: Build on GSD's existing Graphify workflow with optional source-bound code context",
+      "state": "open",
+      "bodySha256": "9a48ef8297e2b0d1af0b945a8db998011952d863786ea29a67b2defdaa46f982",
+      "bodyBytes": 19429,
+      "apiUpdatedAtAtReadback": "2026-10-21T13:28:05Z",
+      "labels": [
+        "documentation",
+        "enhancement",
+        "needs-triage"
+      ]
+    },
+    {
+      "alias": "C01",
+      "number": 2954,
+      "id": "5961059433",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2954",
+      "title": "[Docs]: Clarify native, memory, workflow and external graph contracts",
+      "state": "open",
+      "bodySha256": "37bd50a000a8ff54f70612e7eca56b8cb46b659518be889091fa2504d954a616",
+      "bodyBytes": 13907,
+      "apiUpdatedAtAtReadback": "2026-10-21T13:28:32Z",
+      "labels": [
+        "documentation",
+        "ready-for-agent"
+      ]
+    },
+    {
+      "alias": "C02",
+      "number": 2955,
+      "id": "5961059737",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2955",
+      "title": "[Design/Feature]: Define the bounded optional code-context contract and approved seam",
+      "state": "open",
+      "bodySha256": "40f38be9043407201f2c3ff0fb41739fedc7e25a7776360afa384705c9409710",
+      "bodyBytes": 15776,
+      "apiUpdatedAtAtReadback": "2026-10-21T13:28:10Z",
+      "labels": [
+        "documentation",
+        "enhancement",
+        "needs-triage"
+      ]
+    },
+    {
+      "alias": "C03",
+      "number": 2956,
+      "id": "5961060102",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2956",
+      "title": "[Feature]: Evaluate Graphify feasibility and the approved opt-in reference route",
+      "state": "open",
+      "bodySha256": "c7f2c5d127f7d28c5128bc5cad8b5f89e4c6e4021fbc78faf074a616fa79e114",
+      "bodyBytes": 16713,
+      "apiUpdatedAtAtReadback": "2026-10-21T13:28:39Z",
+      "labels": [
+        "enhancement",
+        "question",
+        "ready-for-agent"
+      ]
+    },
+    {
+      "alias": "C04",
+      "number": 2957,
+      "id": "5961073179",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2957",
+      "title": "[Feature]: Expose approved code-context reads through the selected MCP route",
+      "state": "open",
+      "bodySha256": "5f297fd6873cf1d71be9d9609608a7cbc6566a415c2794890857e8119a929c5b",
+      "bodyBytes": 13875,
+      "apiUpdatedAtAtReadback": "2026-10-21T13:28:40Z",
+      "labels": [
+        "documentation",
+        "enhancement",
+        "needs-triage"
+      ]
+    },
+    {
+      "alias": "C05",
+      "number": 2958,
+      "id": "5961073598",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2958",
+      "title": "[Proposal]: Compose task-scoped code context only after a demonstrated pilot gap",
+      "state": "open",
+      "bodySha256": "ef4249b1af317d9e46061f11bb85de1095a62ee0995803b328cda386cedbb48c",
+      "bodyBytes": 14736,
+      "apiUpdatedAtAtReadback": "2026-10-21T13:28:42Z",
+      "labels": [
+        "documentation",
+        "enhancement",
+        "needs-triage"
+      ]
+    },
+    {
+      "alias": "C06",
+      "number": 2959,
+      "id": "5961073981",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2959",
+      "title": "[Proposal]: Add only demonstrated code-context diagnostic gaps",
+      "state": "open",
+      "bodySha256": "9b53fc0ab22a383780ac9bf759db6500f64f239554960a7e119c93a848e2ffc7",
+      "bodyBytes": 13253,
+      "apiUpdatedAtAtReadback": "2026-10-21T13:28:45Z",
+      "labels": [
+        "documentation",
+        "enhancement",
+        "needs-triage"
+      ]
+    },
+    {
+      "alias": "C07",
+      "number": 2960,
+      "id": "5961074452",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2960",
+      "title": "[Validation]: Verify provider, package and selected-host code-context adoption",
+      "state": "open",
+      "bodySha256": "b8ee36245f68d6e558bfd38827b708cf740beb90b56761406b0ebd5777080314",
+      "bodyBytes": 14997,
+      "apiUpdatedAtAtReadback": "2026-10-21T13:28:47Z",
+      "labels": [
+        "documentation",
+        "tech-debt",
+        "needs-triage"
+      ]
+    }
+  ],
+  "allEightOpen": true,
+  "allExactBodyTitleIdentityChecks": true,
+  "unresolvedPlaceholders": 0,
+  "agentOptimizedTopBanners": 8,
+  "nativeHierarchy": {
+    "verifiedAllSeven": false,
+    "actualNativeNumbers": [],
+    "status": "not-established",
+    "reason": "Existing/readable parent-child native add returned HTTP404 through MCP and bounded REST fallback; exact access/capability cause not established. Seven Markdown child/sibling links verified; maintainer action required for native relation."
+  },
+  "scope": "Publication and source-grounded agent handoff only; not provider/code implementation or maintainer approval."
+}

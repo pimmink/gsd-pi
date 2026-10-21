@@ -1,0 +1,10 @@
+## Publication receipt — 2026-10-21
+
+| Observed publication fact | Result |
+| --- | --- |
+| Created and independently read back | One umbrella and seven children, all OPEN at verification |
+| Navigation | The work-package table and sibling references use actual published issue URLs |
+| Native sub-issue relation | **Not established**; the readable native child list was empty after the attempted add |
+
+> [!WARNING]
+> GitHub rejected the native add for the existing/readable parent and C01 child with HTTP 404, through both GitHub MCP and a bounded authorized REST fallback. Identical retries were stopped; no token/permission escalation or existing-parent replacement was attempted. The exact access/capability cause is not established. A repository-authorized maintainer must verify or attach the native relation. Until then, use the explicit child links above; do not assume GitHub's native hierarchy is complete.

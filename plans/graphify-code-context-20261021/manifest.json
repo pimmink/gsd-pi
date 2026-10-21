@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "repository": "open-gsd/gsd-pi",
+  "sourceRevision": "ee286ce386f79acc240e7fbbe10ece892cedc534",
+  "publicationAuthorizedBy": "Current operator prompt: review completed packet once more, then open umbrella and all child issues. No maintainer implementation approval inferred.",
+  "reviewGate": {
+    "status": "PASS",
+    "architectureRun": "54d571e0-2ddf-4ff0-9a5d-5f74c4a3c1ea",
+    "evidenceFollowupRun": "6a9d9562-40da-4051-90da-8fcb4de04c6f",
+    "blockingC05Finding": "Resolved; applicable base-route C07-B pilot checkpoint plus post-pilot demand decision, not whole C07 closure.",
+    "artifactValidation": ".gsd/exec/1e394b1c-ef50-45a9-8663-179f1aacfd87.meta.json"
+  },
+  "packetSha256": "71aca2a1dc05d2f7f1288cbda220d05f2b915307c5e3cd29ec21f9e1c808c816",
+  "issues": {
+    "U": {
+      "title": "[RFC/Umbrella]: Evaluate optional source-bound code context for GSD agents and MCP",
+      "file": "U.md",
+      "sha256": "395a04de3f5baa4f3d5e538c91a477b2e2cae0454d6b494a9c55f2ad1ac4614e"
+    },
+    "C01": {
+      "title": "[Docs]: Clarify native, memory, workflow and external graph contracts",
+      "file": "C01.md",
+      "sha256": "394baa6d495c61ccb25c8c70695f3ec8d4ea112519ce05c06ed44e5f47be1ea8"
+    },
+    "C02": {
+      "title": "[Design/Feature]: Define the bounded optional code-context contract and approved seam",
+      "file": "C02.md",
+      "sha256": "81ba8893891a00c60f8a889011916268d8a6852ab69045c270c3a009e4958caa"
+    },
+    "C03": {
+      "title": "[Feature]: Evaluate Graphify feasibility and the approved opt-in reference route",
+      "file": "C03.md",
+      "sha256": "1468186cdf2bf733b70eabee2718d53a83f099fcb0d53db642cfa8e9fad757b9"
+    },
+    "C04": {
+      "title": "[Feature]: Expose approved code-context reads through the selected MCP route",
+      "file": "C04.md",
+      "sha256": "eebbdfd8c67c2f1d436704ab6ecf19e005377adc48f173115553f2c78395ef0d"
+    },
+    "C05": {
+      "title": "[Proposal]: Compose task-scoped code context only after a demonstrated pilot gap",
+      "file": "C05.md",
+      "sha256": "8ee068b6dd1b5753afb9f3ea4bbd514a268ef22b6e54e6cd445d40bf20338dc6"
+    },
+    "C06": {
+      "title": "[Proposal]: Add only demonstrated code-context diagnostic gaps",
+      "file": "C06.md",
+      "sha256": "1308426fb488a2921aead3d0b5ffd4c851fe15b5d04dae2ad0782e180f941712"
+    },
+    "C07": {
+      "title": "[Validation]: Verify provider, package and selected-host code-context adoption",
+      "file": "C07.md",
+      "sha256": "170ac8addbcee5a5a64d493a44b25f0e5049c38fc9ae4ea42449dc0380cf50ee"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "version": "3.1",
+  "bytes": 147125,
+  "lines": 1391,
+  "sha256": "9623da0b5bf05dbcccc466743982331a4b5b6b2dd0f52b129f57bbb3025fed9d",
+  "originalSha256": "0479800bf880a44e148527582be457dd46cd0351fb29cab10b518ba24f019db4",
+  "bodyContracts": 8,
+  "downloadAndArtifactEqual": true,
+  "nativeHierarchyEstablished": false
+}

@@ -1,0 +1,79 @@
+{
+  "reviewGate": "PASS",
+  "repository": "open-gsd/gsd-pi",
+  "note": "Final sibling URLs only; U additionally records verified native-add HTTP404 and no native hierarchy claim. Guard existing bodies against concurrent human edits.",
+  "issues": {
+    "U": {
+      "number": 2953,
+      "id": "5960980552",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2953",
+      "title": "[RFC/Umbrella]: Evaluate optional source-bound code context for GSD agents and MCP",
+      "file": "rendered/U.md",
+      "sha256": "8622d9e05c59e1d974a4decc6e00e2788103ec5b2af181346fd7c5246090e75b",
+      "expectedBeforeSha256": "66129c4d7ba298bf6260db26c2a2d07dd6fb9065800f4d7467fa83b25c677b74"
+    },
+    "C01": {
+      "number": 2954,
+      "id": 5961059433,
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2954",
+      "title": "[Docs]: Clarify native, memory, workflow and external graph contracts",
+      "file": "rendered/C01.md",
+      "sha256": "b674a62440e54a0418e15cf83e29cd52f84412ed6429bb990f1551e51ded1bb0",
+      "expectedBeforeSha256": "4b90ff523dd9b3e78eb2686ff9b3824fc2391bab8809f796c84ee7ee2b52b409"
+    },
+    "C02": {
+      "number": 2955,
+      "id": 5961059737,
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2955",
+      "title": "[Design/Feature]: Define the bounded optional code-context contract and approved seam",
+      "file": "rendered/C02.md",
+      "sha256": "cc582f7595f68a755bc6d5dc4bde73243074545f68bc04921cc82e053d61a0b0",
+      "expectedBeforeSha256": "7da3b0bc569fbfd527b548ae017c359408b784ed309045e31287cca3230cdbbf"
+    },
+    "C03": {
+      "number": 2956,
+      "id": 5961060102,
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2956",
+      "title": "[Feature]: Evaluate Graphify feasibility and the approved opt-in reference route",
+      "file": "rendered/C03.md",
+      "sha256": "05f17051c5e139ab85a9eebaccec4e58f1b022009e0dd952b02a0d3dc8f949d7",
+      "expectedBeforeSha256": "1a002e05812cd3f175576bc641ba8069b7f17365303c60e3c59f1374634e0ee8"
+    },
+    "C04": {
+      "number": 2957,
+      "id": "5961073179",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2957",
+      "title": "[Feature]: Expose approved code-context reads through the selected MCP route",
+      "file": "rendered/C04.md",
+      "sha256": "d65d74434d689046f37c4928f4e0d1b7575e2f447ed617d4fe699004bfa1cbfa",
+      "expectedBeforeSha256": "b6615a5d58562273fced630cd9e8d0022fa326b87cf5193fe40e55439c6d93b8"
+    },
+    "C05": {
+      "number": 2958,
+      "id": "5961073598",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2958",
+      "title": "[Proposal]: Compose task-scoped code context only after a demonstrated pilot gap",
+      "file": "rendered/C05.md",
+      "sha256": "7fd4fd8eb0649d8afd5c19f715471567a5c4866e5b652a27a898a4f9ede20e42",
+      "expectedBeforeSha256": "73e4ad2cee833501ec61c1e24e81cf6759a4a546923682228ca16838ce86edda"
+    },
+    "C06": {
+      "number": 2959,
+      "id": "5961073981",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2959",
+      "title": "[Proposal]: Add only demonstrated code-context diagnostic gaps",
+      "file": "rendered/C06.md",
+      "sha256": "03981a2e665e9fcd48ff053caaa9254ffc2e5214c5a3013898f58955d0d63c24",
+      "expectedBeforeSha256": "b9ace5ce3f060ec73b8b3560d537ab1b455683ed17a1b8f0355c4bd50787a099"
+    },
+    "C07": {
+      "number": 2960,
+      "id": "5961074452",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2960",
+      "title": "[Validation]: Verify provider, package and selected-host code-context adoption",
+      "file": "rendered/C07.md",
+      "sha256": "1f4fb692ef51d5f40fdd43457534c7475c4cf26849fa03557709486f1fffedeb",
+      "expectedBeforeSha256": "4dc722c10767a22b07b6329010537a5a098be365f3c1a209f0ba6aa2c0ed51e1"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "parent": 2953,
+  "primary": "github.sub_issue_write(add) returned HTTP 404 for C01; direct parent/child issues are readable.",
+  "fallback": "D278-authorized bounded gh REST read/add; no permission or token escalation.",
+  "attempts": [
+    {
+      "alias": "C01",
+      "number": 2954,
+      "result": "refused",
+      "status": "404",
+      "message": "Not Found"
+    }
+  ],
+  "initialNativeNumbers": [],
+  "status": "native-attachment-unavailable",
+  "actualNativeNumbers": [],
+  "verifiedAllSeven": false
+}

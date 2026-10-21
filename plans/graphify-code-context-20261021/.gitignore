@@ -1,0 +1,12 @@
+# Local transport evidence may contain machine-specific command paths.
+# Public-safe current issue identities and verification live in publication.json.
+publication-U.json
+publication-A.json
+publication-B.json
+final-update-A.json
+final-update-B.json
+agent-handoff-v2-update-A.json
+agent-handoff-v2-update-B.json
+publication-drafts/
+initial-links.json
+download-original.json

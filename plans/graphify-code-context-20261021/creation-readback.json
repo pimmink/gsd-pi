@@ -1,0 +1,62 @@
+{
+  "issues": [
+    {
+      "alias": "U",
+      "number": 2953,
+      "state": "open",
+      "id": "5960980552",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2953"
+    },
+    {
+      "alias": "C01",
+      "number": 2954,
+      "state": "open",
+      "id": "5961059433",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2954"
+    },
+    {
+      "alias": "C02",
+      "number": 2955,
+      "state": "open",
+      "id": "5961059737",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2955"
+    },
+    {
+      "alias": "C03",
+      "number": 2956,
+      "state": "open",
+      "id": "5961060102",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2956"
+    },
+    {
+      "alias": "C04",
+      "number": 2957,
+      "state": "open",
+      "id": "5961073179",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2957"
+    },
+    {
+      "alias": "C05",
+      "number": 2958,
+      "state": "open",
+      "id": "5961073598",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2958"
+    },
+    {
+      "alias": "C06",
+      "number": 2959,
+      "state": "open",
+      "id": "5961073981",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2959"
+    },
+    {
+      "alias": "C07",
+      "number": 2960,
+      "state": "open",
+      "id": "5961074452",
+      "url": "https://github.com/open-gsd/gsd-pi/issues/2960"
+    }
+  ],
+  "allEightOpen": true,
+  "kind": "pre-final-link readback, not feature delivery"
+}
