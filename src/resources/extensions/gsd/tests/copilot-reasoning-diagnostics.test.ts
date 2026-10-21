@@ -89,7 +89,7 @@ test("offline reasoning diagnostics preserve working transports and guard ignore
     assert.equal((payload.reasoning as Record<string, unknown>).effort, "high");
   });
   await t.test("disabled Completions effort is neither selectable nor sent", async () => {
-    for (const id of ["gpt-6-astra", "gpt-6-luna", "claude-fable-5"] as const) {
+    for (const id of ["kimi-k3", "gemini-3.6-flash", "claude-fable-5"] as const) {
       const model = getModel("github-copilot", id);
       assertModelApi(model, "openai-completions");
       assert.deepEqual(getSupportedThinkingLevels(model), ["off"]);
@@ -100,7 +100,7 @@ test("offline reasoning diagnostics preserve working transports and guard ignore
     }
   });
   await t.test("explicit custom compatibility remains usable", async () => {
-    const model = getModel("github-copilot", "gpt-6-astra");
+    const model = getModel("github-copilot", "kimi-k3");
     assertModelApi(model, "openai-completions");
     const custom = {
       ...model, thinkingLevelMap: { xhigh: "xhigh" },

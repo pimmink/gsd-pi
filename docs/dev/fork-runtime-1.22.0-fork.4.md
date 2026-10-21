@@ -17,7 +17,7 @@ The blocker command/inspection and command tests use upstream's implementation, 
 
 The first combined catalog test exposed three stale Completions fixtures that still selected now-Responses GPT-6 models. The reviewed #2684 fixtures now use real Completions IDs, preserving the original boundary assertion rather than weakening it.
 
-Focused checks on the integrated source passed 105 pi-ai tests, 42 catalog/overlay tests, and the pi-ai no-emit typecheck. Additional native authority/recovery and Graphify checks, exact-source online CI/package verification, and runtime installation evidence are recorded separately by the operator session; this source document does not claim those future gates passed.
+Focused checks on the integrated source passed 105 pi-ai tests, 42 catalog/overlay tests, 79 native authority/recovery/Graphify tests, and the pi-ai no-emit typecheck. The first online run (`39664079391`) reached extension typechecking and correctly rejected two additional fork diagnostics fixtures that still assumed GPT-6 used Completions. Those fixtures now select actual declared Completions models, without casts, suppressions, or weakened wire assertions. Their offline diagnostics suite passes 11 tests and the full extension no-emit typecheck passes. The next exact-source online CI/package gate and runtime installation remain separate proofs; this source document does not claim their success.
 
 ## Packaging and activation boundary
 
