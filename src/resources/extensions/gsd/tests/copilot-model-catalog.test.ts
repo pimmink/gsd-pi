@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { getModels, getSupportedThinkingLevels } from "../../../../../packages/pi-ai/src/models.js";
+import { getModel, getModels, getSupportedThinkingLevels } from "../../../../../packages/pi-ai/src/models.js";
 import { streamSimpleOpenAICompletions } from "../../../../../packages/pi-ai/src/providers/openai-completions.js";
 import type { Api, Model } from "../../../../../packages/pi-ai/src/types.js";
 import {
@@ -533,11 +533,15 @@ test("a static Completions model stays disabled without live evidence but accept
 });
 
 test("unknown-only live endpoints do not enable static Completions effort compatibility", async () => {
+  const completionsFixture = getModel("github-copilot", "kimi-k3");
+  assert.equal(completionsFixture.api, "openai-completions");
+  assert.equal(completionsFixture.reasoning, true);
+
   for (const evidence of [
     { supported_reasoning_efforts: ["high"] },
     { capabilities: { supports: { reasoning_effort: true } } },
   ]) {
-    const record = normalizedRecord("gpt-6-astra", {
+    const record = normalizedRecord(completionsFixture.id, {
       supported_endpoints: ["/embeddings"],
       ...evidence,
     });
@@ -550,7 +554,7 @@ test("unknown-only live endpoints do not enable static Completions effort compat
     assert.equal((await captureCompletionsPayload(model, "high")).reasoning_effort, undefined);
   }
 
-  const recognized = normalizedRecord("gpt-6-astra", {
+  const recognized = normalizedRecord(completionsFixture.id, {
     supported_endpoints: ["/embeddings", "/chat/completions"],
     supported_reasoning_efforts: ["high"],
   });
