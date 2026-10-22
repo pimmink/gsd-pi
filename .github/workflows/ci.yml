@@ -439,6 +439,7 @@ jobs:
     name: fork-runtime-package
     needs: [build, ci-gate]
     if: >-
+      !cancelled() &&
       github.repository == 'pimmink/gsd-pi' &&
       startsWith(github.ref, 'refs/heads/release/runtime-') &&
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
