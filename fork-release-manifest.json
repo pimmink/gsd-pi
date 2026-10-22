@@ -12,6 +12,17 @@
   "newlyMergedSincePreviousRuntime": [2684, 2735, 2785, 2858, 2977],
   "reviewedGuidancePatch": "61e08f81a2b621010128d559ae1d17c0f6d4800c",
   "retainedBaselineFixtureRepair": "3c2ee92d4",
+  "reviewedSupplementalTests": {
+    "pullRequest": 2948,
+    "head": "12d0bc18fda6a608ef549f4bb31ab8ca28fa5837",
+    "successfulUpstreamCiRun": 39752227363,
+    "selectedFiles": [
+      "src/resources/extensions/gsd/tests/commands-blocker.test.ts",
+      "src/resources/extensions/gsd/tests/resolve-auto-pause-blocker-by-id.test.ts"
+    ],
+    "fixtureCleanupDisposition": "Already retained in 3c2ee92d4; duplicate permission-restoration hunk intentionally omitted.",
+    "scope": "59 additional test lines only; no superseded PR2948 production implementation reinstated."
+  },
   "integrationNotes": [
     "Preserve explicit Copilot-only GPT-6 and Grok capability helpers; upstream generic xhigh matching must not leak to other providers or lookalike IDs",
     "Keep Completions effort fail-closed when compatibility is absent or unknown, while preserving positive live evidence and upstream typed capability refinements",
