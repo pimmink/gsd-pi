@@ -1,6 +1,6 @@
 {
   "name": "@opengsd/engine-linux-x64-gnu",
-  "version": "1.22.0-fork.4",
+  "version": "1.22.0-fork.5",
   "description": "GSD native engine binary for Linux x64 (glibc)",
   "os": [
     "linux"

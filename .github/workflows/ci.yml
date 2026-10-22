@@ -3,7 +3,7 @@ name: CI
 
 on:
   push:
-    branches: [main, dev, test, 'hotfix/**']
+    branches: [main, dev, test, 'hotfix/**', 'release/runtime-*']
     paths-ignore:
       - '.github/workflows/ai-triage.yml'
       - '.github/workflows/build-native.yml'
@@ -432,6 +432,63 @@ jobs:
           path: test-results/e2e
           if-no-files-found: ignore
           retention-days: 7
+
+  # Installable PERSONAL-FORK package, distinct from intermediate build output.
+  # Never run on PR merge refs, upstream, or before the full normal CI gates.
+  fork-runtime-package:
+    name: fork-runtime-package
+    needs: [build, ci-gate]
+    if: >-
+      github.repository == 'pimmink/gsd-pi' &&
+      startsWith(github.ref, 'refs/heads/release/runtime-') &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      needs.build.result == 'success' && needs.ci-gate.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository without GITHUB_TOKEN
+        shell: bash
+        env:
+          FETCH_DEPTH: '1'
+        run: bash <(curl -fsSL "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/scripts/checkout-no-token.sh")
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
+        with:
+          version: 10.12.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Download this run's validated build output
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: ci-build-artifacts
+          path: ${{ runner.temp }}/fork-runtime-build
+
+      - name: Restore validated build output
+        env:
+          BUILD_ARCHIVE: ${{ runner.temp }}/fork-runtime-build/ci-build-artifacts.tar.gz
+        run: bash scripts/ci-unpack-build-artifacts.sh "$BUILD_ARCHIVE"
+
+      - name: Check personal fork packaging guards
+        run: node --test scripts/package-fork-runtime.test.mjs
+
+      - name: Pack personal fork runtime and provenance
+        run: node scripts/package-fork-runtime.mjs
+
+      - name: Upload installable personal fork package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: personal-fork-runtime-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/fork-runtime-package/*.tgz
+            ${{ runner.temp }}/fork-runtime-package/provenance.json
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
 
   # Validate the strictest declared workspace engines floor (currently ">=22.19.0").
   # The main build/test lanes run on Node 24, so without this lane the supported

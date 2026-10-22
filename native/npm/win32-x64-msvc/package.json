@@ -1,6 +1,6 @@
 {
   "name": "@opengsd/engine-win32-x64-msvc",
-  "version": "1.22.0-fork.4",
+  "version": "1.22.0-fork.5",
   "description": "GSD native engine binary for Windows x64 (MSVC)",
   "os": [
     "win32"

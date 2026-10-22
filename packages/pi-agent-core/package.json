@@ -1,6 +1,6 @@
 {
   "name": "@gsd/pi-agent-core",
-  "version": "1.22.0-fork.4",
+  "version": "1.22.0-fork.5",
   "description": "General-purpose agent with transport abstraction, state management, and attachment support",
   "type": "module",
   "gsd": {

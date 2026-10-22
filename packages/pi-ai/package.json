@@ -1,6 +1,6 @@
 {
   "name": "@gsd/pi-ai",
-  "version": "1.22.0-fork.4",
+  "version": "1.22.0-fork.5",
   "description": "Unified LLM API with automatic model discovery and provider configuration",
   "type": "module",
   "gsd": {

@@ -1,14 +1,23 @@
 {
   "schemaVersion": 1,
-  "version": "1.22.0-fork.4",
+  "version": "1.22.0-fork.5",
   "upstreamRepository": "open-gsd/gsd-pi",
-  "upstreamBase": "7652990959594bbec2b19751236d8aba1ca8ad5c",
-  "previousRuntimeVersion": "1.22.0-fork.3",
-  "previousIntegrationSource": "c8db76350",
+  "upstreamBase": "a15aa8536b0fb044b79b6baa3742cbcdac73e9e5",
+  "previousRuntimeVersion": "1.22.0-fork.4",
+  "previousIntegrationSource": "c91a77022207b61c03cf0313efb0c4d84bb82b4d",
   "retainedIntentGroupsAudited": 9,
-  "reviewedUnmergedPullRequestsRetained": [2684, 2735, 2858, 2951],
+  "reviewedUnmergedPullRequestsRetained": [2951, 2978],
   "supersededImplementation": { "pullRequest": 2948, "upstreamReplacement": 2962 },
-  "mergedUpstreamRefresh": [2962, 2963, 2965, 2970, 2971, 2972, 2975],
+  "mergedUpstreamRefresh": [2962, 2963, 2965, 2970, 2971, 2972, 2975, 2684, 2735, 2785, 2858, 2977],
+  "newlyMergedSincePreviousRuntime": [2684, 2735, 2785, 2858, 2977],
+  "reviewedGuidancePatch": "61e08f81a2b621010128d559ae1d17c0f6d4800c",
+  "retainedBaselineFixtureRepair": "3c2ee92d4",
+  "integrationNotes": [
+    "Preserve explicit Copilot-only GPT-6 and Grok capability helpers; upstream generic xhigh matching must not leak to other providers or lookalike IDs",
+    "Keep Completions effort fail-closed when compatibility is absent or unknown, while preserving positive live evidence and upstream typed capability refinements",
+    "Take merged Graphify scope, unknown-command dispatch and contained fast-forward implementation evidence improvements without replaying duplicate PR patches",
+    "Build and package from clean exact source online; verify archive provenance and installed/managed layers separately"
+  ],
   "retainedIntentCommits": [
     "ccad185b04fa",
     "4b28db60bf41",
@@ -28,7 +37,7 @@
     "GitHub-hosted runner fallback for the personal fork only",
     "Verified seven-model Copilot serving limits, Responses routing and effort maps; fork provider guards remain stronger than unqualified family matching",
     "Graphify preserves caller read/write scope and bounded non-sensitive source evidence",
-    "Recovery guidance preserves persisted prose as diagnostic-only input and distinguishes bare recover from one repaired Task continuation"
+    "Recovery guidance preserves persisted prose as diagnostic-only input and distinguishes bare recover from one repaired Task continuation; PR2978 also removes the projection-import alternative to gated terminal Task recovery"
   ],
   "upstreamReplacementsNotReplayed": [
     "Provider readiness probe isolation and cache clocks from merged upstream",
