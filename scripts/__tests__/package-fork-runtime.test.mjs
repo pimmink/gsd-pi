@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { assertPackageMetadata, assertReleaseContext } from './package-fork-runtime.mjs';
+import { assertPackageMetadata, assertReleaseContext } from '../package-fork-runtime.mjs';
 
 const sha = 'a'.repeat(40);
 const context = {
@@ -47,7 +47,7 @@ test('manifest inclusion, fork version and pack/restore lifecycle are mandatory'
 });
 
 test('workflow packages only after successful build and aggregate CI, with bounded upload', () => {
-  const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
+  const workflow = readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8');
   const job = workflow.split('  fork-runtime-package:\n')[1].split('  node22-smoke:\n')[0];
   assert.match(job, /needs: \[build, ci-gate\]/);
   assert.match(job, /github\.repository == 'pimmink\/gsd-pi'/);

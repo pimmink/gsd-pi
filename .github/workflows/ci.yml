@@ -483,7 +483,7 @@ jobs:
         run: bash scripts/ci-unpack-build-artifacts.sh "$BUILD_ARCHIVE"
 
       - name: Check personal fork packaging guards
-        run: node --test scripts/package-fork-runtime.test.mjs
+        run: node --test scripts/__tests__/package-fork-runtime.test.mjs
 
       - name: Pack personal fork runtime and provenance
         run: node scripts/package-fork-runtime.mjs
