@@ -10,6 +10,8 @@ import YAML from "yaml";
 const WORKFLOW_DIR = ".github/workflows";
 const APPROVED_RUNNERS = new Set([
   "ubuntu-latest",
+  // Fork native build and shard consumers pin the same supported image.
+  "ubuntu-24.04",
   "windows-latest",
   "macos-14",
   "blacksmith-4vcpu-ubuntu-2404",

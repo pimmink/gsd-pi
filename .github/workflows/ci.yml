@@ -108,12 +108,16 @@ jobs:
 
   build:
     name: build
-    # Raised from 25: this job compiles the native engine addon from source
-    # (a cold Rust build) before running the native-backed test suites.
-    timeout-minutes: 45
+    # Authorized fork budget includes cold native compilation and all remaining
+    # normal gates. Compiled units run in the mandatory fork matrix below.
+    timeout-minutes: ${{ github.repository == 'pimmink/gsd-pi' && 75 || 45 }}
     needs: [fast-gates]
-    if: needs.fast-gates.outputs.heavy-code-changed == 'true'
-    runs-on: ${{ github.repository_owner == 'pimmink' && 'ubuntu-latest' || 'blacksmith-4vcpu-ubuntu-2404' }}
+    # Fork units are mandatory, including on otherwise light-only changes.
+    if: github.repository == 'pimmink/gsd-pi' || needs.fast-gates.outputs.heavy-code-changed == 'true'
+    outputs:
+      unit-node-version: ${{ steps.unit-manifest.outputs.node-version }}
+    # Pin the fork producer/consumers to the same hosted OS for native addons.
+    runs-on: ${{ github.repository == 'pimmink/gsd-pi' && 'ubuntu-24.04' || github.repository_owner == 'pimmink' && 'ubuntu-latest' || 'blacksmith-4vcpu-ubuntu-2404' }}
     env:
       # native/.cargo/config.toml sets `-C target-cpu=native` for local dev speed,
       # which bakes host-specific CPU instructions into build artifacts, including
@@ -232,7 +236,36 @@ jobs:
           GSD_NATIVE_PREFER_LOCAL: '1'
         run: pnpm run test:unit:compiled:perf
 
+      # Preserve pnpm symlinks and the producer's dependency graph. No reinstall,
+      # second build, source-tree archive or receipt from another workflow run.
+      - name: Prepare fork compiled-unit manifest and runtime
+        id: unit-manifest
+        if: github.repository == 'pimmink/gsd-pi'
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$(git rev-parse HEAD)" == "$GITHUB_SHA" ]]
+          node scripts/ci-unit-shards.mjs prepare "$GITHUB_SHA" ci-unit-manifest.json
+          echo "node-version=$(node --version)" >> "$GITHUB_OUTPUT"
+          mapfile -d '' -t deps < <(find . -type d -name node_modules -prune -print0)
+          [[ -d node_modules && ${#deps[@]} -gt 0 ]]
+          shopt -s nullglob
+          addons=(native/addon/*.node)
+          [[ ${#addons[@]} -gt 0 ]]
+          tar czf ci-unit-shards.tar.gz dist dist-test packages/*/dist "${addons[@]}" "${deps[@]}" ci-unit-manifest.json
+          du -h ci-unit-shards.tar.gz
+
+      - name: Upload fork compiled-unit runtime
+        if: github.repository == 'pimmink/gsd-pi'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: ci-unit-shards
+          path: ci-unit-shards.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Run unit tests
+        if: github.repository != 'pimmink/gsd-pi'
         env:
           GSD_NATIVE_PREFER_LOCAL: '1'
         run: pnpm run test:unit:compiled
@@ -289,6 +322,62 @@ jobs:
           path: test-results/e2e
           if-no-files-found: ignore
           retention-days: 7
+
+  # Primary release CI, not the optional PR-tier pre-review workflow. The
+  # native addon, dependencies and compiled files all come from this run's build.
+  fork-unit:
+    name: fork-unit (${{ matrix.shard }})
+    if: github.repository == 'pimmink/gsd-pi'
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact source without GITHUB_TOKEN
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init "$GITHUB_WORKSPACE"
+          cd "$GITHUB_WORKSPACE"
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git -c protocol.version=2 fetch --no-tags --prune --depth=1 origin \
+            "+${GITHUB_SHA}:refs/checkout-ref"
+          git checkout --force --detach "$GITHUB_SHA"
+          [[ "$(git rev-parse HEAD)" == "$GITHUB_SHA" ]]
+
+      - name: Setup pnpm for workspace executables
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
+        with:
+          version: 10.12.1
+
+      - name: Setup exact build Node.js version
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0; same pin as sharded reference
+        with:
+          node-version: ${{ needs.build.outputs.unit-node-version }}
+
+      - name: Download this run's compiled-unit runtime
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # existing pre-review sharded pin
+        with:
+          name: ci-unit-shards
+
+      - name: Validate coverage and run compiled-unit shard
+        shell: bash
+        env:
+          GSD_NATIVE_PREFER_LOCAL: '1'
+          SHARD: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          tar xzf ci-unit-shards.tar.gz
+          pnpm exec node scripts/ci-unit-shards.mjs run "$GITHUB_SHA" ci-unit-manifest.json "$SHARD" | tee unit-shard.log
+          {
+            echo "### Compiled units: shard $SHARD"
+            echo "Source: $GITHUB_SHA"
+            grep -E '^✔ [0-9]+ passed, 0 failed, [0-9]+ skipped$' unit-shard.log
+          } >> "$GITHUB_STEP_SUMMARY"
 
   windows-portability:
     name: windows-portability
@@ -600,7 +689,7 @@ jobs:
   ci-gate:
     name: ci-gate
     if: always()
-    needs: [fast-gates, build, windows-portability, node22-smoke, workflow-lint]
+    needs: [fast-gates, build, fork-unit, windows-portability, node22-smoke, workflow-lint]
     runs-on: ubuntu-latest
     steps:
       - name: Assert no upstream job failed or was cancelled
@@ -610,12 +699,18 @@ jobs:
           WINDOWS: ${{ needs.windows-portability.result }}
           NODE22: ${{ needs.node22-smoke.result }}
           WORKFLOW_LINT: ${{ needs.workflow-lint.result }}
+          FORK_UNIT: ${{ needs.fork-unit.result }}
+          REPOSITORY: ${{ github.repository }}
         shell: bash
         run: |
           set -euo pipefail
           echo "fast-gates=$FAST_GATES build=$BUILD windows-portability=$WINDOWS node22-smoke=$NODE22 workflow-lint=$WORKFLOW_LINT"
-          # 'skipped' is an acceptable result (job legitimately not needed).
-          # Only 'failure' / 'cancelled' must block the merge.
+          # Fork units are mandatory: skipped is NOT coverage. Other conditional
+          # platform jobs retain their existing skip policy.
+          if [[ "$REPOSITORY" == 'pimmink/gsd-pi' && "$FORK_UNIT" != 'success' ]]; then
+            echo "::error::Required fork unit matrix: $FORK_UNIT"
+            exit 1
+          fi
           status=0
           for result in "$FAST_GATES" "$BUILD" "$WINDOWS" "$NODE22" "$WORKFLOW_LINT"; do
             case "$result" in

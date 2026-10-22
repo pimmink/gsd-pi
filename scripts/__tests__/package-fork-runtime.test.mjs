@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { assertPackageMetadata, assertReleaseContext } from '../package-fork-runtime.mjs';
@@ -125,4 +126,57 @@ test('workflow packages only after successful build and aggregate CI, with bound
   assert.match(job, /retention-days: 7/);
   assert.match(job, /if-no-files-found: error/);
   assert.doesNotMatch(job, /npm publish|pnpm (install|build)|ignore-scripts=true/);
+});
+
+test('primary CI delegates only fork compiled units to four mandatory exact-source shards', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8');
+  const build = workflow.split('\n  build:\n')[1].split('\n  fork-unit:\n')[0];
+  const shards = workflow.split('\n  fork-unit:\n')[1]?.split('\n  windows-portability:\n')[0];
+  assert.ok(shards, 'required primary unit matrix is missing');
+  assert.match(build, /timeout-minutes: \$\{\{ github.repository == 'pimmink\/gsd-pi' && 75 \|\| 45 \}\}/);
+  assert.match(build, /if: github.repository == 'pimmink\/gsd-pi' \|\| needs.fast-gates.outputs.heavy-code-changed == 'true'/);
+  assert.match(build, /name: Run unit tests\n\s+if: github.repository != 'pimmink\/gsd-pi'/);
+  assert.match(build, /ci-unit-shards.mjs prepare "\$GITHUB_SHA"/);
+  assert.match(build, /find \. -type d -name node_modules -prune -print0/);
+  assert.match(build, /tar czf ci-unit-shards.tar.gz dist dist-test packages\/\*\/dist/);
+  assert.match(shards, /if: github.repository == 'pimmink\/gsd-pi'/);
+  assert.match(shards, /needs: build/);
+  assert.match(shards, /fail-fast: false/);
+  assert.match(shards, /shard: \[0, 1, 2, 3\]/);
+  assert.match(shards, /runs-on: ubuntu-24.04/);
+  assert.match(build, /github.repository == 'pimmink\/gsd-pi' && 'ubuntu-24.04'/);
+  assert.ok(build.includes("github.repository_owner == 'pimmink' && 'ubuntu-latest' || 'blacksmith-4vcpu-ubuntu-2404'"));
+  assert.match(shards, /node-version: \$\{\{ needs.build.outputs.unit-node-version \}\}/);
+  assert.match(shards, /pnpm exec node scripts\/ci-unit-shards.mjs run/);
+  assert.match(shards, /\+\$\{GITHUB_SHA\}:refs\/checkout-ref/);
+  assert.ok(shards.includes('[[ "$(git rev-parse HEAD)" == "$GITHUB_SHA" ]]'));
+  assert.match(shards, /name: ci-unit-shards/);
+  assert.match(shards, /set -euo pipefail[\s\S]*ci-unit-shards.mjs run "\$GITHUB_SHA"/);
+  assert.match(shards, /GSD_NATIVE_PREFER_LOCAL: '1'/);
+  assert.doesNotMatch(shards, /continue-on-error|pnpm install|npm install|run-id:|github-token:/);
+  assert.match(workflow, /needs: \[fast-gates, build, fork-unit, windows-portability, node22-smoke, workflow-lint\]/);
+  for (const gate of ['test:packages:compiled', 'pnpm --filter @gsd/pi-ai test', 'test:unit:compiled:perf', 'test:daemon', 'test:integration', 'test:e2e', 'gate:g8-legacy-counters', 'test:e2e:docker']) assert.ok(build.includes(gate), gate);
+});
+
+test('ci-gate rejects failure, cancellation and skipped fork matrices but permits upstream skip', () => {
+  const workflow = readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8');
+  const gate = workflow.split('\n  ci-gate:\n')[1];
+  assert.match(gate, /if: always\(\)/);
+  const script = gate.split('run: |\n')[1].split('\n').map(line => line.replace(/^          /, '')).join('\n');
+  for (const repo of ['pimmink/gsd-pi', 'open-gsd/gsd-pi']) {
+    for (const result of ['success', 'failure', 'cancelled', 'skipped']) {
+      const rendered = script.replace(/\$\{\{\s*([^}]+?)\s*\}\}/g, (_, expression) => {
+        if (expression === 'github.repository') return repo;
+        if (expression === 'needs.fork-unit.result') return result;
+        if (/^needs\.[\w-]+\.result$/.test(expression)) return 'success';
+        assert.fail(`unexpected gate expression: ${expression}`);
+      });
+      const run = spawnSync('bash', ['-c', rendered], { encoding: 'utf8', env: {
+        ...process.env, REPOSITORY: repo, FORK_UNIT: result,
+        FAST_GATES: 'success', BUILD: 'success', WINDOWS: 'success', NODE22: 'success', WORKFLOW_LINT: 'success',
+      } });
+      const expected = repo === 'pimmink/gsd-pi' ? result === 'success' : true;
+      assert.equal(run.status === 0, expected, `${repo}: ${result}: ${run.stderr}`);
+    }
+  }
 });
