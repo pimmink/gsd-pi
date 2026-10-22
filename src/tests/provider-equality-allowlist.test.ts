@@ -80,7 +80,7 @@ const ALLOWED_FILES: Record<string, string> = {
 
   // GitHub Copilot transport-specific request/auth transforms.
   "packages/pi-ai/src/models.ts":
-    "transport-specific selectable effort metadata; preserves other providers' reasoning controls (ADR-012)",
+    "github-copilot-only suppression of ignored Completions effort controls; other transports retain their existing controls",
   "packages/pi-ai/src/utils/oauth/github-copilot.ts":
     "github-copilot OAuth-specific model shaping",
   "packages/pi-ai/src/providers/anthropic.ts":

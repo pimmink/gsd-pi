@@ -56,30 +56,15 @@ test("offline reasoning diagnostics preserve working transports and guard ignore
   });
 
   await t.test("Responses forwards low through max", async () => {
-    for (const id of ["gpt-5.6-sol"] as const) {
+    for (const id of ["gpt-5.6-sol", "gpt-6.1-sol", "gpt-6-astra"] as const) {
       const model = getModel("github-copilot", id);
       assertModelApi(model, "openai-responses");
+      assert.ok(getSupportedThinkingLevels(model).includes("max"));
       for (const effort of ["low", "medium", "high", "xhigh", "max"] as const) {
         assert.deepEqual((await capture(streamSimpleOpenAIResponses, model, effort)).reasoning,
           { effort, summary: "auto" });
       }
       assert.equal((await capture(streamOpenAIResponses, model)).reasoning, undefined);
-    }
-  });
-  await t.test("Sol effort follows its declared catalog transport", async () => {
-    // Catalog transport migration belongs to the provider lane. Both states must
-    // honor their own compatibility instead of invoking a mismatched adapter.
-    const model: Model<Api> = getModel("github-copilot", "gpt-6.1-sol");
-    if (model.api === "openai-responses") {
-      assertModelApi(model, "openai-responses");
-      assert.ok(getSupportedThinkingLevels(model).includes("max"));
-      assert.deepEqual((await capture(streamSimpleOpenAIResponses, model, "max")).reasoning,
-        { effort: "max", summary: "auto" });
-    } else {
-      assertModelApi(model, "openai-completions");
-      assert.equal(model.compat?.supportsReasoningEffort, false);
-      assert.deepEqual(getSupportedThinkingLevels(model), ["off"]);
-      assert.equal((await capture(streamSimpleOpenAICompletions, model, "high")).reasoning_effort, undefined);
     }
   });
   await t.test("MAI Flash maps xhigh to high", async () => {
@@ -146,7 +131,7 @@ test("offline reasoning diagnostics preserve working transports and guard ignore
     const model = getModel("github-copilot", "claude-haiku-4.5");
     assertModelApi(model, "anthropic-messages");
     const payload = await capture(streamSimpleAnthropic, model, "high");
-    assert.equal((payload.thinking as Record<string, unknown>).type, "enabled");
+    assert.deepEqual(payload.thinking, { type: "enabled", budget_tokens: 16384, display: "summarized" });
     assert.equal(payload.output_config, undefined);
   });
   assert.equal(fetchCalls, 0);

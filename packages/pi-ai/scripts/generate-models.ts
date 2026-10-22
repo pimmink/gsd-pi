@@ -233,6 +233,8 @@ function getTogetherThinkingLevelMap(
 	return { ...TOGETHER_TOGGLE_REASONING_LEVEL_MAP };
 }
 
+// GPT-6 additions are provider-scoped by isCopilotGpt6Model below, not inferred
+// here for every provider or for IDs that only resemble the verified family.
 function supportsOpenAiXhigh(modelId: string): boolean {
 	return (
 		modelId.includes("gpt-5.2") ||

@@ -275,7 +275,7 @@ function normalizeLiveReasoningLevels(record: Record<string, unknown>): LiveReas
 }
 
 function createThinkingLevelMap(
-  supportedLevels: readonly string[],
+  supportedLevels: readonly ModelThinkingLevel[],
   sourceMap?: Model<Api>["thinkingLevelMap"],
 ): NonNullable<Model<Api>["thinkingLevelMap"]> {
   const supported = new Set(supportedLevels);
@@ -557,7 +557,7 @@ function normalizeGitHubCopilotModel(
     record.tool_call
     ?? record.tool_calls
     ?? record.supports_tool_calls
-    ?? (record.capabilities && typeof record.capabilities === "object"
+    ?? (record.capabilities && typeof record.capabilities === "object" && !Array.isArray(record.capabilities)
       ? (record.capabilities as Record<string, unknown>).tool_calls
       : undefined),
   );
