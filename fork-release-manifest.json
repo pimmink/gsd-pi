@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "version": "1.22.0-fork.5",
+  "version": "1.22.0-fork.6",
   "upstreamRepository": "open-gsd/gsd-pi",
-  "upstreamBase": "a15aa8536b0fb044b79b6baa3742cbcdac73e9e5",
-  "previousRuntimeVersion": "1.22.0-fork.4",
-  "previousIntegrationSource": "c91a77022207b61c03cf0313efb0c4d84bb82b4d",
+  "upstreamBase": "8b42266c0cd9cb22b054e37eedc588f9ae54469f",
+  "previousRuntimeVersion": "1.22.0-fork.5",
+  "previousIntegrationSource": "79b17950811c79a6479d7dea9ddfbf1c358676e1",
   "retainedIntentGroupsAudited": 9,
-  "reviewedUnmergedPullRequestsRetained": [2951, 2978],
+  "reviewedUnmergedPullRequestsRetained": [3008, 3010, 3013],
   "supersededImplementation": { "pullRequest": 2948, "upstreamReplacement": 2962 },
-  "mergedUpstreamRefresh": [2962, 2963, 2965, 2970, 2971, 2972, 2975, 2684, 2735, 2785, 2858, 2977],
-  "newlyMergedSincePreviousRuntime": [2684, 2735, 2785, 2858, 2977],
+  "mergedUpstreamRefresh": [2962, 2963, 2965, 2970, 2971, 2972, 2975, 2684, 2735, 2785, 2858, 2977, 3016, 3007, 3003, 3002, 2693, 2758, 2949, 2951, 2978, 2999, 2998, 2995, 2993, 2992, 2988, 2990, 2989, 2983, 2984, 2980],
+  "newlyMergedSincePreviousRuntime": [3016, 3007, 3003, 3002, 2693, 2758, 2949, 2951, 2978, 2999, 2998, 2995, 2993, 2992, 2988, 2990, 2989, 2983, 2984, 2980],
   "reviewedGuidancePatch": "61e08f81a2b621010128d559ae1d17c0f6d4800c",
   "retainedBaselineFixtureRepair": "3c2ee92d4",
   "reviewedSupplementalTests": {
@@ -60,6 +60,19 @@
     "Use upstream #2971 GPT-6 normalizer after ingestion and alias synthesis, before thinking metadata"
   ],
   "excludedUnmergedPullRequests": [2920],
+  "baselineAuditVersion": "1.22.0-fork.5",
+  "baselineAuditNote": "Retained historical audit and supplemental-test fields describe the previously tested fork.5 intent groups; fork.6 acceptance requires fresh source-bound online gates and separate installation evidence.",
+  "fork6Integration": {
+    "strategy": "Preserve fork.5 ancestry, merge pinned upstream, cherry-pick own reviewed diagnostic fixes with source attribution",
+    "pullRequestHeads": {
+      "3008": "f39570cf747d9f7ee4ca0b72b808725615a825d9",
+      "3010": "18e45f7ec65bd98e39787bcfd6fc620297113254",
+      "3013": "44879dae2fa8a160b3e3eb01bb67e1ab1be6fd83"
+    },
+    "blockerPolicy": "Human native approval, positive writable binding, unchanged cutover/adoption effects, one eligible repaired recovery and normal host verification remain mandatory",
+    "verificationReuse": "Do not enable the upstream opt-in evidence-reuse preference during this refresh",
+    "rollbackPolicy": "Require isolated old-reader compatibility evidence; never restore or rewrite live workflow authority to make a package rollback appear successful"
+  },
   "nativeEngineVersion": "1.22.0",
   "catalogSnapshotsRegenerated": false,
   "activationProof": "Source-only manifest. Online package provenance, archive checksum, staged installation and fresh-process package/managed fingerprints must be verified separately before activation is claimed."
