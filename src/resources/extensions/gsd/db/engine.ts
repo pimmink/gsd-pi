@@ -2941,7 +2941,7 @@ export function _resetProvider(): void {
 
 export function getDb(): DbAdapter {
   refuseCoordinationMaintenanceAccessor();
-  if (!currentDb) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open. Call openDatabase() first.");
+  if (!currentDb) throw new GSDError(GSD_STALE_STATE, "gsd-db: No database open");
   return currentDb;
 }
 
