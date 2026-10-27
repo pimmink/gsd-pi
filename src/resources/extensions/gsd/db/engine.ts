@@ -12,7 +12,7 @@ import { createRequire } from "node:module";
 import { createHash, randomUUID } from "node:crypto";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { hostname } from "node:os";
-import type { CoordinationMaintenanceHost, CoordinationMaintenanceReply } from "../../../../coordination-maintenance-contract.js";
+import type { CoordinationMaintenanceHost, CoordinationMaintenanceReply } from "../coordination-maintenance-contract.js";
 import {
   _executeCoordinationMaintenanceDomainOperation,
   assertDomainOperationReceiptComponents,
