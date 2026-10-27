@@ -208,7 +208,13 @@ test("real native bootstrap commits one sealed lease with a complete receipt, th
   assert.deepEqual(snapshot(f.raw), afterCommit);
 
   const lostSealHost = nativeHost(f);
-  assert.equal((await lostSealHost.send("apply", { sealId: prepared.sealId })).status, "refused");
+  const refusal = await lostSealHost.send("apply", { sealId: prepared.sealId });
+  assert.equal(refusal.status, "refused");
+  const diagnostic = refusal.diagnostic as { phase: string; frames: unknown[] };
+  assert.equal(diagnostic.phase, "apply");
+  assert(Array.isArray(diagnostic.frames));
+  assert.equal(JSON.stringify(diagnostic).includes(String(prepared.sealId)), false);
+  assert.equal(JSON.stringify(diagnostic).includes(f.root), false);
   await lostSealHost.finish(1);
   assert.deepEqual(snapshot(f.raw), afterCommit);
 });

@@ -1,9 +1,10 @@
 {
   "schemaVersion": 1,
-  "version": "1.22.0-fork.7",
+  "version": "1.22.0-fork.8",
+  "fork8Integration": { "scope": "redacted native failure diagnostics only", "guardChanges": false, "activationProofRequired": true },
   "upstreamRepository": "open-gsd/gsd-pi",
   "upstreamBase": "8b42266c0cd9cb22b054e37eedc588f9ae54469f",
-  "previousRuntimeVersion": "1.22.0-fork.6",
+  "previousRuntimeVersion": "1.22.0-fork.7",
   "previousIntegrationSource": "f1203b55d82b96e97bc2bd05fa7db44e3d178c95",
   "retainedIntentGroupsAudited": 9,
   "reviewedUnmergedPullRequestsRetained": [3008, 3010, 3013],

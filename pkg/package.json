@@ -1,6 +1,6 @@
 {
   "name": "@glittercowboy/gsd",
-  "version": "1.22.0-fork.7",
+  "version": "1.22.0-fork.8",
   "piConfig": {
     "name": "gsd",
     "configDir": ".gsd"

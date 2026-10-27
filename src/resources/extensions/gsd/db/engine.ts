@@ -13,6 +13,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { hostname } from "node:os";
 import type { CoordinationMaintenanceHost, CoordinationMaintenanceReply } from "../coordination-maintenance-contract.js";
+import { describeCoordinationMaintenanceFailure, type CoordinationMaintenancePhase } from "../coordination-maintenance-diagnostics.js";
 import {
   _executeCoordinationMaintenanceDomainOperation,
   assertDomainOperationReceiptComponents,
@@ -3182,11 +3183,13 @@ function openOwnedCoordinationMaintenanceHost(options: { projectDir: string }): 
     release,
     ownsRequest: (request) => selectedRequest !== undefined && request === selectedRequest,
   };
-  const run = (operation: () => CoordinationMaintenanceReply): CoordinationMaintenanceReply => {
+  const run = (phase: CoordinationMaintenancePhase, operation: () => CoordinationMaintenanceReply): CoordinationMaintenanceReply => {
     if (closed) return { status: "refused", reason: "unavailable" };
+    let failurePhase: CoordinationMaintenancePhase = "host-check";
     try {
       return inCoordinationMaintenance(() => withDatabaseMaintenanceOwner(path, () => _coordinationMaintenance.run(owned, () => {
         check();
+        failurePhase = phase;
         return operation();
       })));
     } catch (error) {
@@ -3194,7 +3197,7 @@ function openOwnedCoordinationMaintenanceHost(options: { projectDir: string }): 
         closed = true;
         throw error;
       }
-      return { status: "refused", reason: "validation-failed" };
+      return { status: "refused", reason: "validation-failed", diagnostic: describeCoordinationMaintenanceFailure(error, failurePhase) };
     }
   };
   const sealInput = (input: unknown): string => {
@@ -3227,7 +3230,7 @@ function openOwnedCoordinationMaintenanceHost(options: { projectDir: string }): 
   return Object.freeze({
     prepare(input: unknown): CoordinationMaintenanceReply {
       input = snapshotInput(input);
-      return run(() => {
+      return run("prepare", () => {
         if (selected || !exact(input, ["expectedRevision", "expectedAuthorityEpoch", "witness"])
           || !integer(input.expectedRevision) || !integer(input.expectedAuthorityEpoch)
           || !exact(input.witness, ["ownerPid", "ownerStartedAt", "ownerHeartbeatAt", "leaseAcquiredAt", "leaseExpiresAt"])
@@ -3258,7 +3261,7 @@ function openOwnedCoordinationMaintenanceHost(options: { projectDir: string }): 
     },
     apply(input: unknown): CoordinationMaintenanceReply {
       input = snapshotInput(input);
-      return run(() => {
+      return run("apply", () => {
         const seal = sealInput(input);
         if (!selectedRequest || selectedSeal !== seal) return fail();
         const result = _executeCoordinationMaintenanceDomainOperation(selectedRequest, db!, rollback!);
@@ -3268,7 +3271,7 @@ function openOwnedCoordinationMaintenanceHost(options: { projectDir: string }): 
     },
     receipt(input: unknown): CoordinationMaintenanceReply {
       input = snapshotInput(input);
-      return run(() => lookup(sealInput(input)));
+      return run("receipt", () => lookup(sealInput(input)));
     },
     close(): void { cleanup(); },
   });

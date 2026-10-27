@@ -87,6 +87,22 @@ function released(f: ReturnType<typeof fixture>): string {
   return String((f.raw.prepare("SELECT status FROM milestone_leases WHERE milestone_id = 'M001'").get() as { status: string }).status);
 }
 
+test("native refusals identify their phase without exposing input or weakening the rejection", (t) => {
+  const f = fixture(t);
+  for (const [phase, input] of [
+    ["prepare", {}],
+    ["apply", { sealId: "00000000-0000-0000-0000-000000000000" }],
+    ["receipt", { sealId: "00000000-0000-0000-0000-000000000000" }],
+  ] as const) {
+    const reply = f.host[phase](input);
+    assert.equal(reply.status, "refused");
+    assert.equal(reply.reason, "validation-failed");
+    assert.equal((reply.diagnostic as { phase: string }).phase, phase);
+    assert.equal(released(f), "held");
+  }
+  assert.throws(() => getDbOrNull());
+});
+
 test("real maintenance commits exactly one release plus complete receipt, without admission or lifecycle adoption", (t) => {
   const f = fixture(t);
   assert.throws(() => getDbOrNull());
