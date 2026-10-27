@@ -22,6 +22,9 @@ export default async function registerExtension(pi: ExtensionAPI) {
   const { registerGSDCommand } = await import("./commands/index.js");
   registerGSDCommand(pi);
 
+  const { registerCutoverCoordinationRead } = await import("./cutover-coordination-runtime-read.js");
+  registerCutoverCoordinationRead(pi);
+
   if (typeof pi.registerRuntimeRead === "function") {
     const { readProjectProgressFromDb, readProjectSnapshotFromDb } = await import("./mcp-bridge.js");
     pi.registerRuntimeRead("project_progress", async (input) => {

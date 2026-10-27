@@ -115,7 +115,7 @@ describe("extension bootstrap isolation (#4168, #4172)", () => {
     );
   });
 
-  test("registers the host-only project progress and snapshot reads and the typed workflow command", async () => {
+  test("registers host-only project reads, the cutover diagnostic and the typed workflow command", async () => {
     const runtimeReads = new Map<string, (input: unknown) => unknown>();
     const { pi } = makePi({
       registerRuntimeRead: (name: string, handler: (input: unknown) => unknown) => {
@@ -125,7 +125,10 @@ describe("extension bootstrap isolation (#4168, #4172)", () => {
 
     await registerExtension(pi as any);
 
-    assert.deepEqual([...runtimeReads.keys()].sort(), ["project_progress", "project_snapshot", "workflow_command"]);
+    assert.deepEqual([...runtimeReads.keys()].sort(), ["authority_cutover_coordination", "project_progress", "project_snapshot", "workflow_command"]);
+    assert.deepEqual(await runtimeReads.get("authority_cutover_coordination")?.({}), {
+      operation: "authority_cutover_coordination", error: "invalid_request",
+    });
     await assert.rejects(
       async () => runtimeReads.get("project_snapshot")?.({}),
       /Project snapshot requires a session CWD/,

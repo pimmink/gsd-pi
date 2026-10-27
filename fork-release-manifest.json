@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "version": "1.22.0-fork.6",
+  "version": "1.22.0-fork.7",
   "upstreamRepository": "open-gsd/gsd-pi",
   "upstreamBase": "8b42266c0cd9cb22b054e37eedc588f9ae54469f",
-  "previousRuntimeVersion": "1.22.0-fork.5",
-  "previousIntegrationSource": "79b17950811c79a6479d7dea9ddfbf1c358676e1",
+  "previousRuntimeVersion": "1.22.0-fork.6",
+  "previousIntegrationSource": "f1203b55d82b96e97bc2bd05fa7db44e3d178c95",
   "retainedIntentGroupsAudited": 9,
   "reviewedUnmergedPullRequestsRetained": [3008, 3010, 3013],
   "supersededImplementation": { "pullRequest": 2948, "upstreamReplacement": 2962 },
@@ -75,5 +75,13 @@
   },
   "nativeEngineVersion": "1.22.0",
   "catalogSnapshotsRegenerated": false,
-  "activationProof": "Source-only manifest. Online package provenance, archive checksum, staged installation and fresh-process package/managed fingerprints must be verified separately before activation is claimed."
+  "activationProof": "Source-only manifest. Online package provenance, archive checksum, staged installation and fresh-process package/managed fingerprints must be verified separately before activation is claimed.",
+  "fork7Integration": {
+    "sourceRevision": "f1203b55d82b96e97bc2bd05fa7db44e3d178c95",
+    "w067ExpiredLeaseMaintenance": { "copiedSourceFiles": 14 },
+    "retainedReadOnlyCutoverDiagnostic": {
+      "copiedSourceFiles": 5,
+      "scope": "inspection only; no adoption, lifecycle, or migration changes"
+    }
+  }
 }
