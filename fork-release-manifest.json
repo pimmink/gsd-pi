@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "version": "1.23.0-fork.9",
+  "upstreamRepository": "open-gsd/gsd-pi",
+  "upstreamBase": "f2756216ccf6bbe9af2fc677f5eafef986727e4e",
+  "previousRuntime": {
+    "version": "1.22.0-fork.8",
+    "source": "e832f26f719f365c033a78c4b5ef4dfcf0bdcd49"
+  },
+  "retainedForkCapabilities": [
+    {
+      "area": "release-provenance",
+      "scope": "Personal-fork CI packaging, exact-source checks, manifest inclusion, archive checksums, and workflow-run provenance."
+    },
+    {
+      "area": "cutover-inspection-safety-gate",
+      "scope": "The inspection tool is deliberately disabled in this release and returns a fixed, bounded refusal without database, filesystem, or process observations. Re-enable only after a side-effect-free, deadline-bounded snapshot is independently verified."
+    },
+    {
+      "area": "maintenance-failure-visibility",
+      "scope": "Redacted phase/failure kind, allowlisted code, and bounded owned-module source coordinates; not comprehensive error telemetry."
+    }
+  ],
+  "upstreamReplacements": [
+    {
+      "area": "recovery-and-blocker-boundaries",
+      "evidence": "Upstream v1.23 provides equivalent recovery guidance and a native-human auto-pause-only blocker command; Task blockers are not resolved by that command."
+    },
+    {
+      "area": "lifecycle-adoption-preview",
+      "evidence": "Upstream contains the adoption preview and first-backfill completed-parent protections."
+    },
+    {
+      "area": "coordination-maintenance-core",
+      "evidence": "Upstream contains the owned, fenced maintenance operation with stronger private-adapter exclusion and bounded worker shutdown/output handling."
+    },
+    {
+      "area": "graphify-caller-scope",
+      "evidence": "Upstream Graphify prompts and contract tests preserve bounded read/write scope; no fork prompt copy is carried."
+    }
+  ],
+  "notCarried": [
+    "Fork.8 generated model catalogs and model-generator aliases: upstream v1.23 catalogs are retained; the current bundled Copilot models are covered upstream, and no active client evidence justified carrying additional aliases or preview assumptions.",
+    "Fork.8's stricter custom-model missing-compatibility effort guard: upstream behavior is retained for models outside the bundled catalog; re-evaluate before relying on selectable reasoning for custom models with absent capability metadata.",
+    "The cutover coordination database inspector: disabled because live SQLite reads were shown to mutate WAL/SHM state and safe bounded access has not been established. The registered tool returns a fixed refusal; do not rely on it for database or process observations.",
+    "The separate uncommitted Task-blocker resolver draft: excluded because it conflicts with upstream blocker command semantics and its RPC confirmation path is not a valid human approval boundary."
+  ],
+  "verificationClaims": {
+    "buildPassed": false,
+    "runtimeInstallationVerified": false,
+    "liveProviderBehaviorVerified": false
+  }
+}

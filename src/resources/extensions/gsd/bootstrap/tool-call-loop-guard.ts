@@ -96,6 +96,7 @@ export const DEFAULT_PER_TOOL_CAP_EXEMPT_TOOLS = [
   "gsd_requirement_list",
   "gsd_project_snapshot",
   "gsd_milestone_status",
+  "gsd_cutover_coordination_inspect",
   "gsd_journal_query",
   "gsd_exec_search",
   "gsd_resume",

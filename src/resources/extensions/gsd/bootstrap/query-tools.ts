@@ -3,6 +3,7 @@
 // gsd-pi — Read-only query tools exposing DB state to the LLM via the WAL connection
 
 import { Type } from "@sinclair/typebox";
+import { readCutoverCoordination } from "../cutover-coordination-inspect.js";
 import type { ExtensionAPI } from "@gsd/pi-coding-agent";
 import { ensureDbOpen, resolveCtxCwd, runInPiToolSession } from "./dynamic-tools.js";
 import { checkpointWorkflowDatabase } from "../db-workspace.js";
@@ -126,6 +127,19 @@ export function registerQueryTools(
 ): void {
   const captureSourceRevision = dependencies.captureMilestoneVerificationSourceRevision
     ?? captureMilestoneVerificationSourceRevision;
+  pi.registerTool({
+    name: "gsd_cutover_coordination_inspect",
+    label: "Cutover Coordination Inspector (Disabled)",
+    description: "Disabled safety gate: refuses inspection because untouched source DB/sidecars and execution bounds cannot be guaranteed. Makes no database or process observations and never authorizes recovery or cutover.",
+    parameters: Type.Object({ limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 25 })) }),
+    async execute(_toolCallId, params, signal) {
+      // No engine import, ensureDbOpen, cwd resolution or async source work.
+      // This is a fixed refusal, not an alternate maintenance/read accessor.
+      const result = readCutoverCoordination("", params.limit, signal);
+      return { content: [{ type: "text" as const, text: JSON.stringify(result) }], details: result };
+    },
+  });
+
   pi.registerTool({
     name: "gsd_milestone_status",
     label: "Milestone Status",

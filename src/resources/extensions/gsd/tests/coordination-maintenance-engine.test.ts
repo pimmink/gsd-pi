@@ -13,7 +13,7 @@ import { openCoordinationMaintenanceHost } from "../coordination-maintenance.ts"
 import { databaseMaintenanceIntentPath } from "../database-maintenance-fence.ts";
 import { _getAdapter, closeDatabase, getDb, getDbOrNull, openDatabase, openExistingDatabase } from "../gsd-db.ts";
 import { _executeCoordinationMaintenanceDomainOperation, _setDomainOperationFaultForTest, executeDomainOperation } from "../db/domain-operation.ts";
-import { immediateTransaction } from "../db/engine.ts";
+import { immediateTransaction, inspectCutoverCoordination } from "../db/engine.ts";
 import { _setStartupSchemaDetectionForTest } from "../db/engine.ts";
 
 function fixture(
@@ -114,6 +114,7 @@ test("openExistingDatabase cannot bypass maintenance exclusion for the same or a
   if (!otherPath) throw new Error("fixture did not create its second database");
   assert.throws(() => openExistingDatabase(f.path), /Generic database access is unavailable during coordination maintenance/);
   assert.throws(() => openExistingDatabase(otherPath), /Generic database access is unavailable during coordination maintenance/);
+  assert.throws(() => inspectCutoverCoordination(f.root), /Generic database access is unavailable during coordination maintenance/);
   f.host.close();
   assert.equal(getDbOrNull(), null);
   assert.equal(_getAdapter(), null);
@@ -163,7 +164,10 @@ test("missing and unbound databases refuse without creation or implicit admissio
   const root = mkdtempSync(join(tmpdir(), "w067-missing-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const missing = openCoordinationMaintenanceHost({ projectDir: root });
-  assert.equal(missing.prepare({}).status, "refused");
+  const refusal = missing.prepare({});
+  assert.equal(refusal.status, "refused");
+  assert.equal((refusal.failure as { phase: string }).phase, "open");
+  assert.doesNotMatch(JSON.stringify(refusal), /w067-missing/);
   missing.close();
   const f = fixture(t);
   f.host.close();
@@ -418,6 +422,7 @@ test("PID and filesystem observers cannot reenter public access or admission", (
   const observe = () => {
     observations++;
     for (const getter of [getDb, getDbOrNull, _getAdapter]) assert.throws(getter);
+    assert.throws(() => inspectCutoverCoordination(f.root));
     assert.throws(() => openDatabase(f.path));
     assert.throws(() => immediateTransaction(() => { callbacks++; }));
     assert.throws(() => _executeCoordinationMaintenanceDomainOperation({} as never, {} as never, {} as never), /maintenance ownership required/);

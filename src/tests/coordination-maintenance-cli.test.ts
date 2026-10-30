@@ -72,7 +72,12 @@ for (const [name, text] of Object.entries({
     assert.equal(await run(f), 1);
     assert.equal(f.opens, 0);
     assert.equal(f.closes, 0);
-    assert.deepEqual(JSON.parse(f.lines.join("")), { requestId: null, result: { status: "refused", code: "maintenance-refused" } });
+    const reply = JSON.parse(f.lines.join(""));
+    const { failure, ...result } = reply.result;
+    assert.deepEqual({ ...reply, result }, { requestId: null, result: { status: "refused", code: "maintenance-refused" } });
+    assert.equal(failure.phase, "input");
+    assert.equal(failure.kind, "native-maintenance-failure");
+    assert.ok(failure.sources.length <= 3);
   });
 }
 
@@ -265,4 +270,49 @@ test("unit: newer managed package fence is read-only and does not trust GSD_VERS
   assert.equal(readFileSync(manifest, "utf8"), before);
   writeFileSync(manifest, "{");
   assert.throws(assertMaintenancePackageCompatibility);
+});
+
+
+test("unit: failures carry the command/open/close phase without private exception data", async () => {
+  for (const phase of ["prepare", "apply", "receipt", "open", "close"] as const) {
+    const command = phase === "open" || phase === "close" ? "prepare" : phase;
+    const f = fixture(Readable.from([request(command)]));
+    const error = Object.assign(new Error("/private/project private-token argv env"), { code: "SQLITE_BUSY" });
+    const fail = (): never => { throw error; };
+    const open = phase === "open" ? async () => fail() : f.open;
+    if (phase === "close") f.host.close = fail;
+    else if (phase !== "open") f.host[phase] = fail;
+    assert.equal(await runCoordinationMaintenanceProtocol("/unit-project", f, open), 1);
+    const last = JSON.parse(f.lines.at(-1)!);
+    assert.equal(last.result.status, "refused");
+    assert.equal(last.result.failure.phase, phase);
+    assert.equal(last.result.failure.kind, "native-maintenance-failure");
+    assert.equal(last.result.failure.code, "SQLITE_BUSY");
+    assert.ok(last.result.failure.sources.length <= 3);
+    assert.doesNotMatch(f.lines.join(""), /private|argv|env/);
+    if (phase !== "open" && phase !== "close") assert.equal(f.closes, 1);
+  }
+});
+
+test("unit: malformed input includes only fixed input-phase failure details and never opens a host", async () => {
+  const f = fixture(Readable.from(["private-token-not-json\n"]));
+  assert.equal(await run(f), 1);
+  const reply = JSON.parse(f.lines[0]);
+  assert.equal(reply.result.failure.phase, "input");
+  assert.equal(reply.result.failure.kind, "native-maintenance-failure");
+  assert.equal(f.opens, 0);
+  assert.doesNotMatch(f.lines.join(""), /private-token-not-json/);
+});
+
+test("unit: deadline still bounds a blocked close-failure diagnostic flush", async t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const f = fixture(Readable.from([request("prepare")]));
+  f.host.close = () => { throw new Error("private-close"); };
+  let writes = 0;
+  const output = new Writable({ write(_chunk, _encoding, callback) { if (++writes === 1) callback(); } });
+  const pending = runCoordinationMaintenanceProtocol("/unit-project", { input: f.input, output }, f.open);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(writes, 2);
+  t.mock.timers.tick(MAINTENANCE_LIMITS.lifetimeMs);
+  assert.equal(await pending, 1);
 });

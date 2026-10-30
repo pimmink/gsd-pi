@@ -6,6 +6,8 @@ import type { Readable, Writable } from "node:stream";
 import { resolveBundledGsdExtensionModule, resolvePackageRoot } from "./bundled-resource-path.js";
 import type { CoordinationMaintenanceFrame, CoordinationMaintenanceHost, CoordinationMaintenanceModule, CoordinationMaintenanceReply } from "./resources/shared/coordination-maintenance-contract.js";
 
+import { maintenanceFailureDetails, type MaintenanceFailurePhase } from "./resources/shared/coordination-maintenance-diagnostics.js";
+
 const COMMAND = "coordination-maintenance";
 import { MAINTENANCE_LIMITS } from "./coordination-maintenance-limits.js";
 export { MAINTENANCE_LIMITS } from "./coordination-maintenance-limits.js";
@@ -80,6 +82,7 @@ export async function runCoordinationMaintenanceProtocol(
   let prepared = false;
   let stopped = false;
   let exitCode = 0;
+  let phase: MaintenanceFailurePhase = "input";
   const cancellation = new AbortController();
   let deadlineReject: (error: Error) => void = () => {};
   const deadline = new Promise<never>((_, reject) => { deadlineReject = reject; });
@@ -96,6 +99,7 @@ export async function runCoordinationMaintenanceProtocol(
   signals?.on("SIGTERM", stop);
   output.on("error", stop);
   const emit = async (result: CoordinationMaintenanceReply) => {
+    phase = "output";
     const line = JSON.stringify({ requestId, result }) + "\n";
     if (Buffer.byteLength(line) > MAINTENANCE_LIMITS.frameBytes) throw new Error("reply-limit");
     await Promise.race([new Promise<void>((resolve, reject) => {
@@ -105,6 +109,7 @@ export async function runCoordinationMaintenanceProtocol(
   try {
     const iterator = input[Symbol.asyncIterator]();
     while (true) {
+      phase = "input";
       const next = await Promise.race([iterator.next(), deadline]);
       if (next.done) break;
       const chunk = Buffer.isBuffer(next.value) ? next.value : Buffer.from(next.value);
@@ -113,6 +118,7 @@ export async function runCoordinationMaintenanceProtocol(
       pending = Buffer.concat([pending, chunk]);
       let newline: number;
       while ((newline = pending.indexOf(10)) !== -1) {
+        phase = "input";
         requestId = null;
         if (newline > MAINTENANCE_LIMITS.frameBytes || ++frames > MAINTENANCE_LIMITS.frames) throw new Error("frame-limit");
         const frame = parseFrame(pending.subarray(0, newline));
@@ -121,6 +127,7 @@ export async function runCoordinationMaintenanceProtocol(
         requestId = frame.requestId;
         if (frame.command === "prepare" && prepared) throw new Error("retarget");
         if (!host) {
+          phase = "open";
           const opening = openHost(projectDir, cancellation.signal).then(opened => {
             if (stopped) { opened.close(); throw new Error("stopped"); }
             return opened;
@@ -128,6 +135,7 @@ export async function runCoordinationMaintenanceProtocol(
           host = await Promise.race([opening, deadline]);
         }
         let result: CoordinationMaintenanceReply;
+        phase = frame.command;
         switch (frame.command) {
           case "prepare": prepared = true; result = host.prepare(frame.input); break;
           case "apply": result = host.apply(frame.input); break;
@@ -136,24 +144,34 @@ export async function runCoordinationMaintenanceProtocol(
         if (!["prepared", "committed", "replayed", "refused"].includes(result.status)) throw new Error("invalid-reply");
         await emit(result);
         if (result.status === "refused") { exitCode = 1; return exitCode; }
+        phase = "input";
         requestId = null;
       }
       if (pending.length > MAINTENANCE_LIMITS.frameBytes) throw new Error("frame-limit");
     }
     if (pending.length !== 0 || frames === 0) throw new Error("incomplete-frame");
-  } catch {
+  } catch (error) {
     exitCode = 1;
-    // Exceptions may contain paths, argv, tokens or raw input. Never serialize them.
+    const failure = maintenanceFailureDetails(phase, error);
+    // Only fixed metadata and bounded package-owned coordinates cross the boundary.
     if (!stopped) {
-      try { await emit({ status: "refused", code: "maintenance-refused" }); } catch { /* Broken output is terminal. */ }
+      try { await emit({ status: "refused", code: "maintenance-refused", failure }); } catch { /* Broken output is terminal. */ }
     }
   } finally {
+    input.destroy();
+    try { host?.close(); } catch (error) {
+      exitCode = 1;
+      if (!stopped) {
+        try {
+          await emit({ status: "refused", code: "maintenance-refused", failure: maintenanceFailureDetails("close", error) });
+        } catch { /* Broken output is terminal. */ }
+      }
+    }
+    // Retain the deadline/error listeners through any final diagnostic flush.
     clearTimeout(timer);
     signals?.off("SIGINT", stop);
     signals?.off("SIGTERM", stop);
     output.off("error", stop);
-    input.destroy();
-    try { host?.close(); } catch { exitCode = 1; }
   }
   return exitCode;
 }

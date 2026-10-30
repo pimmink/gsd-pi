@@ -1,6 +1,8 @@
 // Project/App: gsd-pi
 // File Purpose: Fixed native coordination-maintenance transport contract; no database or writer access.
 
+import type { MaintenanceFailureDetails } from "./coordination-maintenance-diagnostics.js";
+
 export type CoordinationMaintenanceCommand = "prepare" | "apply" | "receipt";
 
 export interface CoordinationMaintenanceFrame {
@@ -11,6 +13,7 @@ export interface CoordinationMaintenanceFrame {
 
 export interface CoordinationMaintenanceReply {
   status: "prepared" | "committed" | "replayed" | "refused";
+  failure?: MaintenanceFailureDetails;
   readonly [key: string]: unknown;
 }
 

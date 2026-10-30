@@ -39,6 +39,7 @@ const FULL_REGISTERED_TOOLS = [
   "gsd_task_complete",
   "gsd_complete_milestone",
   "gsd_exec",
+  "gsd_cutover_coordination_inspect",
   "memory_query",
   "capture_thought",
 ] as const;
@@ -97,6 +98,7 @@ test("buildMinimalGsdWorkflowToolSet includes all registered base tools when act
 
   assertIncludesAll(result, MINIMAL_AUTO_BASE_TOOL_NAMES, "workflow tool set");
   assertIncludesAll(result, INVESTIGATION_TOOLS, "workflow investigation tools");
+  assert.ok(result.includes("gsd_cutover_coordination_inspect"), "disabled cutover safety gate survives minimal workflow scoping");
 });
 
 test("scopeGsdWorkflowToolsForDispatch without unit type pulls registered investigation tools", () => {

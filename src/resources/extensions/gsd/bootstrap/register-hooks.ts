@@ -260,6 +260,7 @@ export const MINIMAL_GSD_TOOL_NAMES = [
   "gsd_exec_search",
   "gsd_resume",
   "gsd_milestone_status",
+  "gsd_cutover_coordination_inspect",
   "gsd_project_snapshot",
   "gsd_checkpoint_db",
   "gsd_plan_milestone",
