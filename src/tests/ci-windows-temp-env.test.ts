@@ -27,7 +27,13 @@ function windowsPackageTestStep(): string {
 		/ {2}windows-portability:\n(?<body>[\s\S]*?)(?=\n {2}[a-zA-Z0-9_-]+:|\n?$)/,
 	)?.groups?.body;
 	assert.ok(job, "windows-portability job must exist");
-	assert.match(job, /runs-on:\s*blacksmith-4vcpu-windows-2025/);
+	const runner = job.match(/^\s+runs-on:\s*(.+)$/m)?.[1];
+	assert.ok(runner, "Windows portability runner must be configured");
+	assert.match(
+		runner,
+		/\$\{\{\s*github\.repository_owner\s*==\s*'pimmink'\s*&&\s*'windows-latest'\s*\|\|\s*'blacksmith-4vcpu-windows-2025'\s*\}\}/,
+		"The fork runner route must preserve the Blacksmith fallback",
+	);
 
 	const step = job.match(
 		/ {6}- name: Run package tests\n(?<body>[\s\S]*?)(?=\n {6}- name:|\n?$)/,

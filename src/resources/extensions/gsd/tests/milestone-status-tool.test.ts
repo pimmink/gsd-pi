@@ -28,6 +28,14 @@ function makeMockPi() {
   } as any;
 }
 
+function getMilestoneStatusTool(pi: ReturnType<typeof makeMockPi>) {
+  const tool = pi.tools.find(
+    (candidate: { name: string }) => candidate.name === "gsd_milestone_status",
+  );
+  assert.ok(tool, "gsd_milestone_status should be registered");
+  return tool;
+}
+
 function makeTmpBase(): string {
   const base = join(tmpdir(), `gsd-query-tool-test-${randomUUID()}`);
   mkdirSync(join(base, ".gsd"), { recursive: true });
@@ -95,7 +103,7 @@ test("registerQueryTools registers gsd_milestone_status tool", () => {
 test("gsd_milestone_status has promptGuidelines mentioning prohibited alternatives", () => {
   const pi = makeMockPi();
   registerQueryTools(pi);
-  const tool = pi.tools[0];
+  const tool = getMilestoneStatusTool(pi);
   assert.ok(Array.isArray(tool.promptGuidelines), "promptGuidelines must be an array");
   assert.ok(tool.promptGuidelines.length >= 1, "Must have at least one guideline");
   const joined = tool.promptGuidelines.join(" ");
@@ -137,7 +145,7 @@ test("gsd_milestone_status returns milestone metadata and slice statuses", async
         return { ok: true, sourceRevision: "sha256:turn-bound-source" };
       },
     });
-    const tool = pi.tools[0];
+    const tool = getMilestoneStatusTool(pi);
 
     assert.equal(captures, 0, "registering an unused status tool must not capture source");
 
@@ -192,7 +200,7 @@ test("gsd_milestone_status returns empty slices array for milestone with no slic
 
     const pi = makeMockPi();
     registerQueryTools(pi);
-    const tool = pi.tools[0];
+    const tool = getMilestoneStatusTool(pi);
 
     const result = await executeToolInDir(tool, { milestoneId: "M002" }, base);
     const parsed = JSON.parse(result.content[0].text);
@@ -215,7 +223,7 @@ test("gsd_milestone_status returns not-found for missing milestone", async () =>
 
     const pi = makeMockPi();
     registerQueryTools(pi);
-    const tool = pi.tools[0];
+    const tool = getMilestoneStatusTool(pi);
 
     const result = await executeToolInDir(tool, { milestoneId: "M999" }, base);
     assert.match(result.content[0].text, /M999.*not found/i);
@@ -236,7 +244,7 @@ test("gsd_milestone_status handles missing DB gracefully", async () => {
   try {
     const pi = makeMockPi();
     registerQueryTools(pi);
-    const tool = pi.tools[0];
+    const tool = getMilestoneStatusTool(pi);
 
     const result = await executeToolInDir(tool, { milestoneId: "M001" }, base);
     assert.deepEqual(result, {
