@@ -46,7 +46,7 @@
     "The separate uncommitted Task-blocker resolver draft: excluded because it conflicts with upstream blocker command semantics and its RPC confirmation path is not a valid human approval boundary."
   ],
   "verificationClaims": {
-    "buildPassed": false,
+    "buildPassed": true,
     "runtimeInstallationVerified": false,
     "liveProviderBehaviorVerified": false
   }
