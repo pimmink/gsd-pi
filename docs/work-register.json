@@ -1824,6 +1824,32 @@
 			"context": "Keep Responses-only endpoint selection and reasoning-effort mappings in the model generator so catalog refreshes preserve them; update generated TypeScript and JSON catalogs with regression coverage. The separate Copilot catalog audit checked the recently listed models against current upstream/main and found the IDs already present; no additional model-addition issue or PR was warranted. This PR is distinct from fork.5 release acceptance tracked in GSD-W053.",
 			"validation": "2026-10-13: Rebased onto upstream/main 48c7d41c8d63253f435d837fbe0b70c663928593 and resolved the generate-models.ts conflict. Focused generated-models.test.ts passed 23/23 before dependency cleanup; no local build was run. Current PR head 5446878fd49d4eab751d89527cf07699df04919d is open and clean for mergeability. CI run 38335192996 passed the build, fast gates, workflow lint, security checks, Node 22 smoke, and aggregate gate; Windows portability was skipped by workflow policy. User-requested node_modules cleanup was verified in both PR worktrees.",
 			"nextAction": "Await maintainer review on PR #2735. Do not open a separate model-addition issue/PR; reconcile the rebased PR source against the fork.5 candidate before release via GSD-W053."
+		},
+		{
+			"id": "GSD-W074",
+			"type": "feature",
+			"scope": "upstream",
+			"upstreamDisposition": "historical",
+			"title": "Opt-in exact cmux restore of GSD conversations (#3014 via PR #3093)",
+			"status": "merged",
+			"issues": [
+				3014
+			],
+			"pullRequests": [
+				3093
+			],
+			"relatedRefs": [
+				"https://github.com/open-gsd/gsd-pi/pull/3124"
+			],
+			"branches": [
+				"feat/3014-cmux-resume"
+			],
+			"commits": [
+				"8bf1c8aff1fece3bd48703fd013d25056369a1da"
+			],
+			"context": "2026-11-06: PR #3093 squash-merged to open-gsd/gsd-pi main as 8bf1c8a after exact-head CI on 83b0964b passed. Adds opt-in cmux.resume, exact session open via --resume-exact with strict identity/cwd checks, and cmux trust-policy respect. Design PR #3124 merged at 44ff46d9. Vault registration #3012 remains closed via #3072; checkpoint branching #3015 is separate. Six Copilot review threads were answered and resolved individually.",
+			"validation": "2026-11-06: Exact-head CI on 83b0964b92e3d37d13e6191c13367c8a32cc59e5 passed build, contract-tests, fast-gates, workflow-lint, node22-smoke, ci-gate and security (Windows portability skipped). Local verify:pr failed only at the performance-baseline gate and test:unit:compiled timed out at 60 minutes; neither was waived. R-11 real cmux restart-and-continue round trip is NOT yet performed.",
+			"nextAction": "Keep #3014 OPEN. Native literal close/reopen restore is NOT proven: after closing the surface, cmux restore record was not carried over ('nothing to restore'). Restore via gsd --resume-exact and append are proven (attempt B, active-session-ownership.md). Decide: accept --resume-exact as the exact-resume contract, or fix/upstream the native restore-record persistence on surface close before closing #3014."
 		}
 	],
 	"localExtensionPatches": [
