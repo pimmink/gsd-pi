@@ -2121,35 +2121,42 @@
       "nextAction": "Run the #2916 host-acceptance matrix after the fork install; close #2916 only with per-item evidence."
     },
 		{
-      "id": "GSD-W080",
-      "type": "feature",
-      "scope": "upstream",
-      "upstreamDisposition": "pr-required",
-      "title": "cmux CUA remaining portable matrix and canonical catalogue provenance",
-      "status": "in-progress",
-      "issues": [
-        3019
-      ],
-      "pullRequests": [
-        3148,
-        3149,
-        3150
-      ],
-      "branches": [
-        "test/cmux-cua-conformance-matrix-20261108"
-      ],
-      "commits": [
-        "005737e681c3acc3f9a4b643866d86f860a6dac3",
-        "675954070e0be3176d0a8f58597060fcadb1d479",
-        "f3970aef7a55b22fd4155b838e28a072e7a60f6e"
-      ],
-      "planRefs": [
-        "PLAN-CUA-CONFORMANCE-MATRIX"
-      ],
-      "context": "2026-11-08: Operator delegates choosing/executing best automatic route and source PR/review/merge work. Architecture decision20e18c19 selects source-only portable conformance first; no supported one-broker live route exists in this session, so no live handshake or synthetic host bootstrap. Owned worktrees/cua-conformance-matrix-20261108 starts at actual upstream afaa13f28b48445c8ac7a5dd98207515187bec8e; plan plans/2026-11-08-cua-conformance-matrix/PLAN.md. Historical merged GSD-W076/GSD-W079 preserved. G03literalfalse/notype_text/all native and install/restart boundaries remain.",
-      "validation": "PR#3150 MERGED 2026-11-10T13:30:29Z by pimmink: docs-only contract alignment (maintainer per-run approval wording and D1-D4 manifest references); Copilot final review 5842643321 Approval recommended, no open issues. PR#3149 OPEN docs provenance, head c53eaa66a, CI SUCCESS, NO Copilot review on that head yet (only 5842559793 on 31081fa8b, finding 4525371968 addressed in c53eaa66a, not yet verified by reviewer). Do not reply/resolve/merge until that review exists. Source increment PR#3148 MERGED 2026-11-10T04:07:09Z at f3970aef7a55b22fd4155b838e28a072e7a60f6e from tested repairhead675954070e0be3176d0a8f58597060fcadb1d479. Exact-head CI42750884480 SUCCESS: extension declarations, core build, compiled unit/package/integration/e2e checks, Node22-smoke/final CI gate; Windows portability SKIPPED, not execution proof. Final complete review/check audit c1fcd26e: original Copilot finding individually fixed/replied/resolved; empty author-reply COMMENTED record is not independent approval; no late findings or unresolved threads. Guarded merge0adf0054; actual merged file blobs match reviewed/tested675 and main is identical401a6dee. Issue3019 remains OPEN. This ships the bounded source increment, not full GSD-W080/catalogue/native acceptance; W080 remains in-progress. Prior005 head CI42531571917 SUCCEEDED including extension typecheck/compiled-test/build; confirmed exact extension include configuration4399dd2e/d30ae1fe, WindowsSKIPPED. Copilot4508121120 abort-specific assertion repair: distinct reasons inspection/verification/discovery, current55fixturesPASS bg_f59a6055, targeted4PASS ec1a6a03, signal-stripped fixtureclient produces3expectedFAIL 1b7ea20e, zero native/mutation attempts, independent d240986fPASS exacttestSHA256d8c23bcecae9762b869b8ae834cb58b4867ff9e28dfe980764aab436e215f8c9. Reply4520856543 persisted despite first CLI output-parse error, deduplicated/reconciled a5b4e315 and one verified thread individually resolved ee8464e7. Never reuse oldheadgreen as repairedheadproof. Historical initial PRhead005737e681c3acc3f9a4b643866d86f860a6dac3 verifiede15b5627. Matrix187testlineadditions55/55macOSruntimePASS (14portable41POSIX+retained36=91), parentcontenthash/timer/nativeguardproofd1fe7a46; boundedsource review0343519ePASS but exactSDKdeclaration acceptanceOPEN afterlocaltimeoutsincludingparent3c99d588, no repeatedlocalretry or packagepassclaim. Guide review006d5eaaflaggedstaleplatformcounts, corrected55versus14/41; coverage/provenance limitationsreviewed. Catalogue source51blobsha/lengthproofcb532ee0 and independentaudit0343519e confirm39literals/37platform38CLIunregisteredalias but rejectcompleteenvelopeclaimmissing schema_version1; no runtime39pinchanged/artifactpadding, guidehonest. ActualSource55/guideonlycommitted/pushed93a47818; sourcechecks6f19b15fPASS. CatalogueaslargefullfixtureNOTpublished; remainingprovenance/runtimecompatibilityopen. No nativeG03/typetext/helper/UI/install/restart changes. Historical setup: Fresh clean source worktree created93689982 from mergedafaa. Native pinned source manaflow-ai/cmux-cua e0f738807dbff2f35fe67d7fbcc99c7082cffc23 independently verified viaGitHubMCP; actual registry/tool_schema/server source downloaded as read-only analysisf154fb68, no execution or localbuild. Canonical full catalogue extraction remains unproved, not inferred from source availability. Parent ownbootstrap presence923ab1e3 absent; model initialization/metadata not D1 peer proof. No completion claim.",
-      "nextAction": "PR3148 source increment is merged; no further PR action is pending. Broader GSD-W080 remains open: reconstruct and independently validate the complete compatible canonical metadata envelope from verified pinned source (schema_version1 is currently missing), preserve the qualified 39literal/37platform/38CLI counts and unregistered alias, and plan remaining private-init/queue/lifecycle/compatibility evidence separately. No fake39padding, runtime-pin change or native broker/bootstrap execution. G03 stays literally false; native D1-D4 and install/restart still need their separate operator GO plus READY."
-    },
+		  "id": "GSD-W080",
+		  "type": "feature",
+		  "scope": "upstream",
+		  "upstreamDisposition": "pr-required",
+		  "title": "cmux CUA remaining portable matrix and canonical catalogue provenance",
+		  "status": "in-progress",
+		  "issues": [
+		    3019
+		  ],
+		  "pullRequests": [
+		    3148,
+		    3149,
+		    3150,
+		    3164,
+		    3166,
+		    3168
+		  ],
+		  "branches": [
+		    "test/cmux-cua-conformance-matrix-20261108"
+		  ],
+		  "commits": [
+		    "005737e681c3acc3f9a4b643866d86f860a6dac3",
+		    "675954070e0be3176d0a8f58597060fcadb1d479",
+		    "f3970aef7a55b22fd4155b838e28a072e7a60f6e",
+		    "b5fec6ed4d8cdd91defabed3d02a03959d15c484",
+		    "d4682ada4bec0e34ec6d1ed51460826cd1fbc103",
+		    "9817d1f7ea6e12b336d1cc2b921ee51443aeb650",
+		    "2d86546073a28b4e887863eb1d0e7c60d0d34c31"
+		  ],
+		  "planRefs": [
+		    "PLAN-CUA-CONFORMANCE-MATRIX"
+		  ],
+		  "context": "2026-11-08: Operator delegates choosing/executing best automatic route and source PR/review/merge work. Architecture decision20e18c19 selects source-only portable conformance first; no supported one-broker live route exists in this session, so no live handshake or synthetic host bootstrap. Owned worktrees/cua-conformance-matrix-20261108 starts at actual upstream afaa13f28b48445c8ac7a5dd98207515187bec8e; plan plans/2026-11-08-cua-conformance-matrix/PLAN.md. Historical merged GSD-W076/GSD-W079 preserved. G03literalfalse/notype_text/all native and install/restart boundaries remain.",
+		  "validation": "PR#3150 MERGED 2026-11-10T13:30:29Z by pimmink: docs-only contract alignment (maintainer per-run approval wording and D1-D4 manifest references); Copilot final review 5842643321 Approval recommended, no open issues. PR#3149 OPEN docs provenance, head c53eaa66a, CI SUCCESS, NO Copilot review on that head yet (only 5842559793 on 31081fa8b, finding 4525371968 addressed in c53eaa66a, not yet verified by reviewer). Do not reply/resolve/merge until that review exists. Source increment PR#3148 MERGED 2026-11-10T04:07:09Z at f3970aef7a55b22fd4155b838e28a072e7a60f6e from tested repairhead675954070e0be3176d0a8f58597060fcadb1d479. Exact-head CI42750884480 SUCCESS: extension declarations, core build, compiled unit/package/integration/e2e checks, Node22-smoke/final CI gate; Windows portability SKIPPED, not execution proof. Final complete review/check audit c1fcd26e: original Copilot finding individually fixed/replied/resolved; empty author-reply COMMENTED record is not independent approval; no late findings or unresolved threads. Guarded merge0adf0054; actual merged file blobs match reviewed/tested675 and main is identical401a6dee. Issue3019 remains OPEN. This ships the bounded source increment, not full GSD-W080/catalogue/native acceptance; W080 remains in-progress. Prior005 head CI42531571917 SUCCEEDED including extension typecheck/compiled-test/build; confirmed exact extension include configuration4399dd2e/d30ae1fe, WindowsSKIPPED. Copilot4508121120 abort-specific assertion repair: distinct reasons inspection/verification/discovery, current55fixturesPASS bg_f59a6055, targeted4PASS ec1a6a03, signal-stripped fixtureclient produces3expectedFAIL 1b7ea20e, zero native/mutation attempts, independent d240986fPASS exacttestSHA256d8c23bcecae9762b869b8ae834cb58b4867ff9e28dfe980764aab436e215f8c9. Reply4520856543 persisted despite first CLI output-parse error, deduplicated/reconciled a5b4e315 and one verified thread individually resolved ee8464e7. Never reuse oldheadgreen as repairedheadproof. Historical initial PRhead005737e681c3acc3f9a4b643866d86f860a6dac3 verifiede15b5627. Matrix187testlineadditions55/55macOSruntimePASS (14portable41POSIX+retained36=91), parentcontenthash/timer/nativeguardproofd1fe7a46; boundedsource review0343519ePASS but exactSDKdeclaration acceptanceOPEN afterlocaltimeoutsincludingparent3c99d588, no repeatedlocalretry or packagepassclaim. Guide review006d5eaaflaggedstaleplatformcounts, corrected55versus14/41; coverage/provenance limitationsreviewed. Catalogue source51blobsha/lengthproofcb532ee0 and independentaudit0343519e confirm39literals/37platform38CLIunregisteredalias but rejectcompleteenvelopeclaimmissing schema_version1; no runtime39pinchanged/artifactpadding, guidehonest. ActualSource55/guideonlycommitted/pushed93a47818; sourcechecks6f19b15fPASS. CatalogueaslargefullfixtureNOTpublished; remainingprovenance/runtimecompatibilityopen. No nativeG03/typetext/helper/UI/install/restart changes. Historical setup: Fresh clean source worktree created93689982 from mergedafaa. Native pinned source manaflow-ai/cmux-cua e0f738807dbff2f35fe67d7fbcc99c7082cffc23 independently verified viaGitHubMCP; actual registry/tool_schema/server source downloaded as read-only analysisf154fb68, no execution or localbuild. Canonical full catalogue extraction remains unproved, not inferred from source availability. Parent ownbootstrap presence923ab1e3 absent; model initialization/metadata not D1 peer proof. No completion claim. UPDATE 2026-11-13: PR#3149 MERGED b5fec6ed4 (reproduction command labelled non-runnable). PR#3164 MERGED d4682ada4 (exact head 224ec7bb1; source-only registry extractor, 37 static sites on pin e0f738807; 10/10 extractor tests in run output; historical 38-tool envelope digest NOT reproduced). PR#3166 MERGED 9817d1f7e (exact head 01631976f; default-off registration test, partial 19-P01). PR#3168 MERGED 2d860546 (exact head a15f2ace6; default-export inertness, partial 19-P01; cold-import and transitive module-graph still OPEN). Umbrella #3019 OPEN.",
+		  "nextAction": "Continue portable 19-P01 (transitive module-graph inertness, non-Mac startup) and 19-P03..P07 gaps; D1-D4 remain blocked on a native cmux runtime decision."
+		},
 		{
       "id": "GSD-W079",
       "type": "feature",
