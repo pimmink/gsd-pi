@@ -1826,6 +1826,77 @@
 			"nextAction": "Await maintainer review on PR #2735. Do not open a separate model-addition issue/PR; reconcile the rebased PR source against the fork.5 candidate before release via GSD-W053."
 		},
 		{
+			"id": "GSD-W072",
+			"type": "umbrella",
+			"scope": "upstream",
+			"upstreamDisposition": "pr-required",
+			"title": "Make sandboxed execution understandable in the GSD TUI (#2913)",
+			"status": "in-progress",
+			"issues": [
+				2913,
+				2914,
+				2916,
+				2929,
+				2931,
+				2932,
+				2933,
+				2934,
+				2935,
+				2936
+			],
+			"pullRequests": [
+				3073,
+				3074,
+				3075,
+				3076,
+				3077,
+				3078,
+				3079,
+				3083,
+				3159
+			],
+			"branches": [
+				"docs/tui-2933-identity-20261102",
+				"docs/tui-2932-blockers-20261102",
+				"docs/tui-2936-activity-20261102",
+				"docs/tui-2934-read-context-20261102",
+				"docs/tui-2931-prose-width-20261102",
+				"docs/tui-2935-notification-20261102",
+				"docs/tui-2929-semantic-emphasis-20261102",
+				"fix/tui-2914-historical-warning-20261102"
+			],
+			"commits": [
+				"bec814864ec77ce86936fad0b31c56a88cf764db",
+				"d3a9cbb60daa3e6ed43d3991e89e529763647f97",
+				"0f5c5623801d85f0de4f0c7f602c1dfdcbdf03c6",
+				"8edeb30620c0939a7d1f18999eadceff99cbb112",
+				"6d8eb80f01a31f7ce8be0b58a358cb9688a260ee",
+				"f3543f9d19ba80fbcce1d2ff118a000b07b8b357",
+				"91b090082ddfb6dc8d48e0e8d674736c78481af1",
+				"beb40c5d2bd5e9f1bd76b8b7211b7df8edb42f4a",
+				"065e3cc43aa20db136ca8c81dcd236508d591020",
+				"bbf5579b5cda07faa3702abb33593cf4844b19d7",
+				"0af111279379c5eaee93a94a9b75c42508059c36",
+				"0d0952b62a72a964f85a31135be988969c97e644",
+				"78bd5207e78e850dbc909681cfe00e1a3f6f7d51",
+				"49bd2620e73fb8b46230641596d6edcdc200071f",
+				"7823cc3c362aee41e751699c576436dae79f3b78"
+			],
+			"relatedRefs": [
+				"https://github.com/open-gsd/gsd-pi/pull/2917",
+				"https://github.com/open-gsd/gsd-pi/pull/2922",
+				"https://github.com/open-gsd/gsd-pi/pull/2939",
+				"https://github.com/open-gsd/gsd-pi/issues/2869",
+				"https://github.com/open-gsd/gsd-pi/pull/2992",
+				"https://github.com/open-gsd/gsd-pi/issues/3070",
+				"https://github.com/open-gsd/gsd-pi/pull/3071",
+				"https://github.com/open-gsd/gsd-pi/pull/3159"
+			],
+			"context": "2026-11-02: Live upstream main is e323d180efe3bd10f16beedf589ae06f14563e47. PRs #3073–#3079 and #3083 are open; #2914 is a focused standalone-error warning fix and the six D01–D06/#2929 proposals remain design-only. #2917/#2922 are merged, #2915 is closed, and #2916 has no real-host evidence. The saved READ-context plan is included under #2934. Native subissue attachment remains maintainer-gated. Related ENOENT fixes #2869/#2992 and #3070/#3071 are specific and closed; no broad general issue was verified.",
+			"validation": "PR #3073 is open on head 0f5c5623801d85f0de4f0c7f602c1dfdcbdf03c6 after a non-conflicting current-main update. Focused regression suites pass 123/123; verify:fast passes on its pre-update code head and exact-SHA sharded verification is pending on the updated head. The seven docs-only proposals passed source/Markdown structure checks; their upstream checks pass, and no host acceptance or runtime installation is claimed. | 2026-11-13 update: PR #3159 head f7c1f6e127ecdc21eb54113faad2881ee89d84d0 (F2 per-block visual cap, red/green 45/46 on prior renderer; PR-CI green on that head; owned-runtime artifact run 43291496736 attempt 1 verified, source-bound). Host matrix H01-H12 on that candidate has receipts: H01,H02,H03,H04,H06,H07,H08,H09,H10,H11,H12 PASS-PENDING-OPERATOR (human visual judgment pending); H05 BLOCKED (setup gap: workflow DB required). Harness changes are traceable in exec-2913 checkpoint. Operator acceptance not given; #2916/#2913 not closed.",
+			"nextAction": "Operator: visual judgment of PASS-PENDING-OPERATOR receipts for PR #3159 candidate f7c1f6e1 (captures listed in h-matrix-status-f7c1.json). Technical: H05 needs an owned bound workflow project (product-supported bootstrap) before re-run. Then independent review of the integrated host evidence and operator acceptance decision. Do not merge or close #2913/#2916 without explicit authorization."
+		},
+		{
 			"id": "GSD-W074",
 			"type": "feature",
 			"scope": "upstream",
