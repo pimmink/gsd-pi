@@ -1854,6 +1854,130 @@
 			"nextAction": "Within existing authority: (1) integrate this item into the remote register (this change). (2) Historical coordination-maintenance work and any live-runtime activation remain blocked until separately authorised. Do not treat the merged CI harness as completion of the historical maintenance task."
 		},
 		{
+      "id": "GSD-W068",
+      "type": "bugfix",
+      "scope": "upstream",
+      "upstreamDisposition": "pr-required",
+      "title": "Add a safe terminal stopped state to auto-mode workers",
+      "status": "in-progress",
+      "issues": [
+        3029
+      ],
+      "pullRequests": [
+        3033
+      ],
+      "relatedRefs": [
+        "GSD-W067",
+        "https://github.com/open-gsd/gsd-pi/issues/2851",
+        "https://github.com/open-gsd/gsd-pi/pull/2854"
+      ],
+      "branches": [
+        "fix/issue-3029-worker-terminal-stop-status"
+      ],
+      "commits": [
+        "91433af377f4e6687d4c9af082e92716ba5a183d"
+      ],
+      "context": "Generic upstream component selected from W067 after the query-only diagnosis proved the pre-admission guard was blocked by stopping worker rows. Upstream production code had no terminal stopped transition. This contribution changes only reusable worker lifecycle semantics, not the fork-only maintenance guard or any application database. The issue was opened before the PR was ready due the prior authorization, then closed immediately to honor the corrected sequencing; reopen only with the completed PR.",
+      "validation": "2026-10-27: focused auto-remote-session-lock-cleanup suite passed 7/7 on commit 91433af. Local extension typecheck timed out at 120 seconds and is not counted as a pass. CI on original PR commit 91433af failed in one existing #2532 test whose expected status was stale; Sol 6.1 review confirmed the new guarded lifecycle result is correct. Updated the assertion, title, and comment; the focused #2532 file passes 6/6. Fix committed and pushed as 17e8e333; upstream run 40531911237 passed on exact HEAD 17e8e333 (all applicable checks green; windows-portability skipped). Fork run 40523434531 remains queued on old SHA 91433af. Local `pnpm run verify:pr` was attempted only after upstream success but failed in `build:core` with TS2345 duplicate workspace types: the feature worktree's `node_modules` symlink resolves `@gsd/agent-core` and `@gsd/pi-coding-agent` to the original fork, while the build compiles worktree sources. Tracked source tree remains clean; the authorized build updated only worktree-generated package `dist` outputs before stopping. The shared `node_modules` symlink and dependency contents were not changed or deleted. No local pass claim and no application DB write.",
+      "nextAction": "PR #3033 is ready for review; issue #3029 was reopened and updated with detailed GFM (comment 6447154337). Upstream CI is green on exact HEAD 17e8e333. Local verify:pr failed only from the documented cross-worktree dependency symlink mismatch; the user accepted this as an environment issue, and no dependency state was altered. Await review; do not merge without applicable approval and per-finding review triage. This worker-lifecycle change does not repair historical foreign-host rows in the W067 database; do not claim live maintenance is unblocked without separately authorized proof-backed reconciliation."
+    },
+		{
+      "id": "GSD-W069",
+      "type": "bugfix",
+      "scope": "upstream",
+      "upstreamDisposition": "pr-required",
+      "title": "Preserve the filesystem when native Graphify dispatches read actions",
+      "status": "merged",
+      "issues": [
+        2960
+      ],
+      "pullRequests": [
+        3057
+      ],
+      "branches": [
+        "fix/graphify-read-actions-no-mkdir-20261030"
+      ],
+      "commits": [
+        "8848df2ccc47541cf825d625e0285e77fce4acbc",
+        "a02810d14ece07094c33737b65afb5d375d9b386"
+      ],
+      "planRefs": [
+        "PLAN-2026-10-30-GRAPHIFY-NATIVE-PROOF-FOLLOWUPS"
+      ],
+      "relatedRefs": [
+        "https://github.com/open-gsd/gsd-pi/issues/2953",
+        "https://github.com/open-gsd/gsd-pi/pull/3054"
+      ],
+      "context": "2026-10-30: Operator authorized three native-route follow-ups and PR publication. Source inspection found handleGraphify creates the knowledge directory before checking query/status/diff. Repair existing behavior only; preserve build behavior and all maintainer gates on C02/provider/MCP integration.",
+      "validation": "2026-10-30: PR #3057 at 8848df2ccc47541cf825d625e0285e77fce4acbc is now ready for review after clean CI run 41130685135 completed successfully, including build, Run unit tests and current ci-gate. Independent source review and local syntax/diff checks passed. Local runtime attempts remain dependency-blocked; no retroactive local pass or observed red/green proof is claimed. Compact logs did not expose isolated per-case names/counts. Reviews/threads/general comments were re-read before readiness; no findings were present then.",
+      "nextAction": "Merged via squash as a02810d14ece07094c33737b65afb5d375d9b386; low test-cleanup advisory is nonblocking. Follow up only if native-host behavior is separately pursued."
+    },
+		{
+      "id": "GSD-W070",
+      "type": "test",
+      "scope": "upstream",
+      "upstreamDisposition": "pr-required",
+      "title": "Assess observed Graphify known-answer facts with fixture-only negative tests",
+      "status": "merged",
+      "issues": [
+        2960
+      ],
+      "pullRequests": [
+        3058
+      ],
+      "branches": [
+        "test/graphify-known-answer-assessor-20261030"
+      ],
+      "commits": [
+        "a22284055a8e72f18af79a4a9353fbae43504777",
+        "3166072db418dffd9a561626a5a4e5ddbb5061b7"
+      ],
+      "planRefs": [
+        "PLAN-2026-10-30-GRAPHIFY-NATIVE-PROOF-FOLLOWUPS"
+      ],
+      "relatedRefs": [
+        "https://github.com/open-gsd/gsd-pi/issues/2953",
+        "https://github.com/open-gsd/gsd-pi/pull/3039"
+      ],
+      "context": "2026-10-30: Existing C07-A tests prove fixture/source integrity, not observed graph answers. Add a small deterministic test-only assessor and malformed/false-call/missing-evidence negatives without defining a provider/runtime contract or claiming native adoption.",
+      "validation": "2026-10-30: PR #3058 at a22284055a8e72f18af79a4a9353fbae43504777. Current 57-test scope passes (52 assessor plus five existing integrity), independently rerun by parent. Independent Sol 6.1 xhigh review reports no blockers plus 286 supplemental malformed/availability/fact-subset assertions passing. Syntax, docs lint and diff checks pass. Clean online run 41130846088 and ci-gate now pass; all 11 registered checks read back terminal success/expected skip at this head. Copilot COMMENTED review has no active findings; no provider/native adoption is credited.",
+      "nextAction": "Merged via squash as 3166072db418dffd9a561626a5a4e5ddbb5061b7; keep fixture-only evidence separate from host/provider adoption."
+    },
+		{
+      "id": "GSD-W071",
+      "type": "documentation",
+      "scope": "upstream",
+      "upstreamDisposition": "pr-required",
+      "title": "Record a public Graphify prompt probe and native-host evidence limits",
+      "status": "merged",
+      "issues": [
+        2960
+      ],
+      "pullRequests": [
+        3059
+      ],
+      "branches": [
+        "docs/graphify-native-pilot-evidence-20261030"
+      ],
+      "commits": [
+        "a3fe6c1b42608cd68ed47dd5a3000697096c3c48",
+        "3906833746e4c83a0ff3b1494dc0f81c6fd6239f",
+        "c327e97adcbdfdd0e821c246df76e438b741a8d7",
+        "c59aa1809ea1f74c301c84f990e66643f435f11f"
+      ],
+      "planRefs": [
+        "PLAN-2026-10-30-GRAPHIFY-NATIVE-PROOF-FOLLOWUPS"
+      ],
+      "relatedRefs": [
+        "GSD-W070",
+        "https://github.com/open-gsd/gsd-pi/issues/2958",
+        "https://github.com/open-gsd/gsd-pi/issues/2959"
+      ],
+      "context": "2026-10-30: Run only the existing native R0 route against an isolated public fixture. A third evidence PR is conditional on a substantive executed result, not a template or invented diagnostic implementation. No optional external provider, new MCP exposure, lifecycle authority or runtime installation.",
+      "validation": "2026-10-30: PR #3059 initial a3fe6c1b42608cd68ed47dd5a3000697096c3c48, current c327e97adcbdfdd0e821c246df76e438b741a8d7. Public prompt-only probe: five module nodes, three imports, two calls, unresolved dynamic target; source/artifact hashes and anchors verified. Prompt/source fixture comparison PASS, native-command evidence INCONCLUSIVE; docs lint zero issues and independent evidence review passed within docs-only limits. One later Copilot missing-provenance-reference finding was fixed in 39068337, remote bytes/diff verified, replied through MCP and individually resolved via gh GraphQL after MCP resolve_review_thread returned unknown tool. Graph bytes/hashes unchanged. Latest c327e97a docs CI run 41135283319 and ci-gate pass; docs-only build/platform skips are not runtime proof. A delayed completion notification reported 192.4 seconds versus the earlier await_job display of 320; both are now preserved as conflicting, unverified elapsed-time reports. No probe rerun occurred and graph hashes/verdicts are unchanged. Previous-SHA green CI was not reused. No native-host/adoption or hard-deadline claim.",
+      "nextAction": "Merged via squash as c59aa1809ea1f74c301c84f990e66643f435f11f. Preserve native-host and C02 authority gates; no runtime installation or adoption claim."
+    },
+		{
 			"id": "GSD-W072",
 			"type": "umbrella",
 			"scope": "upstream",
@@ -1922,8 +2046,32 @@
 			],
 			"context": "2026-11-02: Live upstream main is e323d180efe3bd10f16beedf589ae06f14563e47. PRs #3073–#3079 and #3083 are open; #2914 is a focused standalone-error warning fix and the six D01–D06/#2929 proposals remain design-only. #2917/#2922 are merged, #2915 is closed, and #2916 has no real-host evidence. The saved READ-context plan is included under #2934. Native subissue attachment remains maintainer-gated. Related ENOENT fixes #2869/#2992 and #3070/#3071 are specific and closed; no broad general issue was verified.",
 			"validation": "PR #3073 is open on head 0f5c5623801d85f0de4f0c7f602c1dfdcbdf03c6 after a non-conflicting current-main update. Focused regression suites pass 123/123; verify:fast passes on its pre-update code head and exact-SHA sharded verification is pending on the updated head. The seven docs-only proposals passed source/Markdown structure checks; their upstream checks pass, and no host acceptance or runtime installation is claimed. | 2026-11-13 update: PR #3159 head f7c1f6e127ecdc21eb54113faad2881ee89d84d0 (F2 per-block visual cap, red/green 45/46 on prior renderer; PR-CI green on that head; owned-runtime artifact run 43291496736 attempt 1 verified, source-bound). Host matrix H01-H12 on that candidate has receipts: H01,H02,H03,H04,H06,H07,H08,H09,H10,H11,H12 PASS-PENDING-OPERATOR (human visual judgment pending); H05 BLOCKED (setup gap: workflow DB required). Harness changes are traceable in exec-2913 checkpoint. Operator acceptance not given; #2916/#2913 not closed.",
-			"nextAction": "Merged: PR #3159 at 86317cfdbbe89f7deb800859485a7ab09badff67 on 2026-11-13. #2916 closed. #2913 stays open: native sub-issue attachment function is restored (endpoint answers), but no native sub-issue links are set yet (0 of 15). Open decision for the operator: whether to link the 15 children natively. Upstream umbrella closure waits on that."
+			"nextAction": "Merged: PR #3159 at 86317cfdbbe89f7deb800859485a7ab09badff67 on 2026-11-13. #2916 closed. #2913 stays open: native sub-issue attachment function is restored (endpoint answers), but no native sub-issue links are set yet (0 of 15). Open decision for the operator: whether to link the 15 children natively. Upstream umbrella closure waits on that.\n\n[Earlier local text, 2026-11-13, kept for history]: Operator: visual judgment of PASS-PENDING-OPERATOR receipts for PR #3159 candidate f7c1f6e1 (captures listed in h-matrix-status-f7c1.json). Technical: H05 needs an owned bound workflow project (product-supported bootstrap) before re-run. Then independent review of the integrated host evidence and operator acceptance decision. Do not merge or close #2913/#2916 without explicit authorization."
 		},
+		{
+      "id": "GSD-W073",
+      "type": "umbrella",
+      "scope": "upstream",
+      "upstreamDisposition": "pr-required",
+      "title": "Optional cmux Computer Use connection, desktop safety and conformance (#3017-#3019)",
+      "status": "investigating",
+      "issues": [
+        3017,
+        3018,
+        3019
+      ],
+      "pullRequests": [],
+      "branches": [
+        "docs/3017-cmux-computer-use-contract"
+      ],
+      "commits": [],
+      "relatedRefs": [
+        "https://github.com/open-gsd/gsd-pi/issues/3017#issuecomment-6629146646"
+      ],
+      "context": "2026-11-04: Operator authorizes docs/design PRs, independent review and maintainer merge, then implementation and CI. Isolated CUA work is separate from ongoing vault/exact-resume/theme/sandbox work; no installed runtime or shared session changes. Full local checkpoint is in the workspace plans directory under 2026-11-04-cmux-computer-use/SESSION.md. Existing dirty GSD-W072 register changes are preserved and must not be included in this work's commits.",
+      "validation": "Upstream b631874218fb97d722a198562f7881b7f3e8482d audited. Installed cmux 0.65.0 (108), helper 0.7.1: isolated stdio metadata probe lists 39 real tools through SDK 1.32.0, closes child and creates no state. Default invocation spawns nothing. Metadata does not prove authenticated desktop execution; no issue acceptance is claimed. Generic MCP lacks required image and desktop-safety semantics.",
+      "nextAction": "Verify the supported operational bootstrap/auth contract without exposing credentials, independently review the version-bound optional-adapter design and acceptance matrix, then open the docs PR before implementation."
+    },
 		{
 			"id": "GSD-W074",
 			"type": "feature",
@@ -1947,9 +2095,156 @@
 				"8bf1c8aff1fece3bd48703fd013d25056369a1da"
 			],
 			"context": "2026-11-06: PR #3093 squash-merged to open-gsd/gsd-pi main as 8bf1c8a after exact-head CI on 83b0964b passed. Adds opt-in cmux.resume, exact session open via --resume-exact with strict identity/cwd checks, and cmux trust-policy respect. Design PR #3124 merged at 44ff46d9. Vault registration #3012 remains closed via #3072; checkpoint branching #3015 is separate. Six Copilot review threads were answered and resolved individually.",
-			"validation": "Exact-head CI on the merged PR #3093 head passed. Literal close/reopen replay (attempt C, 2026-11-07): the archived GSD cmux resume binding (closed-item-history, record with kind=gsd, source=agent-hook and full launchCommand using --resume-exact) was re-applied via the public CLI and restored with cmux restore --surface; the same session ID, same JSONL (8 lines, one file), baseline prefix hash intact were verified. The earlier 'restore record lost' reading was a misreading and is corrected. Full R-11 acceptance is not claimed: the UI Reopen Closed route is untested and an independent review flagged closure as premature. #3014 stays OPEN.",
-			"nextAction": "Keep #3014 OPEN. Literal close/reopen replay is verified via the archived cmux resume binding (same session, same JSONL). Remaining: (1) verify the UI Reopen Closed route, or record it as out of scope; (2) decide whether the public-CLI replay is accepted as the exact-resume contract; (3) independent review of the full R-11 evidence before closing #3014."
-		}
+			"validation": "Exact-head CI on the merged PR #3093 head passed. Literal close/reopen replay (attempt C, 2026-11-07): the archived GSD cmux resume binding (closed-item-history, record with kind=gsd, source=agent-hook and full launchCommand using --resume-exact) was re-applied via the public CLI and restored with cmux restore --surface; the same session ID, same JSONL (8 lines, one file), baseline prefix hash intact were verified. The earlier 'restore record lost' reading was a misreading and is corrected. Full R-11 acceptance is not claimed: the UI Reopen Closed route is untested and an independent review flagged closure as premature. #3014 stays OPEN.\n\n[Earlier local text, 2026-11-13, kept for history]: 2026-11-06: Exact-head CI on 83b0964b92e3d37d13e6191c13367c8a32cc59e5 passed build, contract-tests, fast-gates, workflow-lint, node22-smoke, ci-gate and security (Windows portability skipped). Local verify:pr failed only at the performance-baseline gate and test:unit:compiled timed out at 60 minutes; neither was waived. R-11 real cmux restart-and-continue round trip is NOT yet performed.",
+			"nextAction": "Keep #3014 OPEN. Literal close/reopen replay is verified via the archived cmux resume binding (same session, same JSONL). Remaining: (1) verify the UI Reopen Closed route, or record it as out of scope; (2) decide whether the public-CLI replay is accepted as the exact-resume contract; (3) independent review of the full R-11 evidence before closing #3014.\n\n[Earlier local text, 2026-11-13, kept for history]: Keep #3014 OPEN. Native literal close/reopen restore is NOT proven: after closing the surface, cmux restore record was not carried over ('nothing to restore'). Restore via gsd --resume-exact and append are proven (attempt B, active-session-ownership.md). Decide: accept --resume-exact as the exact-resume contract, or fix/upstream the native restore-record persistence on surface close before closing #3014."
+		},
+		{
+      "id": "GSD-W075",
+      "type": "feature",
+      "scope": "upstream",
+      "upstreamDisposition": "historical",
+      "title": "Exec presentation purpose and warning rendering gaps (#2913/#2916)",
+      "status": "merged",
+      "issues": [
+        2913,
+        2916
+      ],
+      "pullRequests": [
+        3097
+      ],
+      "branches": [],
+      "commits": [
+        "3867936f4b9bac9925a4f6c52b7c8c65adc0647a"
+      ],
+      "context": "2026-11-06: PR #3097 squash-merged as 3867936f. Closes exec purpose and warning rendering gaps in the TUI.",
+      "validation": "2026-11-06: merged to upstream/main; exact-head CI passed before merge. Real-host acceptance remains under #2916.",
+      "nextAction": "Run the #2916 host-acceptance matrix after the fork install; close #2916 only with per-item evidence."
+    },
+		{
+      "id": "GSD-W080",
+      "type": "feature",
+      "scope": "upstream",
+      "upstreamDisposition": "pr-required",
+      "title": "cmux CUA remaining portable matrix and canonical catalogue provenance",
+      "status": "in-progress",
+      "issues": [
+        3019
+      ],
+      "pullRequests": [
+        3148,
+        3149,
+        3150
+      ],
+      "branches": [
+        "test/cmux-cua-conformance-matrix-20261108"
+      ],
+      "commits": [
+        "005737e681c3acc3f9a4b643866d86f860a6dac3",
+        "675954070e0be3176d0a8f58597060fcadb1d479",
+        "f3970aef7a55b22fd4155b838e28a072e7a60f6e"
+      ],
+      "planRefs": [
+        "PLAN-CUA-CONFORMANCE-MATRIX"
+      ],
+      "context": "2026-11-08: Operator delegates choosing/executing best automatic route and source PR/review/merge work. Architecture decision20e18c19 selects source-only portable conformance first; no supported one-broker live route exists in this session, so no live handshake or synthetic host bootstrap. Owned worktrees/cua-conformance-matrix-20261108 starts at actual upstream afaa13f28b48445c8ac7a5dd98207515187bec8e; plan plans/2026-11-08-cua-conformance-matrix/PLAN.md. Historical merged GSD-W076/GSD-W079 preserved. G03literalfalse/notype_text/all native and install/restart boundaries remain.",
+      "validation": "PR#3150 MERGED 2026-11-10T13:30:29Z by pimmink: docs-only contract alignment (maintainer per-run approval wording and D1-D4 manifest references); Copilot final review 5842643321 Approval recommended, no open issues. PR#3149 OPEN docs provenance, head c53eaa66a, CI SUCCESS, NO Copilot review on that head yet (only 5842559793 on 31081fa8b, finding 4525371968 addressed in c53eaa66a, not yet verified by reviewer). Do not reply/resolve/merge until that review exists. Source increment PR#3148 MERGED 2026-11-10T04:07:09Z at f3970aef7a55b22fd4155b838e28a072e7a60f6e from tested repairhead675954070e0be3176d0a8f58597060fcadb1d479. Exact-head CI42750884480 SUCCESS: extension declarations, core build, compiled unit/package/integration/e2e checks, Node22-smoke/final CI gate; Windows portability SKIPPED, not execution proof. Final complete review/check audit c1fcd26e: original Copilot finding individually fixed/replied/resolved; empty author-reply COMMENTED record is not independent approval; no late findings or unresolved threads. Guarded merge0adf0054; actual merged file blobs match reviewed/tested675 and main is identical401a6dee. Issue3019 remains OPEN. This ships the bounded source increment, not full GSD-W080/catalogue/native acceptance; W080 remains in-progress. Prior005 head CI42531571917 SUCCEEDED including extension typecheck/compiled-test/build; confirmed exact extension include configuration4399dd2e/d30ae1fe, WindowsSKIPPED. Copilot4508121120 abort-specific assertion repair: distinct reasons inspection/verification/discovery, current55fixturesPASS bg_f59a6055, targeted4PASS ec1a6a03, signal-stripped fixtureclient produces3expectedFAIL 1b7ea20e, zero native/mutation attempts, independent d240986fPASS exacttestSHA256d8c23bcecae9762b869b8ae834cb58b4867ff9e28dfe980764aab436e215f8c9. Reply4520856543 persisted despite first CLI output-parse error, deduplicated/reconciled a5b4e315 and one verified thread individually resolved ee8464e7. Never reuse oldheadgreen as repairedheadproof. Historical initial PRhead005737e681c3acc3f9a4b643866d86f860a6dac3 verifiede15b5627. Matrix187testlineadditions55/55macOSruntimePASS (14portable41POSIX+retained36=91), parentcontenthash/timer/nativeguardproofd1fe7a46; boundedsource review0343519ePASS but exactSDKdeclaration acceptanceOPEN afterlocaltimeoutsincludingparent3c99d588, no repeatedlocalretry or packagepassclaim. Guide review006d5eaaflaggedstaleplatformcounts, corrected55versus14/41; coverage/provenance limitationsreviewed. Catalogue source51blobsha/lengthproofcb532ee0 and independentaudit0343519e confirm39literals/37platform38CLIunregisteredalias but rejectcompleteenvelopeclaimmissing schema_version1; no runtime39pinchanged/artifactpadding, guidehonest. ActualSource55/guideonlycommitted/pushed93a47818; sourcechecks6f19b15fPASS. CatalogueaslargefullfixtureNOTpublished; remainingprovenance/runtimecompatibilityopen. No nativeG03/typetext/helper/UI/install/restart changes. Historical setup: Fresh clean source worktree created93689982 from mergedafaa. Native pinned source manaflow-ai/cmux-cua e0f738807dbff2f35fe67d7fbcc99c7082cffc23 independently verified viaGitHubMCP; actual registry/tool_schema/server source downloaded as read-only analysisf154fb68, no execution or localbuild. Canonical full catalogue extraction remains unproved, not inferred from source availability. Parent ownbootstrap presence923ab1e3 absent; model initialization/metadata not D1 peer proof. No completion claim.",
+      "nextAction": "PR3148 source increment is merged; no further PR action is pending. Broader GSD-W080 remains open: reconstruct and independently validate the complete compatible canonical metadata envelope from verified pinned source (schema_version1 is currently missing), preserve the qualified 39literal/37platform/38CLI counts and unregistered alias, and plan remaining private-init/queue/lifecycle/compatibility evidence separately. No fake39padding, runtime-pin change or native broker/bootstrap execution. G03 stays literally false; native D1-D4 and install/restart still need their separate operator GO plus READY."
+    },
+		{
+      "id": "GSD-W079",
+      "type": "feature",
+      "scope": "upstream",
+      "upstreamDisposition": "pr-required",
+      "title": "cmux CUA production-transaction conformance increment (#3019)",
+      "status": "merged",
+      "issues": [
+        3019
+      ],
+      "pullRequests": [
+        3147
+      ],
+      "branches": [
+        "test/cmux-cua-conformance-3019-20261108"
+      ],
+      "commits": [
+        "2c6ac621c80a6003a84f7499321da930d87369f5",
+        "dc6d815d1cad85e31c7c67a0a729f8852e8e3172",
+        "b96349c91cc909722cc33bd8c950960e1bf10e84",
+        "afaa13f28b48445c8ac7a5dd98207515187bec8e"
+      ],
+      "planRefs": [
+        "PLAN-CUA-CONFORMANCE-3019"
+      ],
+      "context": "2026-11-08: CUA-only follow-up to historical GSD-W076. Operator authorized scoped commits, push, PRs, Copilot thread dispositions and merge after exact-head green CI plus independent review. Owned checkout worktrees/cua-conformance-3019-20261108 starts at upstream a21924b9b6c77316d7185fb208b72dcdf990934b. Plan: plans/2026-11-08-cua-conformance-3019/PLAN.md. G03_RUNTIME_ADMISSION_ENABLED remains false; no typing/native action/install/restart is authorized by this source work.",
+      "validation": "2026-11-08 closeout: PR #3147 actually MERGED at afaa13f28b48445c8ac7a5dd98207515187bec8e, verified against source candidate b96349c91cc909722cc33bd8c950960e1bf10e84. Exact-head CI42510096864 SUCCESS including required ci-gate; current source/PID targeted reviews PASS, 32changed+36retained=68 macOS tests, zero native/mutation attempts, scans PASS. All source review inventories checked: Windows inline finding source-fixeddc6d/replied/individually resolved17adc62a; PIDgeneralreview source-fixedb963/replied6725358848; path-riskcomment disposition6725013327; contradicted B1 rejected against actual AST+independentclarification. Merge receipt/guard88e57f67 and postverification8e497b87; no branch deletion/runtimeinstall/nativeadmission. GitHub auto-closed issue3019 from a negated completion keyword in merge text; immediately reopened viaMCP and verified OPEN, correctioncomment6725697163. This is merged INCREMENT only, not full#3019/nativeumbrella acceptance; remaining portable and D1-D4 proof gates stay open, G03false/notype_text. Historical pre-merge state: PR #3147 OPEN at head b96349c91cc909722cc33bd8c950960e1bf10e84. Current-head CI42510096864 IN_PROGRESS, not a passing release gate yet. Copilot rereview on changed dc6d identified PID-substring/random-UUID false failures; fixed with exact numeric/full-string recursive leaf checks plus deterministic UUID-substring regression. Current32 changed fixtures PASS with zero native/mutation attempts plus retained36=68 on macOS, no Windows/native support inference. Independent targeted review1721eb29 PASS with actual test/doc blobs; scans645c8324 PASS. Finding replied as current-candidate comment6725358848; no thread resolution or merge yet. Next: inspect terminal current-head CI and all latest reviews/inline/general comments, individually resolve only verified addressed findings, then merge only when gates pass. Previous verified candidate: PR #3147 OPEN at repaired head dc6d815d1cad85e31c7c67a0a729f8852e8e3172; CI run42502793491 SUCCESS including build/typecheck, fast-gates, node22-smoke and ci-gate; conditionally selected Windows job SKIPPED and not Windows execution proof. Parent changed31 fixture tests PASS on macOS with zero native/mutation attempts plus retained36 gives67 scoped tests; real-declaration pre/postcanary64114f25 reproduces2oldTS2345 versus0ownedafter,32transitiveborrowed NOT a package pass; source/doc scans PASS. Focused bundled source review validated portability/SDK fix; contradicted B1 outside-try cleanup claim rejected by AST56d9a950 and independent clarification5d6de479, current hash525b5290 matches. Copilot Windows thread PRRT_kwDOSk2dRc61CWT_ replied with commit/regression evidence9999832f; not resolved or merged yet. One actual Copilot rereview requested for changed dc6d head and confirmed pending, no duplicate unchanged-input dispatch. Current-candidate/general risk disposition comment6725013327 records precise scopes and native omissions. Historical first candidate: PR #3147 OPEN at published head 2c6ac621c80a6003a84f7499321da930d87369f5. Independent source and targeted fixture reviews PASS; local aggregate 65 passing tests, zero native/mutation attempts; source/doc scanners PASS. Exact-head CI fast-gates/workflow-lint PASS but build Typecheck extensions FAILED on two SDK fixture handler TS2345 errors; no unchanged CI retry. Actual SDK declaration canary reproduced both before and removed both after a fixture-only typed boundary repair, with 32 borrowed transitive diagnostics still explicitly not a whole-project pass. Copilot Windows POSIX-guard portability finding PRRT_kwDOSk2dRc61CWT_ is verified and under focused repair; all fixes will be bundled before new-head CI. Historical baseline: 36/36 tests passed with zero native/process-mutation guard calls (execution 2e1cff5c-9241-408d-a04b-8be9f4558286); borrowed dependencies are not exact locked CI/build/pack or live proof. Independent architecture plan completed; new fixtures, documentation, current-head CI and final review remain in progress. Issue #3019 claim as pimmink verified via GitHub MCP.",
+      "nextAction": "Merged increment is closed out, not the umbrella. Preserve issue3019 OPEN and native D1-D4/full portable residuals unverified. Obtain a genuine next-route choice for read-only remaining proof versus one approved broker handshake; never infer native/typing/installation/restart go from source-publication approval. Keep G03literalfalse/no type_text and no install/restart without separate explicit go plus READY. Continue remaining scope as separately tracked work without resetting historical merged GSD-W076/GSD-W079 or staging unrelated shared-register dirt."
+    },
+		{
+      "id": "GSD-W076",
+      "type": "feature",
+      "scope": "upstream",
+      "upstreamDisposition": "historical",
+      "title": "Fail-closed cmux Computer Use adapter (#3017-#3019)",
+      "status": "merged",
+      "issues": [
+        3017,
+        3018,
+        3019
+      ],
+      "pullRequests": [
+        3115
+      ],
+      "branches": [],
+      "commits": [
+        "cf60b1818"
+      ],
+      "context": "2026-11-06: PR #3115 merged to upstream/main as cf60b1818. Adds a fail-closed Computer Use adapter; G-03 and type_text remain disabled.",
+      "validation": "2026-11-06: merged; the local adapter test suite passed in the build. Native CUA smoke was approved once earlier and not repeated.",
+      "nextAction": "Keep G-03 and type_text disabled. Any native action needs a new explicit approval."
+    },
+		{
+      "id": "GSD-W077",
+      "type": "feature",
+      "scope": "upstream",
+      "upstreamDisposition": "historical",
+      "title": "Owner-generation binding snapshots for RPC (#2913 identity foundation)",
+      "status": "merged",
+      "issues": [
+        2913,
+        2933
+      ],
+      "pullRequests": [
+        3128
+      ],
+      "branches": [],
+      "commits": [
+        "a51f4708b"
+      ],
+      "context": "2026-11-06: PR #3128 merged to upstream/main as a51f4708b. Adds owner-generation binding snapshots in contracts, agent-core and rpc-mode.",
+      "validation": "2026-11-06: merged; the package build includes owner-generation symbols in 12 dist files.",
+      "nextAction": "Verify with the #2916 acceptance matrix after the fork install."
+    },
+		{
+      "id": "GSD-W078",
+      "type": "docs",
+      "scope": "upstream",
+      "upstreamDisposition": "historical",
+      "title": "As-built exec presentation contract documentation (#2913)",
+      "status": "merged",
+      "issues": [
+        2913
+      ],
+      "pullRequests": [
+        3129
+      ],
+      "branches": [],
+      "commits": [
+        "59117467f"
+      ],
+      "context": "2026-11-06: PR #3129 merged to upstream/main as 59117467f. Documents tested exec presentation behaviour only.",
+      "validation": "2026-11-06: merged. Documents tested behaviour only; real-host acceptance stays under #2916.",
+      "nextAction": "No further action; real-host acceptance is tracked in #2916."
+    }
 	],
 	"localExtensionPatches": [
 		{
