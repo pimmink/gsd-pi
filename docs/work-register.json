@@ -1831,7 +1831,7 @@
 			"scope": "upstream",
 			"upstreamDisposition": "pr-required",
 			"title": "Make sandboxed execution understandable in the GSD TUI (#2913)",
-			"status": "in-progress",
+			"status": "merged",
 			"issues": [
 				2913,
 				2914,
@@ -1894,7 +1894,7 @@
 			],
 			"context": "2026-11-02: Live upstream main is e323d180efe3bd10f16beedf589ae06f14563e47. PRs #3073–#3079 and #3083 are open; #2914 is a focused standalone-error warning fix and the six D01–D06/#2929 proposals remain design-only. #2917/#2922 are merged, #2915 is closed, and #2916 has no real-host evidence. The saved READ-context plan is included under #2934. Native subissue attachment remains maintainer-gated. Related ENOENT fixes #2869/#2992 and #3070/#3071 are specific and closed; no broad general issue was verified.",
 			"validation": "PR #3073 is open on head 0f5c5623801d85f0de4f0c7f602c1dfdcbdf03c6 after a non-conflicting current-main update. Focused regression suites pass 123/123; verify:fast passes on its pre-update code head and exact-SHA sharded verification is pending on the updated head. The seven docs-only proposals passed source/Markdown structure checks; their upstream checks pass, and no host acceptance or runtime installation is claimed. | 2026-11-13 update: PR #3159 head f7c1f6e127ecdc21eb54113faad2881ee89d84d0 (F2 per-block visual cap, red/green 45/46 on prior renderer; PR-CI green on that head; owned-runtime artifact run 43291496736 attempt 1 verified, source-bound). Host matrix H01-H12 on that candidate has receipts: H01,H02,H03,H04,H06,H07,H08,H09,H10,H11,H12 PASS-PENDING-OPERATOR (human visual judgment pending); H05 BLOCKED (setup gap: workflow DB required). Harness changes are traceable in exec-2913 checkpoint. Operator acceptance not given; #2916/#2913 not closed.",
-			"nextAction": "Operator: visual judgment of PASS-PENDING-OPERATOR receipts for PR #3159 candidate f7c1f6e1 (captures listed in h-matrix-status-f7c1.json). Technical: H05 needs an owned bound workflow project (product-supported bootstrap) before re-run. Then independent review of the integrated host evidence and operator acceptance decision. Do not merge or close #2913/#2916 without explicit authorization."
+			"nextAction": "Merged: PR #3159 at 86317cfdbbe89f7deb800859485a7ab09badff67 on 2026-11-13. #2916 closed. #2913 stays open: native sub-issue attachment function is restored (endpoint answers), but no native sub-issue links are set yet (0 of 15). Open decision for the operator: whether to link the 15 children natively. Upstream umbrella closure waits on that."
 		},
 		{
 			"id": "GSD-W074",
