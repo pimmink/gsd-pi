@@ -158,7 +158,7 @@ reconciliation remains required before release.
 | GSD-W077 | Owner-generation binding snapshots for RPC (#2913 identity foundation) | upstream | historical | — | — | — | merged | Verify with the #2916 acceptance matrix after the fork install. |
 | GSD-W078 | As-built exec presentation contract documentation (#2913) | upstream | historical | — | — | — | merged | No further action; real-host acceptance is tracked in #2916. |
 | GSD-W079 | cmux CUA production-transaction conformance increment (#3019) | upstream | pr-required | — | — | — | merged | Merged increment is closed out, not the umbrella. Preserve issue3019 OPEN and native D1-D4/full portable residuals unverified. Obtain a genuine next-route choice for read-only remaining proof versus one approved broker handshake; never infer native/typing/installation/restart go from source-publicat |
-| GSD-W080 | cmux CUA remaining portable matrix and canonical catalogue provenance | upstream | pr-required | 3019 | #3148, #3149, #3150, #3164, #3166, #3168, #3169 | — | in-progress | Portable 19-P01 non-Mac route and 19-P03..P07 gaps. D1-D4 native via helper-binary route (operator grants only). #3169 merged 85491b297. #3019 stays OPEN. |
+| GSD-W080 | cmux CUA remaining portable matrix and canonical catalogue provenance | upstream | pr-required | 3019 | #3148, #3149, #3150, #3164, #3166, #3168, #3169 | — | in-progress | Non-Mac startup verified on Linux (4/4). Remaining: macOS native D1-D4 (operator grants), portable 19-P04/P05 race design. #3019 stays OPEN. |
 
 ## Important commit references
 
