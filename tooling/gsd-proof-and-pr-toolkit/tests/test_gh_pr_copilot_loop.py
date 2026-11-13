@@ -27,3 +27,21 @@ class Summarize(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class BoundedCalls(unittest.TestCase):
+    """Regression: every gh call carries a timeout, and a hung call returns UNKNOWN, not a hang."""
+    def test_fetch_checks_passes_a_timeout(self):
+        import subprocess as sp
+        seen = {}
+        def fake(args, **kw):
+            seen["timeout"] = kw.get("timeout")
+            raise sp.TimeoutExpired(args, kw.get("timeout"))
+        orig = sp.run
+        sp.run = fake
+        try:
+            with self.assertRaises(RuntimeError):
+                loop.fetch_checks("r/r", 1)
+        finally:
+            sp.run = orig
+        self.assertIsNotNone(seen.get("timeout"), "gh call has no timeout")
+

@@ -19,6 +19,8 @@ def overall(checks):
         return "FAILURE"
     if states & PENDING:
         return "PENDING"
+    if not checks:
+        return "UNKNOWN"
     return "PASS"
 
 def compact_threads(threads):
@@ -30,18 +32,30 @@ def compact_threads(threads):
                     "body": (t.get("body") or "")[:BODY_LIMIT]})
     return out
 
+GH_TIMEOUT = 60  # seconds per gh call; a hung call must not hang the poll
+
+
+def _gh(args):
+    """Run gh with a timeout. Any failure raises RuntimeError: never an empty PASS."""
+    try:
+        res = subprocess.run(["gh", *args], capture_output=True, text=True, timeout=GH_TIMEOUT)
+    except subprocess.TimeoutExpired as err:
+        raise RuntimeError(f"gh timed out after {GH_TIMEOUT}s: {' '.join(args[:3])}") from err
+    if res.returncode != 0:
+        raise RuntimeError(res.stderr.strip()[:300] or f"gh exit {res.returncode}")
+    return res.stdout
+
+
 def fetch_checks(repo, pr):
-    res = subprocess.run(["gh", "pr", "checks", str(pr), "-R", repo, "--json", "name,state"],
-                         capture_output=True, text=True)
-    return json.loads(res.stdout or "[]")
+    return json.loads(_gh(["pr", "checks", str(pr), "-R", repo, "--json", "name,state"]) or "[]")
 
 def fetch_threads(repo, pr):
     owner, name = repo.split("/", 1)
     query = ('query($o:String!,$n:String!,$p:Int!){repository(owner:$o,name:$n){pullRequest(number:$p)'
              '{reviewThreads(first:100){nodes{id isResolved path line comments(first:1){nodes{body}}}}}}}')
-    res = subprocess.run(["gh", "api", "graphql", "-f", f"query={query}", "-F", f"o={owner}",
-                          "-F", f"n={name}", "-F", f"p={pr}"], capture_output=True, text=True)
-    nodes = json.loads(res.stdout or "{}")["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
+    out = _gh(["api", "graphql", "-f", f"query={query}", "-F", f"o={owner}",
+               "-F", f"n={name}", "-F", f"p={pr}"])
+    nodes = json.loads(out or "{}")["data"]["repository"]["pullRequest"]["reviewThreads"]["nodes"]
     for n in nodes:
         n["body"] = (n.get("comments", {}).get("nodes") or [{}])[0].get("body", "")
     return nodes
