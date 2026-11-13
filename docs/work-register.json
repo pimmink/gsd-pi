@@ -2253,8 +2253,52 @@
       "context": "2026-11-06: PR #3129 merged to upstream/main as 59117467f. Documents tested exec presentation behaviour only.",
       "validation": "2026-11-06: merged. Documents tested behaviour only; real-host acceptance stays under #2916.",
       "nextAction": "No further action; real-host acceptance is tracked in #2916."
-    }
-	],
+    },
+		{
+		  "id": "GSD-W081",
+		  "type": "feature",
+		  "scope": "upstream",
+		  "upstreamDisposition": "historical",
+		  "title": "Occurrence-based notification deduplication for adopted producers (#2935)",
+		  "status": "merged",
+		  "issues": [
+		    2935
+		  ],
+		  "pullRequests": [
+		    3170
+		  ],
+		  "branches": [
+		    "feat/2935-notification-dedup-rebased-20261113"
+		  ],
+		  "commits": [
+		    "c3934d14dbd73de905b100c87ab4370876df8489"
+		  ],
+		  "context": "2026-11-13: PR #3170 squash-merged as c3934d14d on open-gsd/gsd-pi main. Adds optional NotificationMeta.occurrence; UAT needs-human passes per-attempt occurrence; workspace-scoped key; admission after successful append; capped at 256 with FIFO eviction; legacy dedup unchanged when occurrence is absent.",
+		  "validation": "2026-11-13: CI green on head dc72bfb7f; 3 Copilot threads resolved with fixes and regressions (fd4c04a5b, 7aa8e626e, dc72bfb7f). Notification suites 65/65 locally. Merged before a Copilot verdict on the final head: the reviewer requested was jeremymcs, who had not reviewed; operator chose merge. Local process only; no real-host observation yet.",
+		  "nextAction": "Host-observe a second UAT attempt on the same slice (two notifications) and a repeated attempt (collapsed) in a live session before closing #2935 host criteria. Cross-host dedup is out of scope."
+		},
+		{
+		  "id": "GSD-W082",
+		  "type": "test",
+		  "scope": "upstream",
+		  "upstreamDisposition": "historical",
+		  "title": "Guard that state-directory source cleanup really failed (test-only)",
+		  "status": "merged",
+		  "issues": [],
+		  "pullRequests": [
+		    3172
+		  ],
+		  "branches": [
+		    "test/db-open-cleanup-precondition-assert"
+		  ],
+		  "commits": [
+		    "397423f60"
+		  ],
+		  "context": "2026-11-13: PR #3172 squash-merged as 397423f60. Test-only: asserts the simulated source-cleanup failure occurred; finally restores permissions only when the path exists. Supersedes the teardown fix in fork PR #6 (69a7deb22), which is closed.",
+		  "validation": "2026-11-13: Copilot verdict Approval recommended on exact head c93534429; CI green; 0 open threads; db-open-fail-closed 18/18.",
+		  "nextAction": "None for this build. Not a runtime change; does not block the build."
+		}
+    ],
 	"localExtensionPatches": [
 		{
 			"extensionId": "copilot-catalog-patch",

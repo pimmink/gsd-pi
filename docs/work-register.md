@@ -159,6 +159,8 @@ reconciliation remains required before release.
 | GSD-W078 | As-built exec presentation contract documentation (#2913) | upstream | historical | — | — | — | merged | No further action; real-host acceptance is tracked in #2916. |
 | GSD-W079 | cmux CUA production-transaction conformance increment (#3019) | upstream | pr-required | — | — | — | merged | Merged increment is closed out, not the umbrella. Preserve issue3019 OPEN and native D1-D4/full portable residuals unverified. Obtain a genuine next-route choice for read-only remaining proof versus one approved broker handshake; never infer native/typing/installation/restart go from source-publicat |
 | GSD-W080 | cmux CUA remaining portable matrix and canonical catalogue provenance | upstream | pr-required | 3019 | #3148, #3149, #3150, #3164, #3166, #3168, #3169 | — | in-progress | Non-Mac startup verified on Linux (4/4). Remaining: macOS native D1-D4 (operator grants), portable 19-P04/P05 race design. #3019 stays OPEN. |
+| GSD-W081 | Occurrence-based notification deduplication for adopted producers (#2935) | upstream | historical | 2935 | #3170 | c3934d14d | merged | Merged to open-gsd/gsd-pi main as c3934d14d. Host observation of a second UAT attempt (two rows) and a repeated attempt (collapsed) still open. Cross-host dedup out of scope. |
+| GSD-W082 | Guard that state-directory source cleanup really failed (test-only) | upstream | historical | — | #3172 | 397423f60 | merged | Test-only; merged. Not a runtime change; does not block the build. |
 
 ## Important commit references
 
