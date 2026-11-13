@@ -1,0 +1,68 @@
+name: Vault candidate start and load proof
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Run id of the vault-candidate-build run that produced the pinned tarball
+        required: true
+        type: string
+      gsd_sha:
+        description: The pinned open-gsd/gsd-pi SHA the tarball was built from
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  candidate-start:
+    if: github.repository == 'pimmink/gsd-pi'
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - name: Download the pinned build artifact by run id and verify its SHA
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/cand"
+          gh run download "${{ inputs.build_run_id }}" --repo pimmink/gsd-pi \
+            --name "vault-gsd-candidate-${{ inputs.gsd_sha }}" --dir "$RUNNER_TEMP/cand"
+          cd "$RUNNER_TEMP/cand"
+          shasum -a 256 -c SHA256SUMS
+          echo "TGZ=$RUNNER_TEMP/cand/opengsd-gsd-pi-1.23.0.tgz" >> "$GITHUB_ENV"
+
+      - name: Install the tarball into a private prefix (not global)
+        run: |
+          set -euo pipefail
+          PREFIX="$RUNNER_TEMP/gsd-prefix"
+          mkdir -p "$PREFIX"
+          npm install --prefix "$PREFIX" --ignore-scripts "$TGZ"
+          echo "PREFIX=$PREFIX" >> "$GITHUB_ENV"
+
+      - name: Prove the CLI launches and reports the candidate version
+        run: |
+          set -uo pipefail
+          OUT="$(node "$PREFIX/node_modules/@opengsd/gsd-pi/dist/bootstrap.js" --version 2>&1)"
+          echo "launch_exit=$?"
+          echo "$OUT"
+          echo "$OUT" | grep -q '1.23.0'
+
+      - name: Prove the VAULT module loads and exports the bridge
+        run: |
+          set -euo pipefail
+          node --input-type=module -e "
+            const m = await import(process.env.PREFIX + '/node_modules/@opengsd/gsd-pi/dist/cmux-vault.js');
+            if (typeof m.CmuxVaultBridge !== 'function') throw new Error('CmuxVaultBridge missing');
+            console.log('vault_module_loaded=yes exports=' + Object.keys(m).length);
+          "
+
+      - name: Upload evidence on success and failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vault-candidate-start-${{ inputs.gsd_sha }}
+          path: ${{ runner.temp }}/cand
+          if-no-files-found: warn
