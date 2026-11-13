@@ -46,7 +46,7 @@ Run first on any new worktree, after a branch switch that changes dependencies, 
 
     python3 scripts/dependency_doctor.py WORKTREE [@scope/pkg ...] --json
 
-Read-only: it never installs, builds, deletes, or imports runtime modules. It reports per package a dependency status (READY, MISSING_INSTALL, FOREIGN_WORKSPACE, MISSING_BUILD, or UNKNOWN for a requested name that is not a linkable workspace package) and a separate freshness (FRESH is never claimed; STALE only when a source file is newer than its output, otherwise UNKNOWN).
+Read-only: it never installs, builds, deletes, or imports runtime modules. It reports per package a dependency status (READY, MISSING_INSTALL, FOREIGN_WORKSPACE, MISSING_BUILD) and a separate freshness (FRESH is never claimed; STALE only when a source file is newer than its output, otherwise UNKNOWN).
 
 Package identity comes from `package.json` `name`, not from the directory. `gsd-agent-core` is the directory; `@gsd/agent-core` is the package.
 

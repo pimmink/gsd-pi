@@ -6,12 +6,10 @@ Usage: dependency_doctor.py WORKTREE_ROOT [@scope/pkg ...] [--json]
 Never installs, builds, deletes, or imports runtime modules. It inspects the
 on-disk links and package outputs and reports a status per package:
 
-  READY, MISSING_INSTALL, FOREIGN_WORKSPACE, MISSING_BUILD, UNKNOWN
+  READY, MISSING_INSTALL, FOREIGN_WORKSPACE, MISSING_BUILD, STALE_BUILD, UNKNOWN
 
-READY means only that the checked dependency conditions hold. Staleness is not a
-dependency status: it is reported in the separate `freshness` field, as STALE when a
-source file is newer than the built output, otherwise UNKNOWN. It is never FRESH,
-because mtimes are evidence, not proof.
+READY means only that the checked dependency conditions hold. Freshness is
+UNKNOWN unless it can be proven from mtimes; mtimes are evidence, not proof.
 """
 import json, os, pathlib, sys
 
@@ -52,10 +50,14 @@ def _ancestors_symlinked(path: pathlib.Path, stop: pathlib.Path):
     outside the worktree.
     """
     found = []
-    stop = stop.resolve() if stop.exists() else stop
+    # Compare like with like: walk the caller's own (unresolved) path spelling and
+    # express the stop boundary in that same spelling. Resolving only the stop made
+    # it a different string from path.parent on macOS (/var -> /private/var), so the
+    # walk never reached it and counted system symlinks above the worktree as foreign.
+    stop_norm = os.path.abspath(str(stop))
     cur = path.parent
     for _ in range(256):  # bounded walk; no unbounded loops on pathological paths
-        if cur == stop or cur == cur.parent:
+        if str(cur) == stop_norm or cur == cur.parent:
             break
         if cur.is_symlink():
             found.append(str(cur))
