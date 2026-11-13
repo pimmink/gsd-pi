@@ -9,6 +9,7 @@ import { hostname, tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { test, type TestContext } from "node:test";
+import { assertChildExited } from "../../../../tests/assert-child-exit.ts";
 import { openCoordinationMaintenanceHost } from "../coordination-maintenance.ts";
 import { databaseMaintenanceIntentPath } from "../database-maintenance-fence.ts";
 import { _getAdapter, closeDatabase, getDb, getDbOrNull, openDatabase, openExistingDatabase } from "../gsd-db.ts";
@@ -27,7 +28,7 @@ function fixture(
   mkdirSync(join(root, ".gsd"));
   const path = join(root, ".gsd", "gsd.db");
   const child = spawnSync(process.execPath, ["-e", ""], { timeout: 5000 });
-  assert.equal(child.status, 0);
+  assertChildExited(child, 0, "node -e probe");
   assert.ok(child.pid > 0);
   const now = Date.now();
   const witness = { ownerPid: child.pid, ownerStartedAt: new Date(now - 4000).toISOString(), ownerHeartbeatAt: new Date(now - 3000).toISOString(), leaseAcquiredAt: new Date(now - 2000).toISOString(), leaseExpiresAt: new Date(now - 1000).toISOString() };

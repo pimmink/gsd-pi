@@ -1,6 +1,7 @@
 // Independent-process supervision instrumentation, temporary fixture roots only.
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
+import { assertChildExited } from "./assert-child-exit.ts";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -11,7 +12,7 @@ const bootstrap = fileURLToPath(new URL("../bootstrap.ts", import.meta.url));
 const worker = fileURLToPath(new URL("../coordination-maintenance-attended-worker.ts", import.meta.url));
 test("bare attended backend refuses supervision; legacy budgets are unchanged", () => {
   const result = spawnSync(process.execPath, ["--import", "tsx", worker], { encoding: "utf8", timeout: 10_000 });
-  assert.equal(result.status, 1); assert.match(result.stderr, /maintenance-supervision-required/);
+  assertChildExited(result, 1, "bare worker"); assert.match(result.stderr, /maintenance-supervision-required/);
   assert.deepEqual(MAINTENANCE_LIMITS, { frameBytes: 65_536, totalBytes: 262_144, frames: 16, lifetimeMs: 60_000, cleanupMs: 1_000 });
   assert.equal(ATTENDED_MAINTENANCE_LIMITS.reviewMs, 600_000); assert.equal(ATTENDED_MAINTENANCE_LIMITS.writeMs, 60_000);
 });
