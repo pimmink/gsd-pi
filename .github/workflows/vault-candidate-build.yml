@@ -58,7 +58,7 @@ jobs:
           npm pack --pack-destination "$RUNNER_TEMP/candidate"
           cd "$RUNNER_TEMP/candidate"
           sha256sum *.tgz | tee SHA256SUMS
-          tar -tzf *.tgz | rg 'dist/cmux-vault\.js$' || { echo "cmux-vault.js missing from pack"; exit 1; }
+          tar -tzf *.tgz | grep -E 'dist/cmux-vault\.js$' || { echo "cmux-vault.js missing from pack"; exit 1; }
 
       - name: Upload candidate and evidence
         if: always()
