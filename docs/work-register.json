@@ -2297,6 +2297,61 @@
 		  "context": "2026-11-13: PR #3172 squash-merged as 397423f60. Test-only: asserts the simulated source-cleanup failure occurred; finally restores permissions only when the path exists. Supersedes the teardown fix in fork PR #6 (69a7deb22), which is closed.",
 		  "validation": "2026-11-13: Copilot verdict Approval recommended on exact head c93534429; CI green; 0 open threads; db-open-fail-closed 18/18.",
 		  "nextAction": "None for this build. Not a runtime change; does not block the build."
+		},
+		{
+			"id": "GSD-W083",
+			"type": "test",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Local fork-test integration candidate: upstream c3934d14d + #3152 (212ee1b7e) + #3171 (de39d31553)",
+			"status": "complete",
+			"issues": [],
+			"pullRequests": [
+				3152,
+				3171
+			],
+			"branches": [
+				"integ/runtime-test-20261114",
+				"fix/vault-native-approval-20261110",
+				"fix/openai-codex-gpt6-thinking-scope"
+			],
+			"commits": [
+				"a3f397303",
+				"dbb5018a0"
+			],
+			"context": "2026-11-14: private test integration, not an upstream merge. Artifact sha256 5dde23d9a07918f4b55385225bd1a5c09b24e2157ce9249ce7eabf5a161af6d8 at plans/runtime-test-20261114/artifacts-v2. #3152 is open; native History/CAS acceptance NOT proven.",
+			"validation": "2026-11-14: cmux-vault 91/91, notification-store 33/33, cmux 32/32, provider-errors 102/102, copilot-model-catalog 27/27, cold-resume 1/1, cmux-cua 105/105, pi-ai 45/45 (exit 0). Isolated install verified.",
+			"nextAction": "Operator cmux channel decision; native acceptance of #3152 stays open."
+		},
+		{
+			"id": "GSD-W084",
+			"type": "chore",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Coordinated fork runtime and cmux update (private cutover runner)",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"branches": [],
+			"commits": [],
+			"context": "2026-11-14: private runner at worktrees/restart-handoff/gsd-cutover. Global /usr/local/bin/gsd stays 1.23.0. Candidate launched only via update.sh launch ROLE. Snapshot, activate and cmux app update not yet executed.",
+			"validation": "2026-11-14: config ready:false; attestations VAULT/CUA/EXEC quiescent true, COORDINATOR false; validator attest blocked on COORDINATOR until its own final write.",
+			"nextAction": "Coordinator quiescent after last write; snapshot; external terminal steps; cmux channel decision."
+		},
+		{
+			"id": "GSD-W085",
+			"type": "docs",
+			"scope": "fork-local",
+			"upstreamDisposition": "no-pr-planned",
+			"title": "Restart handoff set and ownership reconciliation for the four screens",
+			"status": "in-progress",
+			"issues": [],
+			"pullRequests": [],
+			"branches": [],
+			"commits": [],
+			"context": "2026-11-14: ownership reconciled by the coordinator as sole writer (VAULT release lines restored, CUA restart bullet appended, EXEC delta present). Startprompts cite the private candidate and newest checkpoints.",
+			"validation": "2026-11-14: CUA append 0 removed, 6 added. Startprompts cite newest checkpoints.",
+			"nextAction": "Independent reviewer confirms each prompt for a fresh session; then coordinator quiescent."
 		}
     ],
 	"localExtensionPatches": [
