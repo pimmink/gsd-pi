@@ -2427,7 +2427,7 @@
       "upstreamDisposition": "pr-required",
       "title": "Discover Codex MCP configuration from TOML",
       "status": "pr-open",
-      "issues": [],
+      "issues": [3186],
       "pullRequests": [3188],
       "branches": ["feat/codex-toml-mcp-discovery"],
       "commits": ["afff69bd2aef8a76a11fe18a9f9f1010f0bf3b32"],
@@ -2443,14 +2443,14 @@
       "upstreamDisposition": "pr-required",
       "title": "Expose and handle the thinking slash command consistently",
       "status": "pr-open",
-      "issues": [],
+      "issues": [3187],
       "pullRequests": [3189],
       "branches": ["fix/thinking-command-autocomplete"],
       "commits": ["e04fc7e3b00a2d05232ca03950685c6530e9ea0b"],
       "planRefs": [],
       "context": "Existing side PR https://github.com/open-gsd/gsd-pi/pull/3189 brought under coordinator supervision; no parallel writer assigned. One bounded Haiku packet reconstructs actual owner/worktree, commit chain and current checks. COORDINATOR handles publication and review requests.",
       "validation": "Current head e04fc7e3b00a2d05232ca03950685c6530e9ea0b differs from existing Copilot COMMENTED review head122cec1aafebd3dddbe3a4a113468759b128496a. Previous findings require /thinking in browser-parity expectations and dispatch before both streaming and compaction queuing, with behavioral regressions. Current-head CI build is in progress. Coordinator verified old Copilot request/review predated the new commit (committed17:26:38Z), no current Copilot reviewer was pending, and requested exactly one renewed review on e04fc7e3. Accepted Copilot review_requested timeline event verified at2026-11-15T17:57:00Z. Old-head review is not presented as current-head approval.",
-      "nextAction": "Consume BATCH-SIDEPRS-TRIAGE-01; retain existing owner and avoid reimplementing already fixed code. Independently review any remaining focused corrections and run current integration/queue regressions. If new commits are already published and no current-head Copilot request is pending/completed, request exactly one renewed review and verify the accepted event. Merge only with current real checks and resolved findings."
+      "nextAction": "Existing linked issue3187 is OPEN; no new issue created. Renewed Copilot review on e04fc7e3 was actually requested and accepted at17:57:00Z; do not duplicate this round. Process the current-head review and CI, verify existing parity/streaming/compaction fixes against actual source and behavioral regressions, and obtain independent review provenance. Owner/worktree reconstruction remains incomplete after read-only triage; do not start a duplicate writer or treat the absent claimed local report as proof. Merge only with current real checks and resolved findings."
     },
     {
       "id": "GSD-W091",
