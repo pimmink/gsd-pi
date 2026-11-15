@@ -2399,6 +2399,26 @@
       "context": "2026-11-15: operator decision D001 (CUA-P02-contract, human-made): fixed SERVER_TOOL_COUNT is a pinned-source expectation/diagnostic, not an independent discovery rejection gate. Identity/version, required names, metadata/schema, uniqueness and complete bounded pagination and existing safety/endpoint gates are preserved; no extra native authority. Worktree worktrees/cua-p02-count-contract-3019-20261115 clean at 95e29ddd3 on upstream/main ancestor. Pushed to origin/fix/cmux-cua-count-contract-3019 (exact remote SHA verified). PR not yet opened; issue #3184 (OPEN) is the fix issue; #3019 umbrella stays OPEN. #3184 body claims verified against branch source (pinnedSourceCommit, staticSourceToolCount 37, discoveredToolCount).",
       "validation": "2026-11-15: PR https://github.com/open-gsd/gsd-pi/pull/3185 MERGED 2026-11-15T11:07:26Z, merge commit 865ef15dc; head 95e29ddd3. Closes #3184 (closed 2026-11-15T11:07:28Z by merge). CI run 43701226546 success (verify-pr + verify-merge literal). Copilot COMMENTED approval-recommended, no open issues; not a human approval. Umbrella #3019 stays OPEN. Native D1-D4 NOT-RUN; no host acceptance claimed.",
       "nextAction": "Umbrella #3019 remains open: native D1-D4 (operator grants) and remaining portable P03-P07 gaps are separate work items. Do not claim #3019 complete."
+    },
+    {
+      "id": "GSD-W088",
+      "type": "fix",
+      "scope": "upstream",
+      "upstreamDisposition": "pr-required",
+      "title": "Bound the cmux subagent launcher bootstrap with a private script file",
+      "status": "in-progress",
+      "issues": [],
+      "pullRequests": [],
+      "branches": [
+        "fix/launcher-long-command-startup-20261115"
+      ],
+      "commits": [
+        "038feb2810fa9e411d273289c949d242222f1bc8"
+      ],
+      "planRefs": [],
+      "context": "Focused product bugfix in runSingleAgentInCmuxSplit/sendSurface, not private cutover tooling. The inline wrapper exceeded the terminal line bound (22227 bytes versus 4096). The unchanged wrapper is written to a private mode-0600 launch script before a short quoted bootstrap. Existing CUA owner holds the committed source; COORDINATOR alone handles publication. No new issue created under the obvious-bugfix contribution-policy exception.",
+      "validation": "Coordinator verified all four manifest SHA-256 values against committed blobs. Existing causal failing-first assertion is 22227 greater than 4096; focused 1/1 and subagent suite 154/154 are hash-matched existing evidence, not a fresh clean-environment run. Extension typecheck used a documented local dependency overlay. Independent Sol xhigh review c674ee2a-2831-4a79-afba-bc7b02126e40: PASS, no actionable defects. Current classifier against fetched upstream/main 865ef15dc104521daa041d30dd4c750455de7c37 requires the full merge gate. Fresh isolated install failed ENOSPC; only new unused partial-install artifacts were removed. Actual fast-gate script verification remains in progress; live cmux E2E and full remote merge parity NOT-RUN.",
+      "nextAction": "Complete missing actual fast checks without mutating shared dependencies; then coordinator-only push, focused PR and verified Copilot review request on exact published head. Obtain current required remote merge evidence, address findings and merge only when actual policy/rights/criteria permit. Keep splits off and shared runtime unchanged; do not treat mock or overlay results as native E2E."
     }
   ],
   "localExtensionPatches": [
