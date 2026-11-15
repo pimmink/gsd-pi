@@ -2359,7 +2359,7 @@
       "scope": "upstream",
       "upstreamDisposition": "pr-required",
       "title": "Native read-only attention overview (#2932)",
-      "status": "blocked",
+      "status": "in-progress",
       "issues": [
         2932
       ],
@@ -2372,8 +2372,8 @@
         "PLAN-2026-11-15-EXEC-2932-NATIVE-ATTENTION"
       ],
       "context": "2026-11-15: selected under GSD-W072/#2913 by actual decision/implementation-axis review. Binding #2932 receipt approves native read-only overview with existing identity/authority/navigation; no inline mutation controls. Existing #3077 design and #2948 inspect are consumed, not reimplemented; #3170 already implements #2935. Operator explicitly requested targeted plan review followed by immediate clean featureworktree/writer assignment on conformance. Target worktrees/feat-2932-native-attention-20261115 already exists at fresh upstream/main base 15dee8e1afcbd54f2a3ae89928d93b56c296f8d4; old #2935 checkout/branch at dc72bfb7fa1add114c68636b81a107193f62a71e remains clean and retained. Existing private EXEC is the sole assigned writer; configured runtime cwd and frozen cutover remain unchanged.",
-      "validation": "Final independent Sol xhigh review BATCH-EXEC-FINAL-REVIEW-02 (run4896e857-4bb8-418b-aaba-1c73506ba47e) completed FAIL/REQUEST_CHANGES after all three authorized recovery attempts. Original height5 B1, B2 and A1 pass. Residual B1: worst-case counter reservation is falsely treated as physical impossibility. Exact witness N120 workflow-only rows, selection0, terminalheight4,width12 fits three actual essential rows but renders Resize. Green384 fixtures/27 body traversals and84 retained cases do not retire this witness. No codecommit or PR.",
-      "nextAction": "Park only #2932 and preserve the frozen attempt3 source and review02 evidence; no fourth patch, counter reset, waiver or commit. EXEC owner notified. One durable question remains for later bundling: explicit authorization for one narrowly scoped actual-counter admission repair versus manual correction/maintainer input; recommendation is the bounded actual-span repair with the witness as a regression. Continue independent authorized lanes now; do not open a modal question while available work remains."
+      "validation": "D005 latest direct Pim delta: exactly ONE extra actual-counter repair delivered by Haiku clear-ridge beyond old3, no reset/waiver. HEAD15dee8; source frozen/uncommitted. Exact N120/selected0/H4W12 RED then GREEN. Component33, compact3,overlay9,model18,reader6,overview9; physical384/0fail/27bodytails and early84/0falseFallbacks; package tsc exits0. Legacy probe TypeError not PASS; full fast/merge gates not yet run. Independent full-diff Sol/xhigh review child0 of0c9a52d4-2196-489b-96b7-bd55fbf6fd7a pending.",
+      "nextAction": "Consume independent complete-diff review/freeze before any codecommit. Keep the one-extra repair limit and all old attempts. Exclude untracked root duplicate from intended staging; satisfy applicable gates with physical candidate-owned aliases, no installer/shared writes or local full verify:pr. No automatic extra repair if review finds a blocker."
     },
     {
       "id": "GSD-W087",
@@ -2406,7 +2406,7 @@
       "scope": "upstream",
       "upstreamDisposition": "pr-required",
       "title": "Bound the cmux subagent launcher bootstrap with a private script file",
-      "status": "blocked",
+      "status": "in-progress",
       "issues": [2822],
       "pullRequests": [3190],
       "branches": [
@@ -2417,8 +2417,8 @@
       ],
       "planRefs": [],
       "context": "Focused product bugfix in runSingleAgentInCmuxSplit/sendSurface, not private cutover tooling. The inline wrapper exceeded the terminal line bound (22227 bytes versus 4096). The unchanged wrapper is written to a private mode-0600 launch script before a short quoted bootstrap. Existing CUA owner holds the committed source; COORDINATOR alone handles publication. No new issue created under the obvious-bugfix contribution-policy exception.",
-      "validation": "PR #3190 remains OPEN/DRAFT at 038feb281 (literal GitHub refresh 20:17Z). Original long-command startup fix and historical focused/fast gates remain; live cancellation is NOT PASS. Final recovery fafaee82 is PARTIAL: only process-manager owner core and seven red/green fixtures; print-host, CLI, wrapper, finalizers and activation are absent. All three conservative recovery stages are spent; no new commit/push/live attempt. The worker incorrectly claimed the original DIAG report absent; it exists under cua-live-01 (SHA256 4d7287ab...). Its whole-disk find/head hung; only those identity-bound read-only subprocesses were interrupted, preserving the same model attempt. Process exit 0 does not approve the partial implementation.",
-      "nextAction": "Park this lane and preserve the dirty manager/test files and exact reports. No fourth patch, counter reset, waiver or merge. A real user may authorize exactly one additional bounded implementation with the strict D003/public-owner design and independent review, or keep the draft parked; record that choice rather than assume it. CUA activation plan and live02 remain PREPARED/NOT-RUN, with no global settings, resource/profile, auth-copy or app replacement. Missing original live provenance remains NOT_CAPTURED. Continue other authorized lanes."
+      "validation": "D005 latest direct Pim delta: cancellation PARTIAL, no live replay/PASS. Original frozen owner-core patch+7tests preserved. Additional coupled-source writer12620 in64755c77 received identity-bound SIGINT then SIGSTOP; paused still counts as a child, no exit/descendant-quiescence claim. 20 source files archived and verified; immutable original core patch retained; descendant quiescence UNPROVEN. Independent frozen-core review AND event-based cap audit child1 of0c9a52d4 pending. Old2/3-versus3/3 records remain history; separate code/completion, preflight/test and actual live events. A documented live count is not code-budget authorization.",
+      "nextAction": "Keep completion child12620 suspended; preserve immutable core patch and all newer unreviewed coupled changes, no rollback or live activation. Consume independent core review and evidence-based cap reconciliation. If cap genuinely exhausted, ask Pim ONE concrete bounded completion proposal; incomplete history is not available budget or proved exhaustion. Do not silently resume writer or certify current coupled source. Other lanes continue."
     },
     {
       "id": "GSD-W089",
@@ -2429,12 +2429,12 @@
       "status": "merged",
       "issues": [3186],
       "pullRequests": [3188],
-      "branches": ["feat/codex-toml-mcp-discovery", "fix/3188-config-output-privacy-20261115", "fix/discovery-endpoint-privacy-20261115"],
+      "branches": ["feat/codex-toml-mcp-discovery"],
       "commits": ["afff69bd2aef8a76a11fe18a9f9f1010f0bf3b32", "974fc486f1719e44101846a66c4bb294fe14573b", "6756529dc99963368a34c91eea2c3182ac1660dd", "9e37abfb1c91473ad953d14a9ebfb648d7b54acd"],
       "planRefs": [],
       "context": "Existing side PR https://github.com/open-gsd/gsd-pi/pull/3188 brought under coordinator supervision without restarting its work or assigning a second writer. Owner/worktree and linked issue chain are being reconciled by one bounded Haiku triage packet. COORDINATOR alone handles shared governance and subsequent GitHub publication.",
-      "validation": "Original #3188 was merged externally by pimmink at 18:41:51Z as 9e37abfb; #3186 closed. Fresh 20:17Z main still has the unfixed formatter; the local privacy fix did not ship. Final independent Sol review a52b04e5 PASS approves the frozen two-file local follow-up: 35/35 normal-resolution tests, 24/24 real-discovery properties/red control and both secret scanners exit 0. No blocking privacy-code finding remains. The first final fast run had 384/385 policy tests: a foreign-worktree native alias violated fixture ownership. Local physical scopes/own workspace aliases fixed that test (9/9). Next full run passed all 385 policy tests but its audit classified copied before-images as unwired tests; only those verified own copies were archived, not source tests or gate rules. That run also passed all 385 policy tests and the protected-file guard; its remaining two unwired files were old, self-owned review-fixture copies, now archived with byte verification. The affected strict-unwired audit, strict matrix, Pi boundary and MCP bridge boundary each exit 0 without source/test-rule changes. Final unchanged end-to-end fast-script run bg_2eefcbe1 is pending; full clean install and new-head CI are not claimed.",
-      "nextAction": "Finish the actual fast script and protected-file guard, then request explicit publication permission for one focused privacy follow-up referencing #3188/#3186; never update the closed PR or duplicate its merge. No codecommit/push/new PR yet. Coordinator owns the earlier install-prefix error and subsequent fixture copy-through: 42 generated NODE_PATH prefixes were repaired; three exact fixture stubs in fork/native were recovered from its actual Git index, and 33 known-corrupt ESM outputs regenerated as the original CommonJS from indexed source. All before-images/hashes retained; import smoke exits 0 with 54 exports/no broken fixture export. The exact pre-existing unstaged native state is UNPROVEN, not called fully recovered. The passing code freeze is unchanged. No further installer or unknown rollback; recovered Native is guarded byte/mtime-wise during the final gate."
+      "validation": "Original upstream #3188 merged at18:41:51Z as9e37abfb1c91473ad953d14a9ebfb648d7b54acd from6756529dc; #3186 closed18:41:52Z. Original candidate CI had13 successes/native-attended skipped and Copilot COMMENTED/no active findings. The later independently found endpoint-disclosure fix was NOT in that merge; its separate implementation and gates are tracked under GSD-W092. Original feature remains merged; no reopened/duplicate merge.",
+      "nextAction": "Retain original merge/head/CI/issue receipts. Privacy follow-up is now owned by separate linked GSD-W092 with plan PLAN-2026-11-15-DISCOVERY-ENDPOINT-PRIVACY; do not attach later commits to the closed #3188 or treat its old checks/review as new-fix approval."
     },
     {
       "id": "GSD-W090",
@@ -2465,8 +2465,30 @@
       "commits": [],
       "planRefs": [],
       "context": "Distinct from merged GSD-W074 core restore and from native CAS implementation. Actual harness repository and publication destination are pimmink/cmux, upstream manaflow-ai/cmux, at base85d758714696ce279be98b621944b8e2aa117ad1. This fork-local validation work is not an upstream GSD product PR and will not be automatically moved to a guessed CI repository. VAULT retains concern ownership; coordinator assigns one exclusive portable writer at a time and alone publishes. Native acceptance remains separate.",
-      "validation": "Native receipt BATCH-NATIVE-CAS-CLT-01 is PARTIAL PASS at unchanged 33daf63: Intel macOS15.7.9/Swift6.1.2/target14. Cold filtered package build timed out at1500s (exit124, no compile error/summary); same-scratch warm continuation exited0 with8 focused public-CAS tests. Two commands are not collapsed into a cold pass. App-host/live CAS/History/close/continuation NOT-RUN. Completed historical FR23 audit finds four FR3 test-result events with nonmonotone results and one FR2 race repro/no documented fix-verification; these are not an established lifetime repair count. Counts remain incomplete. The older ledger reset claim has no accepted authorization and does not establish a fresh budget. Actual host close still lacks generation fencing; current124 portable tests do not retire that defect.",
-      "nextAction": "Freeze portable product edits until a real user authorizes one explicitly bounded additional portable-only safety packet or history establishes remaining authority; no label reset or new set of three. The proposed local packet is a refusal-only real runner, test-only orchestration and exact detector regression, not invented native support or a waiver. Preserve native logs, passing scratch and VAULT25/KEEP. A supported full-app/Intel artifact remains a separate source-pinned, cost-bounded CI decision; no new paid workflow or app replacement has occurred. Public resume CAS does not provide atomic workspace-close fencing."
+      "validation": "D005 confirms existing native8CAS package cases are PARTIAL evidence only: cold timeout124 then warm resume0 on retained exact source33daf63/Intel15.7.9/Swift6.1/target14. Apphost/liveCAS/History/close/continuation NOT-RUN. Existing historical audit: four mixed FR3 test-result events are NOT four demonstrated code repairs; lifetime code/hypothesis totals incomplete. No new native probe, reset or invented exhaustion.",
+      "nextAction": "Preserve existing native receipt, logs, scratch and VAULT25/KEEP. Reuse completed historical audit; reconcile only newly evidenced actual code/hypothesis events. No rerun/research, close-fence or GUI acceptance claim; no portable/native completion outside established authority."
+    },
+    {
+      "id": "GSD-W092",
+      "type": "fix",
+      "scope": "upstream",
+      "upstreamDisposition": "pr-required",
+      "title": "Keep MCP endpoint credentials out of discovery tool output",
+      "status": "pr-open",
+      "issues": [
+        3186
+      ],
+      "pullRequests": [3191],
+      "branches": [
+        "fix/discovery-endpoint-privacy-20261115"
+      ],
+      "commits": ["6aa9152597a29e23a2ccdd7b0925e6d4534f619e"],
+      "planRefs": [
+        "PLAN-2026-11-15-DISCOVERY-ENDPOINT-PRIVACY"
+      ],
+      "context": "Owner: COORDINATOR. Separate privacy bug-fix follow-up linked to GSD-W089 / merged upstream #3188; existing #3186 is a closed reference, not reopened or newly claimed. Worktree: worktrees/review-codex-3188-6756529-20261115. Direct human D004 confirms targeted publication/review/appropriate merge after real gates. This item is allocated from the canonical sequence under the sole coordinator writer, not a hardcoded suggested ID. No standalone allocator CLI exists in the declared tooling roots.",
+      "validation": "D005 preserves existing targeted publication permission. New follow-up https://github.com/open-gsd/gsd-pi/pull/3191 is ALREADY published and immediately registered, source6aa9152597a29e23a2ccdd7b0925e6d4534f619e, original3188 remains merged. Independent35+24/scanners0; final fast-clean.exit0/all385 plus Native/source guards preserved. Earlier385-green/overall-exit1 gate is FAILURE, never PASS. Committed classifier0 REQUIRES verify:merge before review readiness. Latest metadata: head 6aa9152597a29e23a2ccdd7b0925e6d4534f619e, draft true, checks triage:COMPLETED:SUCCESS; fast-gates:COMPLETED:SUCCESS; Classify changed files and assess risk:COMPLETED:SUCCESS; workflow-lint:COMPLETED:SUCCESS; build:COMPLETED:SUCCESS; native-attended:COMPLETED:SKIPPED; windows-portability:COMPLETED:SKIPPED; node22-smoke:COMPLETED:SUCCESS; ci-gate:COMPLETED:SUCCESS; GitGuardian Security Checks:COMPLETED:SUCCESS; Socket Security: Project Report:COMPLETED:SUCCESS; Socket Security: Pull Request Alerts:COMPLETED:SUCCESS, reviews 0, requests 0. No additional paid CI dispatched; full clean local install not claimed.",
+      "nextAction": "Do not repeat commit/push/PRcreation or recovery. Satisfy actual merge-gate classes through authorized clean-runner/conditional CI; do not silently equate sharded verify:pr to full merge parity. Keep draft until ready, actually request and verify current-head Copilot review once, process findings, then legitimate merge under real gates. No general publication question, credential changes or old3188 evidence reuse. ExtraCI spend/pending/reserved must stay within10EUR before paid work."
     }
   ],
   "localExtensionPatches": [
