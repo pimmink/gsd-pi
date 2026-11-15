@@ -2381,10 +2381,9 @@
       "scope": "upstream",
       "upstreamDisposition": "pr-required",
       "title": "cmux CUA tool-count contract: treat inventory count as source diagnostic (#3019 P02)",
-      "status": "pr-open",
+      "status": "merged",
       "issues": [
-        3019,
-        3184
+        3019
       ],
       "pullRequests": [
         3185
@@ -2393,12 +2392,13 @@
         "fix/cmux-cua-count-contract-3019"
       ],
       "commits": [
-        "95e29ddd375003f9d030c6a9d6c0c7adcc958e50"
+        "95e29ddd375003f9d030c6a9d6c0c7adcc958e50",
+        "865ef15dc104521daa041d30dd4c750455de7c37"
       ],
       "planRefs": [],
       "context": "2026-11-15: operator decision D001 (CUA-P02-contract, human-made): fixed SERVER_TOOL_COUNT is a pinned-source expectation/diagnostic, not an independent discovery rejection gate. Identity/version, required names, metadata/schema, uniqueness and complete bounded pagination and existing safety/endpoint gates are preserved; no extra native authority. Worktree worktrees/cua-p02-count-contract-3019-20261115 clean at 95e29ddd3 on upstream/main ancestor. Pushed to origin/fix/cmux-cua-count-contract-3019 (exact remote SHA verified). PR not yet opened; issue #3184 (OPEN) is the fix issue; #3019 umbrella stays OPEN. #3184 body claims verified against branch source (pinnedSourceCommit, staticSourceToolCount 37, discoveredToolCount).",
-      "validation": "2026-11-15: PR https://github.com/open-gsd/gsd-pi/pull/3185 OPEN, not draft, head 95e29ddd3, base main; body Closes #3184 (fix issue, closes on merge), Refs #3019 (umbrella stays open). CI run 43701226546 (pimmink/gsd-pi-ci) completed success; verify-pr (literal) and verify-merge (literal) success; harness d2712f49b separate. Compiled regressions 82 pass. Linux CI does not replace Windows, macOS or native evidence; native D1-D4 NOT-RUN; no host acceptance claimed. Independent review of the PR body against the branch: done by coordinator (claims match source).",
-      "nextAction": "Review PR #3185 with required reviewers; merge only after the required gates for the PR tier are green on the frozen SHA. On merge #3184 closes automatically; #3019 stays open as umbrella. Do not claim #3019 complete."
+      "validation": "2026-11-15: PR https://github.com/open-gsd/gsd-pi/pull/3185 MERGED 2026-11-15T11:07:26Z, merge commit 865ef15dc; head 95e29ddd3. Closes #3184 (closed 2026-11-15T11:07:28Z by merge). CI run 43701226546 success (verify-pr + verify-merge literal). Copilot COMMENTED approval-recommended, no open issues; not a human approval. Umbrella #3019 stays OPEN. Native D1-D4 NOT-RUN; no host acceptance claimed.",
+      "nextAction": "Umbrella #3019 remains open: native D1-D4 (operator grants) and remaining portable P03-P07 gaps are separate work items. Do not claim #3019 complete."
     }
   ],
   "localExtensionPatches": [
