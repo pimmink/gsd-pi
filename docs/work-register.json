@@ -2359,7 +2359,7 @@
       "scope": "upstream",
       "upstreamDisposition": "pr-required",
       "title": "Native read-only attention overview (#2932)",
-      "status": "blocked",
+      "status": "in-progress",
       "issues": [
         2932
       ],
@@ -2372,8 +2372,8 @@
         "PLAN-2026-11-15-EXEC-2932-NATIVE-ATTENTION"
       ],
       "context": "2026-11-15: selected under GSD-W072/#2913 by actual decision/implementation-axis review. Binding #2932 receipt approves native read-only overview with existing identity/authority/navigation; no inline mutation controls. Existing #3077 design and #2948 inspect are consumed, not reimplemented; #3170 already implements #2935. Operator explicitly requested targeted plan review followed by immediate clean featureworktree/writer assignment on conformance. Target worktrees/feat-2932-native-attention-20261115 already exists at fresh upstream/main base 15dee8e1afcbd54f2a3ae89928d93b56c296f8d4; old #2935 checkout/branch at dc72bfb7fa1add114c68636b81a107193f62a71e remains clean and retained. Existing private EXEC is the sole assigned writer; configured runtime cwd and frozen cutover remain unchanged.",
-      "validation": "D006source05geometry accepted by fresh strict runtimeverification:physical384/384,early84/84,tails27/27,transitions3/3;5/5negativecontrolsrejected;71targeted+9overviewpass;23dirtyhashespreserved. BUT independentCOMPLETE-DIFF REVIEW05 REQUEST_CHANGES: productionInspect key/navigationcallbacknotconnected; committedregressiongrid isNOToriginal29/84 tuples andomitsrealbody/normalcounter/transitionconstraints. Lowreportedaggregatefreezehashunreproducible,individualhashesmatch. CompactallocatorstaticPASS doesNOTmakefullcandidatePASS. Originalfrozenprobeexit1/18normal-onlyoraclefailuresretained. D006sourcegrantused; noautomaticnewrepair/codecommit/push/PR/gatejob.",
-      "nextAction": "Preservefullcandidate/source05andboth1aadd768reports. Askonlyconcrete remaining boundedsource decision forapprovedInspectwiring+exact29/84productionregressions(allfourcontentconstraints)+reproduciblefreezeproof,orparkEXEC. No weakened oracle/requirementwaiver. PRdraftlocalonly; beforepublication reconcileopen2932/parent2913,merged2948/2951/3077andseparateacceptedimplementationclaimperissueheader. Coordinatorpublishesonlyafteractualreview/gates."
+      "validation": "D008actualhumanchoicegrants exactlyONEfocusedEXECfinishingassignment aftersource05fullcandidateREQUEST_CHANGES. SoleSol6.1/xhighsourcewriter2881 steady-quartz, child0 of0c7bb2ac-199e-451d-a281-abd00db6328c. ScopeapprovedexistingInspectkey/productionmountnavigation,exactoriginal29or84supersetproductionregressions(allfourcontentconstraints/transitionsemantics),reproduciblecompletefreeze/aggregate. Geometry05alreadyverified384/84/27/3,negative5; no allocatorrewrite/waiver. Old3+FIX04+ADMISSION05retained; no new3. IndependentHaiku5.5/high2882 clear-lantern child1 doesREADONLYpublication/policy/physicalaliasreadiness+publicdraft,notcodereview/codewriter/gates. No commit/push/PR/activationyet.",
+      "nextAction": "Let existing2881finishthisONEassignment;2882preparesreadonlygate/claimfacts,notwrites/installs. Source06mustrefreezeandpassindependentreviewbeforecodecommit; requiredgates/current-headCopilotbeforeauthorizedPRcompletion. Actual2932headerrequiresseparateacceptedimplementationclaim; donotconfuselocalPimpermission/docsmergewithupstreamapprovaloraskgeneralgoahead. No anotherrepairifroundstrands:preserveresult/askonlyconcretedecision. D007D003remainsparked; no controllerwork."
     },
     {
       "id": "GSD-W087",
